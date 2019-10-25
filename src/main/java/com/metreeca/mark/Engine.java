@@ -31,7 +31,7 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.isEqual;
 
 
-public final class Mark {
+public final class Engine {
 
 	private static final String EventFormat="%-20s %s";
 
@@ -49,7 +49,7 @@ public final class Mark {
 	private Log logger=new SystemStreamLog();
 
 
-	public Mark source(final Path source) {
+	public Engine source(final Path source) {
 
 		if ( source == null ) {
 			throw new NullPointerException("null source");
@@ -60,7 +60,7 @@ public final class Mark {
 		return this;
 	}
 
-	public Mark target(final Path target) {
+	public Engine target(final Path target) {
 
 		if ( target == null ) {
 			throw new NullPointerException("null target");
@@ -72,7 +72,7 @@ public final class Mark {
 	}
 
 
-	public Mark assets(final Path assets) {
+	public Engine assets(final Path assets) {
 
 		if ( assets == null ) {
 			throw new NullPointerException("null assets");
@@ -83,7 +83,7 @@ public final class Mark {
 		return this;
 	}
 
-	public Mark layout(final Path layout) {
+	public Engine layout(final Path layout) {
 
 		if ( layout == null ) {
 			throw new NullPointerException("null layout");
@@ -95,7 +95,7 @@ public final class Mark {
 	}
 
 
-	public Mark shared(final Map<String, Object> shared) {
+	public Engine shared(final Map<String, Object> shared) {
 
 		if ( shared == null ) {
 			throw new NullPointerException("null shared model");
@@ -106,7 +106,7 @@ public final class Mark {
 		return this;
 	}
 
-	public Mark logger(final Log logger) {
+	public Engine logger(final Log logger) {
 
 		if ( logger == null ) {
 			throw new NullPointerException("null logger");
@@ -120,7 +120,7 @@ public final class Mark {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Mark build() {
+	public Engine build() {
 		return exec((resources, handler) -> {
 
 			clean();
@@ -194,7 +194,7 @@ public final class Mark {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Mark exec(final BiConsumer<Stream<Path>, Function<Path, String>> task) {
+	private Engine exec(final BiConsumer<Stream<Path>, Function<Path, String>> task) {
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");

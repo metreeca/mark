@@ -7,10 +7,10 @@ package com.metreeca.mark.mojos;
 import org.apache.maven.plugins.annotations.Mojo;
 
 
-@Mojo(name="build") public class BuildMojo extends MarkMojo {
+@Mojo(name="watch") public class WatchMojo extends MarkMojo {
 
 	@Override public void execute() {
-		engine().build();
+		engine().build().watch();
 	}
 
 }
