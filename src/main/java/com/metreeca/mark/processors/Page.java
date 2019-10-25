@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Math.max;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonMap;
@@ -107,21 +106,7 @@ public final class Page implements Processor {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-	public static String extension(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final String text=path.toString();
-		final String type=text.substring(max(0, text.lastIndexOf('.')));
-
-		return text.equals(type)? "" : type;
-	}
-
-
-	@Override public boolean process(final Path source, final Path target) {
+	@Override public String process(final Path source, final Path target) {
 
 		final String path=target.toString();
 		final String base=Optional.of(path.lastIndexOf('.')).map(dot -> path.substring(0, dot)).orElse(path);
@@ -149,20 +134,14 @@ public final class Page implements Processor {
 				throw new UncheckedIOException(e);
 			}
 
-
-			return true;
+			return "markdown+jade";
 
 		} else {
 
-			return false;
+			return "";
 
 		}
 
-	}
-
-
-	@Override public String toString() {
-		return "markdown+jade";
 	}
 
 

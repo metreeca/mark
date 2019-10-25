@@ -11,7 +11,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.metreeca.mark.processors.Page.extension;
+import static java.lang.Math.max;
 
 
 public final class Verbatim implements Processor {
@@ -27,12 +27,12 @@ public final class Verbatim implements Processor {
 		}
 
 		this.base=layout.getParent();
-		this.type=extension(layout);
+		this.type=type(layout);
 	}
 
 
-	@Override public boolean process(final Path source, final Path target) {
-		if ( !source.startsWith(base) || !source.toString().endsWith(type) ) { // ignore layouts
+	@Override public String process(final Path source, final Path target) {
+		if ( source.startsWith(base) && type(source).equals(type) ) { return ""; } else { // ignore layouts
 
 			try {
 
@@ -42,18 +42,20 @@ public final class Verbatim implements Processor {
 				throw new UncheckedIOException(e);
 			}
 
-			return true;
-
-		} else {
-
-			return false;
+			return "verbatim";
 
 		}
 	}
 
 
-	@Override public String toString() {
-		return "verbatim";
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static String type(final Path path) {
+		return type(path.toString());
+	}
+
+	private static String type(final String path) {
+		return path.substring(max(0, path.lastIndexOf('.')));
 	}
 
 }

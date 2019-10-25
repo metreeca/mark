@@ -4,8 +4,8 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.processors.Verbatim;
 import com.metreeca.mark.processors.Page;
+import com.metreeca.mark.processors.Verbatim;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -14,65 +14,134 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.lang.System.currentTimeMillis;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.isEqual;
 
 
 public final class Mark {
 
-	private final Path source;
-	private final Path target;
-	private final Path layout;
+	private Path source=Paths.get("");
+	private Path target=Paths.get("");
+	private Path layout=Paths.get("");
 
-	private final Log logger=new SystemStreamLog();
+	private Map<String, Object> values=emptyMap();
+	private Log logger=new SystemStreamLog();
 
-	private final List<Processor> processors;
 
-
-	public Mark(final Path source, final Path target, final Path layout, final Map<String, Object> defaults) {
+	public Mark source(final Path source) {
 
 		if ( source == null ) {
 			throw new NullPointerException("null source");
 		}
 
-		if ( !Files.exists(source) ) {
-			throw new IllegalArgumentException("missing source folder {"+source+"}");
-		}
+		this.source=source.toAbsolutePath().normalize();
+
+		return this;
+	}
+
+	public Mark target(final Path target) {
 
 		if ( target == null ) {
 			throw new NullPointerException("null target");
 		}
 
+		this.target=target.toAbsolutePath().normalize();
+
+		return this;
+	}
+
+	public Mark layout(final Path layout) {
+
 		if ( layout == null ) {
 			throw new NullPointerException("null layout");
 		}
 
-		if ( defaults == null ) {
-			throw new NullPointerException("null defaults");
-		}
+		this.layout=layout; // source-relative
 
-		this.source=source.toAbsolutePath().normalize();
-		this.target=target.toAbsolutePath().normalize();
-
-		if ( this.target.startsWith(this.source) || this.source.startsWith(this.target) ) {
-			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
-		}
-
-		this.layout=source.resolve(layout).toAbsolutePath();
-
-		this.processors=asList(
-				new Page(this.layout, defaults),
-				new Verbatim(this.layout)
-		);
+		return this;
 	}
 
 
-	public void process() {
+	public Mark values(final Map<String, Object> values) {
+
+		if ( values == null ) {
+			throw new NullPointerException("null values");
+		}
+
+		this.values=unmodifiableMap(values);
+
+		return this;
+	}
+
+	public Mark logger(final Log logger) {
+
+		if ( logger == null ) {
+			throw new NullPointerException("null logger");
+		}
+
+		this.logger=logger;
+
+		return this;
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public Mark build() {
+
+		if ( !Files.exists(source) ) {
+			throw new IllegalArgumentException("missing source folder {"+source+"}");
+		}
+
+		if ( target.startsWith(source) || source.startsWith(target) ) {
+			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
+		}
+
+		// !!! handle empty layout
+
+		final Path layout=source.resolve(this.layout);
+
+		return clean().build(processor(asList(
+				new Page(layout, values),
+				new Verbatim(layout)
+		)));
+	}
+
+	public void watch() {
+
+		throw new UnsupportedOperationException("to be implemented"); // !!! tbi
+
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Processor processor(final Collection<Processor> processors) {
+		return (source, target) -> {
+
+			final String path=this.source.relativize(source).toString();
+
+			return processors.stream()
+					.map(processor -> processor.process(source, target))
+					.filter(status -> !status.isEmpty())
+					.peek(status -> logger.info(String.format("%-25s %s", status, path)))
+					.findFirst()
+					.orElse("");
+
+		};
+	}
+
+
+	private Mark clean() {
 
 		if ( Files.exists(target) ) {
 			try (final Stream<Path> walk=Files.walk(target)) { // clean target folder
@@ -94,21 +163,41 @@ public final class Mark {
 			}
 		}
 
+		return this;
+	}
+
+	private Mark build(final Processor processor) {
+
 		if ( Files.exists(source) ) {
 
 			try (final Stream<Path> walk=Files.walk(source)) { // process source folder
 
-				walk.sorted(Path::compareTo).filter(Files::isRegularFile).forEach(path -> {
+				final long start=currentTimeMillis();
+
+				final long count=walk.sorted(Path::compareTo).filter(Files::isRegularFile).map(path -> {
 
 					try {
 
-						process(path);
+						final Path target=this.target.resolve(source.relativize(path));
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e); // !!! report
+						Files.createDirectories(target.getParent());
+
+						return processor.process(path, target);
+
+					} catch ( final IOException|RuntimeException e ) {
+
+						logger.error(String.format("error while processing %s", path), e);
+
+						return "";
+
 					}
 
-				});
+				}).filter(status -> !status.isEmpty()).count();
+
+				final long stop=currentTimeMillis();
+
+				logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
+
 
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
@@ -116,32 +205,7 @@ public final class Mark {
 
 		}
 
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private void process(final Path source) throws IOException {
-
-		final Path target=this.target.resolve(this.source.relativize(source));
-
-		Files.createDirectories(target.getParent());
-
-		final String path=this.source.relativize(source).toString();
-
-		try {
-
-			processors.stream()
-					.filter(processor -> processor.process(source, target))
-					.findFirst()
-					.ifPresent(processor -> logger.info(String.format("%-20s %s", processor, path)));
-
-		} catch ( final RuntimeException e ) {
-
-			logger.error(String.format("error while processing %s", path), e);
-
-		}
-
+		return this;
 	}
 
 }

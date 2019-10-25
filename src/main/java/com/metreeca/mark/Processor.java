@@ -9,6 +9,6 @@ import java.nio.file.Path;
 
 @FunctionalInterface public interface Processor {
 
-	public boolean process(final Path source, final Path target);
+	public String process(final Path source, final Path target);
 
 }
