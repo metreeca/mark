@@ -4,7 +4,7 @@
 
 package com.metreeca.mark.mojos;
 
-import com.metreeca.mark.Engine;
+import com.metreeca.mark.Mark;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -35,8 +35,8 @@ public abstract class MarkMojo extends AbstractMojo {
 	private String layout;
 
 
-	protected Engine engine() {
-		return new Engine()
+	protected Mark mark() {
+		return new Mark()
 
 				.source(Paths.get(source))
 				.target(Paths.get(target))
@@ -45,6 +45,7 @@ public abstract class MarkMojo extends AbstractMojo {
 				.layout(Paths.get(layout == null? "" : layout)) // ;( maven ignores empty default values…
 
 				.shared(singletonMap("project", project))
+
 				.logger(getLog());
 	}
 

@@ -2,9 +2,9 @@
  * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
-package com.metreeca.mark.processors;
+package com.metreeca.mark.pipes;
 
-import com.metreeca.mark.Processor;
+import com.metreeca.mark.Pipe;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,13 +14,13 @@ import java.nio.file.Path;
 import static java.lang.Math.max;
 
 
-public final class Verbatim implements Processor {
+public final class Wild implements Pipe {
 
 	private final Path base;
 	private final String type;
 
 
-	public Verbatim(final Path layout) {
+	public Wild(final Path layout) {
 
 		if ( layout == null ) {
 			throw new NullPointerException("null layout");

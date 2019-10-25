@@ -2,9 +2,9 @@
  * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
-package com.metreeca.mark.processors;
+package com.metreeca.mark.pipes;
 
-import com.metreeca.mark.Processor;
+import com.metreeca.mark.Pipe;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.Text;
@@ -39,10 +39,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 
-public final class Page implements Processor {
+public final class Md implements Pipe {
 
 	private static final String JadeExtension=".jade";
 	private static final Pattern ExpressionPattern=Pattern.compile("(\\\\)?#\\{([^}]*)}");
+
 
 	private final Path root;
 	private final Path layout;
@@ -53,7 +54,7 @@ public final class Page implements Processor {
 	private final JadeConfiguration jade;
 
 
-	public Page(final Path root, final Path layout, final Map<String, Object> shared) {
+	public Md(final Path root, final Path layout, final Map<String, Object> shared) {
 
 		this.root=root;
 		this.layout=layout;
@@ -245,7 +246,7 @@ public final class Page implements Processor {
 
 		public String getLabel();
 
-		public List<Page.Section> getSections();
+		public List<Md.Section> getSections();
 
 	}
 

@@ -10,7 +10,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name="build") public class BuildMojo extends MarkMojo {
 
 	@Override public void execute() {
-		engine().build();
+		mark().build();
 	}
 
 }

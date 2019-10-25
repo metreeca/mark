@@ -4,8 +4,8 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.processors.Page;
-import com.metreeca.mark.processors.Verbatim;
+import com.metreeca.mark.pipes.Md;
+import com.metreeca.mark.pipes.Wild;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -31,7 +31,7 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.isEqual;
 
 
-public final class Engine {
+public final class Mark {
 
 	private static final String EventFormat="%-20s %s";
 
@@ -49,7 +49,7 @@ public final class Engine {
 	private Log logger=new SystemStreamLog();
 
 
-	public Engine source(final Path source) {
+	public Mark source(final Path source) {
 
 		if ( source == null ) {
 			throw new NullPointerException("null source");
@@ -60,7 +60,7 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine target(final Path target) {
+	public Mark target(final Path target) {
 
 		if ( target == null ) {
 			throw new NullPointerException("null target");
@@ -72,7 +72,7 @@ public final class Engine {
 	}
 
 
-	public Engine assets(final Path assets) {
+	public Mark assets(final Path assets) {
 
 		if ( assets == null ) {
 			throw new NullPointerException("null assets");
@@ -83,7 +83,7 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine layout(final Path layout) {
+	public Mark layout(final Path layout) {
 
 		if ( layout == null ) {
 			throw new NullPointerException("null layout");
@@ -95,7 +95,7 @@ public final class Engine {
 	}
 
 
-	public Engine shared(final Map<String, Object> shared) {
+	public Mark shared(final Map<String, Object> shared) {
 
 		if ( shared == null ) {
 			throw new NullPointerException("null shared model");
@@ -106,7 +106,7 @@ public final class Engine {
 		return this;
 	}
 
-	public Engine logger(final Log logger) {
+	public Mark logger(final Log logger) {
 
 		if ( logger == null ) {
 			throw new NullPointerException("null logger");
@@ -120,7 +120,7 @@ public final class Engine {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Engine build() {
+	public Mark build() {
 		return exec((resources, handler) -> {
 
 			clean();
@@ -194,7 +194,7 @@ public final class Engine {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Engine exec(final BiConsumer<Stream<Path>, Function<Path, String>> task) {
+	private Mark exec(final BiConsumer<Stream<Path>, Function<Path, String>> task) {
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
@@ -230,8 +230,8 @@ public final class Engine {
 		final Stream<Path> resources=Stream.empty(); // !!!
 
 		final Function<Path, String> handler=handler(asList(
-				new Page(target, layout, shared),
-				new Verbatim(layout)
+				new Md(target, layout, shared),
+				new Wild(layout)
 		));
 
 		task.accept(resources, handler);
@@ -239,7 +239,7 @@ public final class Engine {
 		return this;
 	}
 
-	private Function<Path, String> handler(final Collection<Processor> processors) {
+	private Function<Path, String> handler(final Collection<Pipe> pipes) {
 		return path -> {
 
 			try {
@@ -249,8 +249,8 @@ public final class Engine {
 
 				Files.createDirectories(target.getParent());
 
-				return processors.stream()
-						.map(processor -> processor.process(path, target))
+				return pipes.stream()
+						.map(pipe -> pipe.process(path, target))
 						.filter(status -> !status.isEmpty())
 						.peek(status -> logger.info(String.format(EventFormat, status, source)))
 						.findFirst()
