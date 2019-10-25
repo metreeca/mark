@@ -44,6 +44,7 @@ public final class Page implements Processor {
 	private static final String JadeExtension=".jade";
 	private static final Pattern ExpressionPattern=Pattern.compile("(\\\\)?#\\{([^}]*)}");
 
+	private final Path root;
 	private final Path layout;
 
 	private final Parser.Builder parsers;
@@ -52,10 +53,12 @@ public final class Page implements Processor {
 	private final JadeConfiguration jade;
 
 
-	public Page(final Path layout, final Map<String, Object> defaults) {
+	public Page(final Path root, final Path layout, final Map<String, Object> shared) {
 
+		this.root=root;
 		this.layout=layout;
 		this.jade=new JadeConfiguration();
+
 
 		final MutableDataSet options=new MutableDataSet()
 
@@ -66,7 +69,7 @@ public final class Page implements Processor {
 
 
 		jade.setPrettyPrint(true);
-		jade.setSharedVariables(defaults);
+		jade.setSharedVariables(shared);
 
 		jade.setTemplateLoader(new TemplateLoader() {
 
@@ -124,7 +127,7 @@ public final class Page implements Processor {
 				final Map<String, Object> model=model(document);
 				final String content=content(document, model);
 
-				model.put("base", target.relativize(target));
+				model.put("base", target.relativize(root));
 				model.put("content", content);
 				model.put("headings", headings(document));
 

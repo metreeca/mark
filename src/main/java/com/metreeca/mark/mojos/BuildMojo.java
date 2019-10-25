@@ -40,7 +40,7 @@ import static java.util.Collections.singletonMap;
 				.target(Paths.get(target))
 				.layout(Paths.get(layout))
 
-				.values(singletonMap("project", project))
+				.shared(singletonMap("project", project))
 				.logger(getLog())
 
 				.build();

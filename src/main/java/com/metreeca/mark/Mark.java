@@ -71,13 +71,13 @@ public final class Mark {
 	}
 
 
-	public Mark values(final Map<String, Object> values) {
+	public Mark shared(final Map<String, Object> shared) {
 
-		if ( values == null ) {
-			throw new NullPointerException("null values");
+		if ( shared == null ) {
+			throw new NullPointerException("null shared model");
 		}
 
-		this.values=unmodifiableMap(values);
+		this.values=unmodifiableMap(shared);
 
 		return this;
 	}
@@ -111,7 +111,7 @@ public final class Mark {
 		final Path layout=source.resolve(this.layout);
 
 		return clean().build(processor(asList(
-				new Page(layout, values),
+				new Page(target, layout, values),
 				new Verbatim(layout)
 		)));
 	}

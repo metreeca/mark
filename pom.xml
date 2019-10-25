@@ -135,6 +135,19 @@
 
 		<plugins>
 
+			<plugin> <!-- !!! provisional tests -->
+
+				<groupId>com.metreeca</groupId>
+				<artifactId>mark-maven-plugin</artifactId>
+				<version>0.0.0-SNAPSHOT</version>
+
+				<configuration>
+					<layout>assets/default.jade</layout>
+				</configuration>
+
+			</plugin>
+
+
 			<plugin> <!-- https://maven.apache.org/plugin-tools/maven-plugin-plugin/ -->
 
 				<groupId>org.apache.maven.plugins</groupId>
