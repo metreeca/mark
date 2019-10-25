@@ -18,27 +18,32 @@ import static java.util.Collections.singletonMap;
 
 @Mojo(name="build") public class BuildMojo extends AbstractMojo {
 
-	@Parameter( defaultValue = "${project}", readonly = true, required = true )
+	@Parameter(defaultValue="${project}", readonly=true)
 	private MavenProject project;
 
 
-	@Parameter( property = "build.source", defaultValue = "${project.basedir}/src/docs/" )
+	@Parameter(defaultValue="${project.basedir}/src/docs/")
 	private String source;
 
-	@Parameter( property = "build.target", defaultValue = "${project.build.directory}/docs/" )
+	@Parameter(defaultValue="${project.build.directory}/docs/")
 	private String target;
 
-	@Parameter( property = "build.layout", defaultValue = "" )
+
+	@Parameter(defaultValue="")
+	private String assets;
+
+	@Parameter(required=true)
 	private String layout;
 
 
-
-	public void execute() {
+	@Override public void execute() {
 		new Mark()
 
 				.source(Paths.get(source))
 				.target(Paths.get(target))
-				.layout(Paths.get(layout))
+
+				.assets(Paths.get(assets == null? "" : assets)) // ;( maven ignores empty default values…
+				.layout(Paths.get(layout == null? "" : layout)) // ;( maven ignores empty default values…
 
 				.shared(singletonMap("project", project))
 				.logger(getLog())

@@ -219,6 +219,10 @@ public final class Mark {
 			throw new IllegalArgumentException("missing default layout {"+layout+"}");
 		}
 
+		if ( !Files.isRegularFile(layout) ) {
+			throw new IllegalArgumentException("layout is not a plain file {"+layout+"}");
+		}
+
 		if ( !layout.startsWith(source) ) {
 			throw new IllegalArgumentException("default layout outside assets folder {"+layout+"}");
 		}
