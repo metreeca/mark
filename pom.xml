@@ -2,19 +2,6 @@
 
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Copyright © 2019 Metreeca srl. All rights reserved.
-
-  This file is part of Metreeca/Mark.
-
-  Metreeca/Mark is free software: you can redistribute it and/or modify it under the terms
-  of the GNU Affero General Public License as published by the Free Software Foundation,
-  either version 3 of the License, or(at your option) any later version.
-
-  Metreeca/Mark is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details.
-
-  You should have received a copy of the GNU Affero General Public License along with Metreeca/Mark.
-  If not, see <http://www.gnu.org/licenses/>.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -39,8 +26,8 @@
 
 	<licenses>
 		<license>
-			<name>GNU Affero General Public License, Version 3</name>
-			<url>https://www.gnu.org/licenses/agpl.html</url>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
@@ -77,18 +64,11 @@
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 
-		<site>
-			<id>github-pages</id>
-			<url>https://metreeca.github.io/link/reports</url>
-		</site>
-
 	</distributionManagement>
 
 	<properties>
 
 		<java.version>1.8</java.version>
-
-		<flexmark.version>0.50.42</flexmark.version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
