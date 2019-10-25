@@ -68,7 +68,7 @@ public final class Page implements Processor {
 		this.renderers=HtmlRenderer.builder(options);
 
 
-		jade.setPrettyPrint(true);
+		jade.setPrettyPrint(false);
 		jade.setSharedVariables(shared);
 
 		jade.setTemplateLoader(new TemplateLoader() {
