@@ -94,6 +94,18 @@ public final class Mark {
 	}
 
 
+	public static Path create(final Path path) throws IOException {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		Files.createDirectories(path.getParent());
+
+		return path;
+	}
+
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Path source=Paths.get("");
@@ -312,18 +324,16 @@ public final class Mark {
 
 			try {
 
-				final Path xxx=this.source.relativize(source);
-				final Path target=this.target.resolve(xxx);
-
-				Files.createDirectories(target.getParent());
+				final Path local=this.source.relativize(source);
+				final Path target=this.target.resolve(local);
 
 				return pipes.stream()
 						.filter(task -> task.process(source, target))
-						.peek(status -> logger.info(xxx.toString()))
+						.peek(status -> logger.info(local.toString()))
 						.findFirst()
 						.isPresent();
 
-			} catch ( final IOException|RuntimeException e ) {
+			} catch ( final RuntimeException e ) {
 
 				logger.error(String.format("error while processing %s", source), e);
 

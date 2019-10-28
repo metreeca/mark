@@ -4,6 +4,7 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.mark.Mark;
 import com.metreeca.mark.Task;
 
 import com.vladsch.flexmark.ast.Heading;
@@ -134,7 +135,7 @@ public final class Md implements Task {
 
 			try (
 					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(target(target, ".html"), UTF_8)
+					final BufferedWriter writer=Files.newBufferedWriter(target(Mark.create(target), ".html"), UTF_8)
 			) {
 
 				final Node document=parsers.build().parseReader(reader);

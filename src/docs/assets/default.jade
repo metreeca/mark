@@ -4,10 +4,7 @@ html(lang="en")
 
     head
 
-        title
-            if page.title
-                | #{page.title} |
-            | #{project.name}
+        title #{page.title} #{page.title && project.name ? " | " : ""} #{project.name}
 
         meta(name="description" content="{{ page.excerpt | strip_html }}")
         meta(name="copyright" content="{{ copyright }}")
@@ -55,7 +52,7 @@ html(lang="en")
 
             section !{page.content}
 
-            footer © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
-                a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License
+            footer
+                include includes/copyright.jade
 
         script(type="text/javascript" src="!{page.base}/assets/default.js")

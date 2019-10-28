@@ -12,6 +12,8 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.metreeca.mark.Mark.create;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
@@ -34,7 +36,7 @@ public final class Wild implements Task {
 		if ( Mark.layout(source, layout) ) { return false; } else {
 			try {
 
-				Files.copy(source, target, REPLACE_EXISTING);
+				Files.copy(source, create(target), REPLACE_EXISTING);
 
 				return true;
 
