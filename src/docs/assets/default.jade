@@ -45,7 +45,9 @@ html(lang="en")
 
                 a(class="title" href="#_top") #{page.title}
 
-                | {{ page.toc }}
+                for heading in page.headings
+                    #{"h"+heading.level}
+                        a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
 
         main
 
@@ -53,7 +55,7 @@ html(lang="en")
 
             section !{page.content}
 
-            footer © {{ 'now' | date: '%Y' }} Metreeca srl. This work is licensed under the
+            footer © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
                 a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License
 
         script(type="text/javascript" src="!{page.base}/assets/default.js")

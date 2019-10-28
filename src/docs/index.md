@@ -2,12 +2,12 @@
 title: Samples
 ---
 
-Shared theme for Metreeca docs sites. ${page.title} ${zot}
+Shared theme for Metreeca docs sites.
 
 |Variable|Value|  
 |--------|-----|
 |project.artifactId|${project.artifactId}|  
-|project.version|${project.version}|
+|project.version|${project.version}| 
 
 # Lorem
 

@@ -4,12 +4,14 @@
 
 package com.metreeca.mark.tasks;
 
-import com.metreeca.mark.Mark;
 import com.metreeca.mark.Task;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.Text;
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
+import com.vladsch.flexmark.ext.definition.DefinitionExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
@@ -29,10 +31,13 @@ import de.neuland.jade4j.template.TemplateLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.metreeca.mark.Mark.base;
 import static com.metreeca.mark.Mark.target;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -68,7 +73,10 @@ public final class Md implements Task {
 
 				.set(Parser.EXTENSIONS, asList(
 						YamlFrontMatterExtension.create(),
-						TablesExtension.create()
+						TocExtension.create(),
+						TablesExtension.create(),
+						DefinitionExtension.create(),
+						AutolinkExtension.create()
 				))
 
 				.set(HtmlRenderer.RENDER_HEADER_ID, true)
@@ -133,11 +141,20 @@ public final class Md implements Task {
 
 				final Map<String, Object> model=metadata(document);
 
-				model.put("base", Mark.base(target, root));
+				model.computeIfAbsent("date", key -> DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()));
+
+				model.put("base", base(target, root));
 				model.put("content", content(document, model));
 				model.put("headings", headings(document));
 
-				jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
+				jade.renderTemplate(
+						jade.getTemplate(layout.getParent()
+								.resolve(model.getOrDefault("layout", layout).toString())
+								.toString()
+						),
+						singletonMap("page", model),
+						writer
+				);
 
 				return true;
 
@@ -200,7 +217,7 @@ public final class Md implements Task {
 
 				builder.append(chars.subSequence(last, start)); // leading text
 
-				if ( matcher.group() .charAt(0) == '\\' ) { // escaped
+				if ( matcher.group().charAt(0) == '\\' ) { // escaped
 
 					builder.append(chars.subSequence(start+1, end)); // expression text
 
@@ -234,28 +251,13 @@ public final class Md implements Task {
 		return renderers.build().render(document);
 	}
 
-	private Object headings(final Node document) {
+	private List<Heading> headings(final Node document) {
 
-		final List<Section> stack=new ArrayList<>();
+		final List<Heading> headings=new ArrayList<>();
 
-		new NodeVisitor(new VisitHandler<>(Heading.class, heading -> {
+		new NodeVisitor(new VisitHandler<>(Heading.class, headings::add)).visit(document);
 
-			if ( heading.getLevel() == 1 ) {
-				//headings.add(heading.getText().toString());
-			}
-
-		})).visit(document);
-
-		return stack;
-	}
-
-
-	public static interface Section {
-
-		public String getLabel();
-
-		public List<Md.Section> getSections();
-
+		return headings;
 	}
 
 }

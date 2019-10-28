@@ -49,7 +49,9 @@ public final class Mark {
 			throw new NullPointerException("null root");
 		}
 
-		return path.getParent().equals(root)? Paths.get(".") : path.getParent().relativize(root);
+		return path.getParent().equals(root)
+				? Paths.get(".")
+				: path.getParent().relativize(root);
 	}
 
 	public static Path target(final Path path, final String extension) {
@@ -62,8 +64,9 @@ public final class Mark {
 			throw new NullPointerException("null extension");
 		}
 
-		return path.getParent()
-				.resolve(ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension));
+		return path.getParent().resolve(
+				ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension)
+		);
 	}
 
 
@@ -77,7 +80,8 @@ public final class Mark {
 			throw new NullPointerException("null layout");
 		}
 
-		return path.startsWith(layout.getParent()) && extension(path).equals(extension(layout));
+		return path.startsWith(layout.getParent())
+				&& extension(path).equals(extension(layout));
 	}
 
 
