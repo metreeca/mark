@@ -4,6 +4,7 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.mark.Mark;
 import com.metreeca.mark.Task;
 
 import java.io.IOException;
@@ -11,13 +12,12 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static java.lang.Math.max;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
 public final class Wild implements Task {
 
-	private final Path base;
-	private final String type;
+	private final Path layout;
 
 
 	public Wild(final Path layout) {
@@ -26,16 +26,15 @@ public final class Wild implements Task {
 			throw new NullPointerException("null layout");
 		}
 
-		this.base=layout.getParent();
-		this.type=type(layout);
+		this.layout=layout;
 	}
 
 
 	@Override public boolean process(final Path source, final Path target) {
-		if ( source.startsWith(base) && type(source).equals(type) ) { return false; } else {
+		if ( Mark.layout(source, layout) ) { return false; } else {
 			try {
 
-				Files.copy(source, target);
+				Files.copy(source, target, REPLACE_EXISTING);
 
 				return true;
 
@@ -43,17 +42,6 @@ public final class Wild implements Task {
 				throw new UncheckedIOException(e);
 			}
 		}
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static String type(final Path path) {
-		return type(path.toString());
-	}
-
-	private static String type(final String path) {
-		return path.substring(max(0, path.lastIndexOf('.')));
 	}
 
 }

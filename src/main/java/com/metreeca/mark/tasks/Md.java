@@ -4,6 +4,7 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.mark.Mark;
 import com.metreeca.mark.Task;
 
 import com.vladsch.flexmark.ast.Heading;
@@ -28,7 +29,6 @@ import de.neuland.jade4j.template.TemplateLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,13 +41,6 @@ import static java.util.stream.Collectors.toMap;
 
 
 public final class Md implements Task {
-
-	public static Path type(final Path path, final String extension) {
-		return Paths.get(path.toString().replaceFirst("\\.[^.]+$", extension));
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final String JadeExtension=".jade";
 	private static final Pattern ExpressionPattern=Pattern.compile("(\\\\)?#\\{([^}]*)}");
@@ -131,7 +124,7 @@ public final class Md implements Task {
 
 			try (
 					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(type(target, ".html"), UTF_8)
+					final BufferedWriter writer=Files.newBufferedWriter(Mark.type(target, ".html"), UTF_8)
 			) {
 
 				final Node document=parsers.build().parseReader(reader);
@@ -139,7 +132,7 @@ public final class Md implements Task {
 				final Map<String, Object> model=model(document);
 				final String content=content(document, model);
 
-				model.put("base", target.relativize(root));
+				model.put("base", Mark.base(target, root));
 				model.put("content", content);
 				model.put("headings", headings(document));
 

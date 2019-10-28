@@ -7,6 +7,7 @@ package com.metreeca.mark;
 import com.metreeca.mark.tasks.Md;
 import com.metreeca.mark.tasks.Wild;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 
@@ -18,8 +19,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
@@ -32,6 +35,61 @@ import static java.util.function.Predicate.isEqual;
 
 
 public final class Mark {
+
+	private static final Pattern ExtensionPattern=Pattern.compile("\\.[^.]+$");
+
+
+	public static Path base(final Path path, final Path root) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( root == null ) {
+			throw new NullPointerException("null root");
+		}
+
+		return path.getParent().equals(root)? Paths.get(".") : path.getParent().relativize(root);
+	}
+
+	public static Path type(final Path path, final String extension) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( extension == null ) {
+			throw new NullPointerException("null extension");
+		}
+
+		return path.getParent().resolve(ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension));
+	}
+
+
+	public static boolean layout(final Path path, final Path layout) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( layout == null ) {
+			throw new NullPointerException("null layout");
+		}
+
+		return path.startsWith(layout.getParent()) && extension(path).equals(extension(layout));
+	}
+
+
+	private static String extension(final Path path) {
+		return extension(path.toString());
+	}
+
+	private static String extension(final String path) {
+		return path.substring(max(0, path.lastIndexOf('.')));
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Path source=Paths.get("");
 	private Path target=Paths.get("");
@@ -135,17 +193,19 @@ public final class Mark {
 				final WatchService service=source.getFileSystem().newWatchService();
 				final Kind<?>[] events={ENTRY_CREATE, ENTRY_MODIFY};
 
-				// !!! watch resources?
+				// !!! watch assets?
 
-				Files.walk(source).filter(Files::isDirectory).forEach(path -> { // register existing folders
-					try {
+				try (final Stream<Path> sources=Files.walk(source)) {
+					sources.filter(Files::isDirectory).forEach(path -> { // register existing folders
+						try {
 
-						path.register(service, events);
+							path.register(service, events,  SensitivityWatchEventModifier.HIGH);
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				});
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
+					});
+				}
 
 				logger.info(String.format("watching %s", Paths.get("").toAbsolutePath().relativize(source)));
 
@@ -167,7 +227,15 @@ public final class Mark {
 
 						} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
 
-							handler.apply(path);
+							if ( layout(path, source.resolve(assets).resolve(layout))) {
+
+								build();
+
+							} else {
+
+								handler.apply(path);
+
+							}
 
 						} else if ( kind.equals(OVERFLOW) ) {
 
