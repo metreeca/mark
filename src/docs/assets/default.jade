@@ -1,0 +1,14 @@
+doctype html
+
+html(lang="en")
+    body
+
+        h1 #{page.title}
+
+        for h in page.headings
+            li !{h}
+
+        !{page.content}
+
+        p #{page.base}
+        p #{project.version}

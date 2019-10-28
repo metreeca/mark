@@ -1,0 +1,96 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright © 2019 Metreeca srl. All rights reserved.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <title>Page | Metreeca/Link</title>
+
+        <meta name="description" content="{{ page.excerpt | strip_html }}">
+        <meta name="copyright" content="{{ copyright }}"/>
+
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+        <link rel="shortcut icon" href="./icons/logo.ico"/>
+        <link rel="stylesheet" type="text/css" href="./default.css"/>
+        <link rel="stylesheet" type="text/css" href="./github.css"/>
+
+    </head>
+
+    <body>
+
+        <input id="toggle" type="checkbox"> <!-- hidden menu toggle for mobile view -->
+
+        <nav>
+
+            <header>
+
+                <a class="logo" href="https://www.metreeca.com/"></a>
+
+                <span>
+                    <a href=".">{{ project }}</a>
+                    /
+                    <!--<a href="{{ release }}" target="_blank">v{{ version }}</a>-->
+                </span>
+
+                <label for="toggle" class="icon"></label> <!-- icon dynamically managed by default.css -->
+
+            </header>
+
+            <section>
+
+                <a class="title" href="#_top">{{ title }}</a>
+
+                {{ page.toc }}
+
+            </section>
+
+        </nav>
+
+        <main>
+
+            <header id="_top">
+                <span>{{ title }}</span>
+            </header>
+
+            <section>
+
+                <div>{{ content }}</div>
+
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eu sodales felis. Phasellus in lectus non purus laoreet ultrices. Morbi pellentesque tristique nisi eu dictum. Integer lacinia rhoncus urna sed finibus. Maecenas dolor urna, porta sed viverra at, porttitor consectetur magna. Sed imperdiet lacus sapien, quis lobortis erat tristique in. Pellentesque elementum consequat nunc eu accumsan.
+                </p>
+
+
+                <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam diam odio, ultricies id sodales et, posuere vitae lorem. Mauris lorem ex, ultricies quis lacus congue, facilisis semper dolor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In eu luctus lacus, malesuada ullamcorper felis. Praesent pulvinar justo vitae augue condimentum maximus. Quisque maximus, tellus vitae aliquet accumsan, lorem turpis sagittis libero, eget finibus mauris felis nec magna. Fusce id velit sit amet nibh vulputate imperdiet. Sed dapibus vulputate arcu quis efficitur. Quisque ligula urna, efficitur eget urna vel, suscipit egestas purus.
+                </p>
+
+
+                <p>Praesent eget nunc imperdiet ante eleifend luctus ut nec augue. Etiam sed ipsum laoreet, ultrices nisl eget, ornare elit. Quisque porta dolor hendrerit mi commodo cursus vel sed enim. Curabitur id urna pulvinar, congue dui sit amet, condimentum ex. Phasellus sed sodales ipsum. Integer ut erat quis sem cursus fringilla. Sed vehicula varius neque eu fermentum. In hac habitasse platea dictumst. Etiam porta odio ac lectus vulputate, eu scelerisque purus aliquet. Mauris malesuada dignissim malesuada. Aenean cursus arcu nec quam dignissim luctus ut sollicitudin leo. Praesent ornare convallis sem ac faucibus.
+                </p>
+
+
+                <p>Morbi tempus vulputate augue eget vehicula. Cras in ex blandit risus convallis viverra. Vivamus et augue sem. Sed ut feugiat mauris. Suspendisse potenti. Maecenas euismod libero eleifend lorem volutpat aliquet. Vestibulum quis diam a enim ullamcorper pellentesque consequat nec ligula. Morbi eleifend placerat ex, nec scelerisque ligula scelerisque sed. Praesent a elementum ex, at convallis ante. Suspendisse potenti. Sed a ultrices tortor.
+                </p>
+
+
+                <p>Vivamus molestie porttitor est a maximus. Donec pellentesque condimentum elit, in elementum odio malesuada a. Interdum et malesuada fames ac ante ipsum primis in faucibus. Maecenas sed magna rhoncus, hendrerit odio eu, cursus mi. Curabitur sed finibus odio, quis facilisis nibh. Sed a libero congue, pellentesque enim eu, molestie massa. In at velit et purus blandit maximus. Mauris porttitor ipsum non finibus tincidunt. Donec interdum justo ligula, vel aliquam ligula tempus sed. Nam sagittis sodales mi id porttitor. Mauris rhoncus, nulla ac iaculis pellentesque, libero est vulputate odio, ac ultricies ipsum risus in enim. Fusce lacinia ipsum eget nisl consectetur blandit. Mauris lobortis non nulla vel venenatis. Mauris dui enim, scelerisque sit amet porta quis, sodales a nulla. Donec suscipit, ipsum sit amet congue congue, nisl libero vulputate nulla, nec gravida tellus odio nec justo. Nullam nunc mi, tincidunt et dignissim ac, facilisis non est.
+                </p>
+
+            </section>
+
+            <footer>© {{ 'now' | date: '%Y' }} Metreeca srl. This work is licensed under the
+                <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons BY-NC-SA 4.0 License</a>
+            </footer>
+
+        </main>
+
+        <script type="text/javascript" src="./default.js"></script>
+
+    </body>
+
+</html>
