@@ -2,12 +2,13 @@
  * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
-package com.metreeca.mark.pipes;
+package com.metreeca.mark.tasks;
 
-import com.metreeca.mark.Pipe;
+import com.metreeca.mark.Task;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.Text;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
@@ -29,18 +30,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.singleton;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 
-public final class Md implements Pipe {
+public final class Md implements Task {
+
+	public static Path type(final Path path, final String extension) {
+		return Paths.get(path.toString().replaceFirst("\\.[^.]+$", extension));
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final String JadeExtension=".jade";
 	private static final Pattern ExpressionPattern=Pattern.compile("(\\\\)?#\\{([^}]*)}");
@@ -64,7 +71,15 @@ public final class Md implements Pipe {
 
 		final MutableDataSet options=new MutableDataSet()
 
-				.set(Parser.EXTENSIONS, singleton(YamlFrontMatterExtension.create()));
+				.set(Parser.EXTENSIONS, asList(
+						YamlFrontMatterExtension.create(),
+						TablesExtension.create()
+				))
+
+				.set(HtmlRenderer.RENDER_HEADER_ID, true)
+				.set(HtmlRenderer.GENERATE_HEADER_ID, true)
+				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
+				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true);
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);
@@ -111,40 +126,34 @@ public final class Md implements Pipe {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Optional<Consumer<Path>> process(final Path source) {
+	@Override public boolean process(final Path source, final Path target) {
 		if ( source.toString().endsWith(".md") ) {
 
-			return Optional.of(target -> {
+			try (
+					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
+					final BufferedWriter writer=Files.newBufferedWriter(type(target, ".html"), UTF_8)
+			) {
 
-				final String path=target.toString();
-				final String base=Optional.of(path.lastIndexOf('.')).map(dot -> path.substring(0, dot)).orElse(path);
-				final String type=path.substring(base.length());
+				final Node document=parsers.build().parseReader(reader);
 
-				try (
-						final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-						final BufferedWriter writer=Files.newBufferedWriter(Paths.get(base+".html"), UTF_8)
-				) {
+				final Map<String, Object> model=model(document);
+				final String content=content(document, model);
 
-					final Node document=parsers.build().parseReader(reader);
+				model.put("base", target.relativize(root));
+				model.put("content", content);
+				model.put("headings", headings(document));
 
-					final Map<String, Object> model=model(document);
-					final String content=content(document, model);
+				jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
 
-					model.put("base", target.relativize(root));
-					model.put("content", content);
-					model.put("headings", headings(document));
+				return true;
 
-					jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-
-			});
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
 
 		} else {
 
-			return Optional.empty();
+			return false;
 
 		}
 	}

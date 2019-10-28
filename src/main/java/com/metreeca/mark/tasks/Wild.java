@@ -2,21 +2,19 @@
  * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
-package com.metreeca.mark.pipes;
+package com.metreeca.mark.tasks;
 
-import com.metreeca.mark.Pipe;
+import com.metreeca.mark.Task;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 import static java.lang.Math.max;
 
 
-public final class Wild implements Pipe {
+public final class Wild implements Task {
 
 	private final Path base;
 	private final String type;
@@ -33,16 +31,18 @@ public final class Wild implements Pipe {
 	}
 
 
-	@Override public Optional<Consumer<Path>> process(final Path source) { // ignore layouts
-		return source.startsWith(base) && type(source).equals(type) ? Optional.empty() : Optional.of(target -> {
+	@Override public boolean process(final Path source, final Path target) {
+		if ( source.startsWith(base) && type(source).equals(type) ) { return false; } else {
 			try {
 
 				Files.copy(source, target);
 
+				return true;
+
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
 			}
-		});
+		}
 	}
 
 

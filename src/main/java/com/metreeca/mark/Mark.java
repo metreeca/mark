@@ -4,8 +4,8 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.pipes.Md;
-import com.metreeca.mark.pipes.Wild;
+import com.metreeca.mark.tasks.Md;
+import com.metreeca.mark.tasks.Wild;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -16,7 +16,6 @@ import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -235,36 +234,25 @@ public final class Mark {
 		return this;
 	}
 
-	private Function<Path, Boolean> handler(final Collection<Pipe> pipes) {
-		return path -> {
+	private Function<Path, Boolean> handler(final Collection<Task> pipes) {
+		return source -> {
 
 			try {
 
-				final Path source=this.source.relativize(path);
-				final Path target=this.target.resolve(source);
+				final Path xxx=this.source.relativize(source);
+				final Path target=this.target.resolve(xxx);
 
 				Files.createDirectories(target.getParent());
 
 				return pipes.stream()
-						.map(task -> task.process(path))
-						.filter(Optional::isPresent)
-						.map(Optional::get)
+						.filter(task -> task.process(source, target))
+						.peek(status -> logger.info(xxx.toString()))
 						.findFirst()
-						.map(consumer -> {
-
-							logger.info(source.toString());
-
-							consumer.accept(target);
-
-							return true;
-
-						})
-
-						.orElse(false);
+						.isPresent();
 
 			} catch ( final IOException|RuntimeException e ) {
 
-				logger.error(String.format("error while processing %s", path), e);
+				logger.error(String.format("error while processing %s", source), e);
 
 				return false;
 
