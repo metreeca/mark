@@ -16,6 +16,7 @@ import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -32,11 +33,6 @@ import static java.util.function.Predicate.isEqual;
 
 
 public final class Mark {
-
-	private static final String EventFormat="%-20s %s";
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Path source=Paths.get("");
 	private Path target=Paths.get("");
@@ -162,7 +158,7 @@ public final class Mark {
 
 						if ( event.kind().equals(ENTRY_CREATE) && Files.isDirectory(path) ) {
 
-							logger.info(String.format(EventFormat, "folder", source.relativize(path)));
+							logger.info(source.relativize(path).toString());
 
 							path.register(service, events); // register new folders
 
@@ -194,7 +190,7 @@ public final class Mark {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Mark exec(final BiConsumer<Stream<Path>, Function<Path, String>> task) {
+	private Mark exec(final BiConsumer<Stream<Path>, Function<Path, Boolean>> task) {
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
@@ -229,7 +225,7 @@ public final class Mark {
 
 		final Stream<Path> resources=Stream.empty(); // !!!
 
-		final Function<Path, String> handler=handler(asList(
+		final Function<Path, Boolean> handler=handler(asList(
 				new Md(target, layout, shared),
 				new Wild(layout)
 		));
@@ -239,7 +235,7 @@ public final class Mark {
 		return this;
 	}
 
-	private Function<Path, String> handler(final Collection<Pipe> pipes) {
+	private Function<Path, Boolean> handler(final Collection<Pipe> pipes) {
 		return path -> {
 
 			try {
@@ -250,17 +246,27 @@ public final class Mark {
 				Files.createDirectories(target.getParent());
 
 				return pipes.stream()
-						.map(pipe -> pipe.process(path, target))
-						.filter(status -> !status.isEmpty())
-						.peek(status -> logger.info(String.format(EventFormat, status, source)))
+						.map(task -> task.process(path))
+						.filter(Optional::isPresent)
+						.map(Optional::get)
 						.findFirst()
-						.orElse("");
+						.map(consumer -> {
+
+							logger.info(source.toString());
+
+							consumer.accept(target);
+
+							return true;
+
+						})
+
+						.orElse(false);
 
 			} catch ( final IOException|RuntimeException e ) {
 
 				logger.error(String.format("error while processing %s", path), e);
 
-				return "";
+				return false;
 
 			}
 
@@ -290,7 +296,7 @@ public final class Mark {
 		}
 	}
 
-	private void build(final Function<Path, String> processor) { // process source folder
+	private void build(final Function<Path, Boolean> handler) { // process source folder
 		if ( Files.exists(source) ) {
 
 			try (final Stream<Path> walk=Files.walk(source)) {
@@ -298,10 +304,8 @@ public final class Mark {
 				final long start=currentTimeMillis();
 
 				final long count=walk
-						.sorted(Path::compareTo)
 						.filter(Files::isRegularFile)
-						.map(processor)
-						.filter(status -> !status.isEmpty())
+						.filter(handler::apply)
 						.count();
 
 				final long stop=currentTimeMillis();

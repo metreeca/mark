@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,42 +111,42 @@ public final class Md implements Pipe {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public String process(final Path source, final Path target) {
+	@Override public Optional<Consumer<Path>> process(final Path source) {
+		if ( source.toString().endsWith(".md") ) {
 
-		final String path=target.toString();
-		final String base=Optional.of(path.lastIndexOf('.')).map(dot -> path.substring(0, dot)).orElse(path);
-		final String type=path.substring(base.length());
+			return Optional.of(target -> {
 
-		if ( type.equals(".md") ) {
+				final String path=target.toString();
+				final String base=Optional.of(path.lastIndexOf('.')).map(dot -> path.substring(0, dot)).orElse(path);
+				final String type=path.substring(base.length());
 
-			try (
-					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(Paths.get(base+".html"), UTF_8)
-			) {
+				try (
+						final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
+						final BufferedWriter writer=Files.newBufferedWriter(Paths.get(base+".html"), UTF_8)
+				) {
 
-				final Node document=parsers.build().parseReader(reader);
+					final Node document=parsers.build().parseReader(reader);
 
-				final Map<String, Object> model=model(document);
-				final String content=content(document, model);
+					final Map<String, Object> model=model(document);
+					final String content=content(document, model);
 
-				model.put("base", target.relativize(root));
-				model.put("content", content);
-				model.put("headings", headings(document));
+					model.put("base", target.relativize(root));
+					model.put("content", content);
+					model.put("headings", headings(document));
 
-				jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
+					jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
 
-			return "markdown+jade";
+			});
 
 		} else {
 
-			return "";
+			return Optional.empty();
 
 		}
-
 	}
 
 

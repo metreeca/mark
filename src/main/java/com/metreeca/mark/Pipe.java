@@ -5,10 +5,7 @@
 package com.metreeca.mark;
 
 import java.nio.file.Path;
+import java.util.function.Consumer;
 
 
-@FunctionalInterface public interface Pipe {
-
-	public String process(final Path source, final Path target);
-
-}
+public interface Pipe extends Task<Path, Consumer<Path>> {}

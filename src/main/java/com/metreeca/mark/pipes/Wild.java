@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static java.lang.Math.max;
 
@@ -31,9 +33,8 @@ public final class Wild implements Pipe {
 	}
 
 
-	@Override public String process(final Path source, final Path target) {
-		if ( source.startsWith(base) && type(source).equals(type) ) { return ""; } else { // ignore layouts
-
+	@Override public Optional<Consumer<Path>> process(final Path source) { // ignore layouts
+		return source.startsWith(base) && type(source).equals(type) ? Optional.empty() : Optional.of(target -> {
 			try {
 
 				Files.copy(source, target);
@@ -41,10 +42,7 @@ public final class Wild implements Pipe {
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
 			}
-
-			return "verbatim";
-
-		}
+		});
 	}
 
 
