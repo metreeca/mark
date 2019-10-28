@@ -1,0 +1,8 @@
+- var name = "metreeca-link".replace("metreeca-", "")
+- var version = "1.10"
+
+a(class="logo" href="https://www.metreeca.com/")
+span
+    a(href=page.base) #{name}
+    =  " / "
+    a(href="https://github.com/metreeca/#{name}/releases/tag/v#{version}" target="_blank") v#{version}

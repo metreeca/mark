@@ -1,0 +1,38 @@
+doctype html
+
+- var canonical = page.canonical.toString().startsWith("/")? (page.base.toString()+page.canonical) : page.canonical
+
+html(lang="en")
+
+    head
+
+        title "Redirecting…" #{project.name ? " | " : ""} #{project.name}
+
+        meta(name="viewport" content="width=device-width,initial-scale=1")
+        meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+        meta(http-equiv="Refresh" content="0; url='#{canonical}'}")
+
+        link(rel="shortcut icon" href="!{page.base}/assets/icons/logo.ico")
+        link(rel="canonical" href=canonical)
+
+        style(type="text/css")
+            :plain
+                @import url(//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+
+                html {
+                    width: 100%;
+                    height: 100%;
+                }
+
+                body {
+                    width: 100%;
+                    height: 100%;
+                    padding-top: 45%;
+                    text-align: center;
+                    font-size: 250%;
+                    color: #CCC;
+                }
+
+    body
+
+        i(class="fa fa-spin fa-refresh")

@@ -6,9 +6,6 @@ html(lang="en")
 
         title #{page.title} #{page.title && project.name ? " | " : ""} #{project.name}
 
-        meta(name="description" content="{{ page.excerpt | strip_html }}")
-        meta(name="copyright" content="{{ copyright }}")
-
         meta(name="viewport" content="width=device-width,initial-scale=1")
         meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 
@@ -27,12 +24,7 @@ html(lang="en")
 
             header
 
-                a(class="logo" href="https://www.metreeca.com/")
-
-                span
-                    a(href=".") !{project.name}
-                    | /
-                    !{project.version}
+                include includes/header
 
                 //- icon dynamically managed by default.css
 
@@ -53,6 +45,6 @@ html(lang="en")
             section !{page.content}
 
             footer
-                include includes/copyright.jade
+                include includes/footer
 
         script(type="text/javascript" src="!{page.base}/assets/default.js")
