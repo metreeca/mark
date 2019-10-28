@@ -52,7 +52,7 @@ public final class Mark {
 		return path.getParent().equals(root)? Paths.get(".") : path.getParent().relativize(root);
 	}
 
-	public static Path type(final Path path, final String extension) {
+	public static Path target(final Path path, final String extension) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -62,7 +62,8 @@ public final class Mark {
 			throw new NullPointerException("null extension");
 		}
 
-		return path.getParent().resolve(ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension));
+		return path.getParent()
+				.resolve(ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension));
 	}
 
 

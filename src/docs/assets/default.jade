@@ -4,9 +4,12 @@ html(lang="en")
 
     head
 
-        title #{page.title} | Work
+        title
+            if page.title
+                | #{page.title} |
+            | #{project.name}
 
-        meta(name="description", content="{{ page.excerpt | strip_html }}")
+        meta(name="description" content="{{ page.excerpt | strip_html }}")
         meta(name="copyright" content="{{ copyright }}")
 
         meta(name="viewport" content="width=device-width,initial-scale=1")
@@ -17,10 +20,11 @@ html(lang="en")
         link(rel="stylesheet" type="text/css" href="!{page.base}/assets/default.css")
         link(rel="stylesheet" type="text/css" href="!{page.base}/assets/github.css")
 
-
     body
 
-        input(id="toggle" type="checkbox") //- hidden menu toggle for mobile view
+        //- hidden menu toggle for mobile view
+
+        input(id="toggle" type="checkbox")
 
         nav
 
@@ -29,27 +33,27 @@ html(lang="en")
                 a(class="logo" href="https://www.metreeca.com/")
 
                 span
-                    a(href=".") {{ project }}
+                    a(href=".") !{project.name}
                     | /
-                    a(href="{{ release }}" target="_blank") v{{ version }}
+                    !{project.version}
 
-                    label(for="toggle" class="icon") //- icon dynamically managed by default.css
+                //- icon dynamically managed by default.css
+
+                label(for="toggle" class="icon")
 
             section
 
-                a(class="title" href="#_top") {{ title }}
+                a(class="title" href="#_top") #{page.title}
 
                 | {{ page.toc }}
 
-
         main
 
-            header(id="_top") {{ title }}
+            header(id="_top") #{page.title}
 
             section !{page.content}
 
             footer © {{ 'now' | date: '%Y' }} Metreeca srl. This work is licensed under the
                 a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License
-
 
         script(type="text/javascript" src="!{page.base}/assets/default.js")

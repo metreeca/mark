@@ -4,35 +4,26 @@
 
 package com.metreeca.mark;
 
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Paths;
 
- final class MarkTest {
+import static java.util.Collections.singletonMap;
 
-	@Test void build() {
 
+final class MarkTest {
+
+	public static void main(final String... args) {
 		new Mark()
 
 				.source(Paths.get("src/docs"))
 				.target(Paths.get("target/docs"))
 				.layout(Paths.get("assets/default.jade"))
 
-				.build();
+				.shared(singletonMap("zot", "123"))
+
+				.build()
+				.watch()
+				;
 
 	}
-
-	 @Test void watch() {
-
-		 new Mark()
-
-				 .source(Paths.get("src/docs"))
-				 .target(Paths.get("target/docs"))
-				 .layout(Paths.get("assets/default.jade"))
-
-				 .build()
-				 .watch();
-
-	 }
 
 }

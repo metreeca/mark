@@ -393,6 +393,10 @@ table {
 	font-size: 95%;
 }
 
+table th:last-child {
+	width: 100%;
+}
+
 tr:nth-child(odd) > td {
 	background-color: #F8F8F8;
 }

@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.metreeca.mark.Mark.target;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -43,7 +45,7 @@ import static java.util.stream.Collectors.toMap;
 public final class Md implements Task {
 
 	private static final String JadeExtension=".jade";
-	private static final Pattern ExpressionPattern=Pattern.compile("(\\\\)?#\\{([^}]*)}");
+	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 
 
 	private final Path root;
@@ -124,16 +126,15 @@ public final class Md implements Task {
 
 			try (
 					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(Mark.type(target, ".html"), UTF_8)
+					final BufferedWriter writer=Files.newBufferedWriter(target(target, ".html"), UTF_8)
 			) {
 
 				final Node document=parsers.build().parseReader(reader);
 
-				final Map<String, Object> model=model(document);
-				final String content=content(document, model);
+				final Map<String, Object> model=metadata(document);
 
 				model.put("base", Mark.base(target, root));
-				model.put("content", content);
+				model.put("content", content(document, model));
 				model.put("headings", headings(document));
 
 				jade.renderTemplate(jade.getTemplate(layout.toString()), singletonMap("page", model), writer);
@@ -154,7 +155,7 @@ public final class Md implements Task {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Map<String, Object> model(final Node document) {
+	private Map<String, Object> metadata(final Node document) {
 
 		final AbstractYamlFrontMatterVisitor visitor=new AbstractYamlFrontMatterVisitor();
 
@@ -199,16 +200,20 @@ public final class Md implements Task {
 
 				builder.append(chars.subSequence(last, start)); // leading text
 
-				if ( matcher.group(1) != null ) { // escaped
+				if ( matcher.group() .charAt(0) == '\\' ) { // escaped
 
-					builder.append(chars.subSequence(start, end)); // expression text
+					builder.append(chars.subSequence(start+1, end)); // expression text
 
 				} else {
 
 					try {
 
+						final JadeModel bindings=new JadeModel(jade.getSharedVariables());
+
+						bindings.putAll(model);
+
 						builder.append(SubSequence.of(handler.evaluateStringExpression(
-								matcher.group(2), new JadeModel(model) // expression value
+								matcher.group(1), bindings // expression value
 						)));
 
 					} catch ( ExpressionException e ) {

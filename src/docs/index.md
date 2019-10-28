@@ -1,11 +1,13 @@
+---
+title: Samples
+---
 
-Shared theme for Metreeca docs sites.
+Shared theme for Metreeca docs sites. ${page.title} ${zot}
 
-|Variable|Value|
+|Variable|Value|  
 |--------|-----|
-|page.project|{{page.project}}|
-|page.version|{{page.version}}|
-|page.tagline|{{page.tagline}}|      
+|project.artifactId|${project.artifactId}|  
+|project.version|${project.version}|
 
 # Lorem
 
