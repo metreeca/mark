@@ -1,12 +1,11 @@
 
 Shared theme for Metreeca docs sites.
 
-
 |Variable|Value|
 |--------|-----|
 |page.project|{{page.project}}|
 |page.version|{{page.version}}|
-|page.tagline|{{page.tagline}}|
+|page.tagline|{{page.tagline}}|      
 
 # Lorem
 

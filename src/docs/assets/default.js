@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Metreeca srl. All rights reserved.
+ * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
 (function (window) {

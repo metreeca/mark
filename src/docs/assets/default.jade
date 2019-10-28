@@ -1,14 +1,55 @@
 doctype html
 
 html(lang="en")
+
+    head
+
+        title #{page.title} | Work
+
+        meta(name="description", content="{{ page.excerpt | strip_html }}")
+        meta(name="copyright" content="{{ copyright }}")
+
+        meta(name="viewport" content="width=device-width,initial-scale=1")
+        meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+
+        link(rel="shortcut icon" href="!{page.base}/assets/icons/logo.ico")
+
+        link(rel="stylesheet" type="text/css" href="!{page.base}/assets/default.css")
+        link(rel="stylesheet" type="text/css" href="!{page.base}/assets/github.css")
+
+
     body
 
-        h1 #{page.title}
+        input(id="toggle" type="checkbox") //- hidden menu toggle for mobile view
 
-        for h in page.headings
-            li !{h}
+        nav
 
-        !{page.content}
+            header
 
-        p #{page.base}
-        p #{project.version}
+                a(class="logo" href="https://www.metreeca.com/")
+
+                span
+                    a(href=".") {{ project }}
+                    | /
+                    a(href="{{ release }}" target="_blank") v{{ version }}
+
+                    label(for="toggle" class="icon") //- icon dynamically managed by default.css
+
+            section
+
+                a(class="title" href="#_top") {{ title }}
+
+                | {{ page.toc }}
+
+
+        main
+
+            header(id="_top") {{ title }}
+
+            section !{page.content}
+
+            footer © {{ 'now' | date: '%Y' }} Metreeca srl. This work is licensed under the
+                a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License
+
+
+        script(type="text/javascript" src="!{page.base}/assets/default.js")
