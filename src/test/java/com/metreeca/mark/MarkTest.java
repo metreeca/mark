@@ -14,7 +14,7 @@ final class MarkTest {
 
 				.source(Paths.get("src/docs"))
 				.target(Paths.get("target/docs"))
-				.layout(Paths.get("assets/default.jade"))
+				//.layout(Paths.get("assets/default.jade"))
 
 				.build()
 				//.watch()

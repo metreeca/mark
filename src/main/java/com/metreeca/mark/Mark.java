@@ -13,6 +13,7 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
 import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
+import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -39,6 +41,37 @@ public final class Mark {
 	private static final Pattern ExtensionPattern=Pattern.compile("\\.[^.]+$");
 
 
+	private Path skin() {
+		try {
+
+			final FileSystem skin=newFileSystem(URI.create("jar:"+Mark.class.getResource("skins/default.zip")), emptyMap());
+
+			for (final Path root : skin.getRootDirectories()) {
+				try (final Stream<Path> walk=Files.walk(root)) {
+					walk.filter(Files::isRegularFile).forEachOrdered(source -> {
+						try {
+
+							final Path target=Paths.get(assets+source.toString());
+
+							Files.createDirectories(target.getParent());
+							Files.copy(source, target);
+
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
+
+					});
+				}
+			}
+
+			return assets.resolve(Paths.get("assets/default.jade"));
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+
 	public Path base(final Path path) {
 
 		if ( path == null ) {
@@ -51,7 +84,15 @@ public final class Mark {
 	}
 
 	public Path resolve(final String name) {
-		return name.isEmpty() || name.equals(extension(layout))? layout : layout.getParent().resolve(name);
+		if ( name.isEmpty() || name.equals(extension(layout)) ) {
+
+			return layout;
+
+		} else {
+
+			return layout.getParent().resolve(name);
+
+		}
 	}
 
 
@@ -79,7 +120,6 @@ public final class Mark {
 	}
 
 
-
 	private static String extension(final Path path) {
 		return extension(path.toString());
 	}
@@ -98,6 +138,33 @@ public final class Mark {
 	private Map<String, Object> shared=emptyMap();
 
 	private Log logger=new SystemStreamLog();
+
+	private Path assets=assets();
+
+
+	private Path assets() {
+		try {
+
+			final Path assets=Files.createTempDirectory("");
+
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				try (final Stream<Path> walk=Files.walk(this.assets)) {
+
+					walk.sorted(reverseOrder()).forEachOrdered(path -> {
+						try { Files.delete(path); } catch ( final IOException e ) { throw new UncheckedIOException(e); }
+					});
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			}));
+
+			return assets;
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
 
 	public Path source() {
@@ -186,6 +253,7 @@ public final class Mark {
 		return exec(handler -> {
 
 			if ( Files.exists(target) ) { // clean target folder
+
 				try (final Stream<Path> walk=Files.walk(target)) {
 
 					walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
@@ -203,17 +271,16 @@ public final class Mark {
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
+
 			}
 
-			//  !!! merge resources
+			if ( Files.exists(assets) ) { // process skin assets
 
-			if ( Files.exists(source) ) { // process source folder
-
-				try (final Stream<Path> walk=Files.walk(source)) {
+				try (final Stream<Path> walk=Files.walk(assets)) {
 
 					final long start=currentTimeMillis();
 
-					final long count=walk
+					final long count=walk // !!! factor
 							.filter(Files::isRegularFile)
 							.filter(path -> !isLayout(path))
 							.filter(handler::apply)
@@ -221,7 +288,33 @@ public final class Mark {
 
 					final long stop=currentTimeMillis();
 
-					logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
+					if ( count > 0 ) {
+						logger.info(String.format("generated %,d files in %,.3f s", count, (stop-start)/1000f));
+					}
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+
+			}
+
+			if ( Files.exists(source) ) { // process source folder
+
+				try (final Stream<Path> walk=Files.walk(source)) {
+
+					final long start=currentTimeMillis();
+
+					final long count=walk // !!! factor
+							.filter(Files::isRegularFile)
+							.filter(path -> !isLayout(path))
+							.filter(handler::apply)
+							.count();
+
+					final long stop=currentTimeMillis();
+
+					if ( count > 0 ) {
+						logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
+					}
 
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
@@ -329,9 +422,9 @@ public final class Mark {
 			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
 		}
 
-		if ( layout.equals(Paths.get(""))) {
+		if ( layout.equals(Paths.get("")) ) {
 
-			throw new UnsupportedOperationException("to be implemented"); // !!! tbi
+			this.layout=skin().toAbsolutePath().normalize();
 
 		} else {
 
@@ -360,7 +453,7 @@ public final class Mark {
 
 			try {
 
-				final Path _common=source.relativize(_source);
+				final Path _common=(_source.startsWith(source) ? source : assets).relativize(_source);
 				final Path _target=target.resolve(_common);
 
 				Files.createDirectories(_target.getParent());
