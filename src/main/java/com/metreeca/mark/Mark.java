@@ -4,8 +4,8 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.tasks.Md;
-import com.metreeca.mark.tasks.Wild;
+import com.metreeca.mark.pipes.Md;
+import com.metreeca.mark.pipes.Wild;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
@@ -17,7 +17,7 @@ import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -70,7 +70,7 @@ public final class Mark {
 	}
 
 
-	public static boolean layout(final Path path, final Path layout) {
+	private static boolean layout(final Path path, final Path layout) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -94,24 +94,12 @@ public final class Mark {
 	}
 
 
-	public static Path create(final Path path) throws IOException {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		Files.createDirectories(path.getParent());
-
-		return path;
-	}
-
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private Path source=Paths.get("");
 	private Path target=Paths.get("");
 
-	private Path assets=Paths.get(""); // !!!
+	private Path assets=Paths.get("");
 	private Path layout=Paths.get("");
 
 	private Map<String, Object> shared=emptyMap();
@@ -125,7 +113,7 @@ public final class Mark {
 			throw new NullPointerException("null source");
 		}
 
-		this.source=source.toAbsolutePath().normalize();
+		this.source=source; // cwd-relative
 
 		return this;
 	}
@@ -136,7 +124,7 @@ public final class Mark {
 			throw new NullPointerException("null target");
 		}
 
-		this.target=target.toAbsolutePath().normalize();
+		this.target=target; // cwd-relative
 
 		return this;
 	}
@@ -159,7 +147,7 @@ public final class Mark {
 			throw new NullPointerException("null layout");
 		}
 
-		this.layout=layout; // assets-relative
+		this.layout=layout; // source-relative
 
 		return this;
 	}
@@ -191,40 +179,82 @@ public final class Mark {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public Mark build() {
-		return exec((resources, handler) -> {
+		return exec(handler -> {
 
-			clean();
+			if ( Files.exists(target) ) { // clean target folder
+				try (final Stream<Path> walk=Files.walk(target)) {
+
+					walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
+
+						try {
+
+							Files.delete(path);
+
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
+
+					});
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			}
 
 			//  !!! merge resources
 
-			build(handler);
+			if ( Files.exists(source) ) { // process source folder
+
+				try (final Stream<Path> walk=Files.walk(source)) {
+
+					final long start=currentTimeMillis();
+
+					final long count=walk
+							.filter(Files::isRegularFile)
+							.filter(path -> !layout(path, layout))
+							.filter(handler::apply)
+							.count();
+
+					final long stop=currentTimeMillis();
+
+					logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+
+			}
 
 		});
 	}
 
 	public void watch() {
-		exec((resources, handler) -> {
+		exec(handler -> {
 
-			try {
+			try (final WatchService service=source.getFileSystem().newWatchService()) {
 
-				final WatchService service=source.getFileSystem().newWatchService();
-				final Kind<?>[] events={ENTRY_CREATE, ENTRY_MODIFY};
+				final Consumer<Path> register=path -> {
+					try {
+
+						path.register(service,
+								new Kind<?>[] {ENTRY_CREATE, ENTRY_MODIFY},
+								SensitivityWatchEventModifier.HIGH
+						);
+
+					} catch ( final IOException e ) {
+						throw new UncheckedIOException(e);
+					}
+				};
 
 				// !!! watch assets?
 
 				try (final Stream<Path> sources=Files.walk(source)) {
-					sources.filter(Files::isDirectory).forEach(path -> { // register existing folders
-						try {
-
-							path.register(service, events,  SensitivityWatchEventModifier.HIGH);
-
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					});
+					sources.filter(Files::isDirectory).forEach(register); // register existing folders
 				}
 
 				logger.info(String.format("watching %s", Paths.get("").toAbsolutePath().relativize(source)));
+
+				final Path layout=source.resolve(assets).resolve(this.layout); // !!!
 
 				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
 					for (final WatchEvent<?> event : key.pollEvents()) {
@@ -232,19 +262,21 @@ public final class Mark {
 						final Kind<?> kind=event.kind();
 						final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-						if ( event.kind().equals(ENTRY_CREATE) && Files.isDirectory(path) ) {
+						if ( event.kind().equals(ENTRY_CREATE) && Files.isDirectory(path) ) { // register new folders
 
 							logger.info(source.relativize(path).toString());
 
-							path.register(service, events); // register new folders
+							register.accept(path);
 
 						} else if ( event.kind().equals(ENTRY_CREATE) && Files.isRegularFile(path) ) {
 
-							handler.apply(path);
+							if ( !layout(path, layout) ) {
+								handler.apply(path);
+							}
 
 						} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
 
-							if ( layout(path, source.resolve(assets).resolve(layout))) {
+							if ( layout(path, layout) ) {
 
 								build();
 
@@ -274,7 +306,13 @@ public final class Mark {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Mark exec(final BiConsumer<Stream<Path>, Function<Path, Boolean>> task) {
+	private Mark exec(final Consumer<Function<Path, Boolean>> task) {
+
+		this.source=source.toAbsolutePath().normalize();
+		this.target=target.toAbsolutePath().normalize();
+
+		this.assets=source.resolve(assets).toAbsolutePath().normalize();
+		this.layout=source.resolve(layout).toAbsolutePath().normalize();
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
@@ -292,8 +330,17 @@ public final class Mark {
 			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
 		}
 
-		final Path assets=source; // !!! handle empty layout
-		final Path layout=assets.resolve(this.layout);
+		if ( !Files.exists(assets) ) {
+			throw new IllegalArgumentException("missing assets folder {"+assets+"}");
+		}
+
+		if ( !Files.isDirectory(assets) ) {
+			throw new IllegalArgumentException("assets is not a folder {"+assets+"}");
+		}
+
+		if ( target.startsWith(assets) || assets.startsWith(target) ) {
+			throw new IllegalArgumentException("overlapping assets/target folders {"+assets+" <-> "+target+"}");
+		}
 
 		if ( !Files.exists(layout) ) {
 			throw new IllegalArgumentException("missing default layout {"+layout+"}");
@@ -307,87 +354,37 @@ public final class Mark {
 			throw new IllegalArgumentException("default layout outside assets folder {"+layout+"}");
 		}
 
-		final Stream<Path> resources=Stream.empty(); // !!!
-
-		final Function<Path, Boolean> handler=handler(asList(
+		final Collection<Pipe> pipes=asList(
 				new Md(target, layout, shared),
-				new Wild(layout)
-		));
+				new Wild()
+		);
 
-		task.accept(resources, handler);
-
-		return this;
-	}
-
-	private Function<Path, Boolean> handler(final Collection<Task> pipes) {
-		return source -> {
+		task.accept(_source -> {
 
 			try {
 
-				final Path local=this.source.relativize(source);
-				final Path target=this.target.resolve(local);
+				final Path _common=source.relativize(_source);
+				final Path _target=target.resolve(_common);
+
+				Files.createDirectories(_target.getParent());
 
 				return pipes.stream()
-						.filter(task -> task.process(source, target))
-						.peek(status -> logger.info(local.toString()))
+						.filter(pipe -> pipe.process(_source, _target))
+						.peek(status -> logger.info(_common.toString()))
 						.findFirst()
 						.isPresent();
 
-			} catch ( final RuntimeException e ) {
+			} catch ( final IOException|RuntimeException e ) {
 
-				logger.error(String.format("error while processing %s", source), e);
+				logger.error(String.format("error while processing %s", _source), e);
 
 				return false;
 
 			}
 
-		};
-	}
+		});
 
-
-	private void clean() { // clean target folder
-		if ( Files.exists(target) ) {
-			try (final Stream<Path> walk=Files.walk(target)) {
-
-				walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
-
-					try {
-
-						Files.delete(path);
-
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-
-				});
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		}
-	}
-
-	private void build(final Function<Path, Boolean> handler) { // process source folder
-		if ( Files.exists(source) ) {
-
-			try (final Stream<Path> walk=Files.walk(source)) {
-
-				final long start=currentTimeMillis();
-
-				final long count=walk
-						.filter(Files::isRegularFile)
-						.filter(handler::apply)
-						.count();
-
-				final long stop=currentTimeMillis();
-
-				logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-
-		}
+		return this;
 	}
 
 }

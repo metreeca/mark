@@ -2,10 +2,9 @@
  * Copyright © 2019 Metreeca srl. All rights reserved.
  */
 
-package com.metreeca.mark.tasks;
+package com.metreeca.mark.pipes;
 
-import com.metreeca.mark.Mark;
-import com.metreeca.mark.Task;
+import com.metreeca.mark.Pipe;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.Text;
@@ -33,7 +32,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,13 +40,14 @@ import static com.metreeca.mark.Mark.base;
 import static com.metreeca.mark.Mark.target;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 
-public final class Md implements Task {
+public final class Md implements Pipe {
 
 	private static final String JadeExtension=".jade";
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
@@ -135,14 +134,14 @@ public final class Md implements Task {
 
 			try (
 					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(target(Mark.create(target), ".html"), UTF_8)
+					final BufferedWriter writer=Files.newBufferedWriter(target(target, ".html"), UTF_8)
 			) {
 
 				final Node document=parsers.build().parseReader(reader);
 
 				final Map<String, Object> model=metadata(document);
 
-				model.computeIfAbsent("date", key -> DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now()));
+				model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
 				model.put("base", base(target, root));
 				model.put("content", content(document, model));
