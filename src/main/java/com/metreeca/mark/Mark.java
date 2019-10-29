@@ -39,20 +39,29 @@ public final class Mark {
 	private static final Pattern ExtensionPattern=Pattern.compile("\\.[^.]+$");
 
 
-	public static Path base(final Path path, final Path root) {
+	public Path base(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
 		}
 
-		if ( root == null ) {
-			throw new NullPointerException("null root");
-		}
-
-		return path.getParent().equals(root)
+		return path.getParent().equals(target)
 				? Paths.get(".")
-				: path.getParent().relativize(root);
+				: path.getParent().relativize(target);
 	}
+
+	public Path resolve(final String name) {
+		return name.isEmpty() || name.equals(extension(layout))? layout : layout.getParent().resolve(name);
+	}
+
+
+	private boolean isLayout(final Path path) {
+		return path.startsWith(layout.getParent())
+				&& extension(path).equals(extension(layout));
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static Path target(final Path path, final String extension) {
 
@@ -70,20 +79,6 @@ public final class Mark {
 	}
 
 
-	private static boolean layout(final Path path, final Path layout) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( layout == null ) {
-			throw new NullPointerException("null layout");
-		}
-
-		return path.startsWith(layout.getParent())
-				&& extension(path).equals(extension(layout));
-	}
-
 
 	private static String extension(final Path path) {
 		return extension(path.toString());
@@ -98,14 +93,16 @@ public final class Mark {
 
 	private Path source=Paths.get("");
 	private Path target=Paths.get("");
-
-	private Path assets=Paths.get("");
 	private Path layout=Paths.get("");
 
 	private Map<String, Object> shared=emptyMap();
 
 	private Log logger=new SystemStreamLog();
 
+
+	public Path source() {
+		return source;
+	}
 
 	public Mark source(final Path source) {
 
@@ -116,6 +113,11 @@ public final class Mark {
 		this.source=source; // cwd-relative
 
 		return this;
+	}
+
+
+	public Path target() {
+		return target;
 	}
 
 	public Mark target(final Path target) {
@@ -130,15 +132,8 @@ public final class Mark {
 	}
 
 
-	public Mark assets(final Path assets) {
-
-		if ( assets == null ) {
-			throw new NullPointerException("null assets");
-		}
-
-		this.assets=assets; // source-relative
-
-		return this;
+	public Path layout() {
+		return layout;
 	}
 
 	public Mark layout(final Path layout) {
@@ -153,6 +148,10 @@ public final class Mark {
 	}
 
 
+	public Map<String, Object> shared() {
+		return unmodifiableMap(shared);
+	}
+
 	public Mark shared(final Map<String, Object> shared) {
 
 		if ( shared == null ) {
@@ -162,6 +161,11 @@ public final class Mark {
 		this.shared=unmodifiableMap(shared);
 
 		return this;
+	}
+
+
+	public Log logger() {
+		return logger;
 	}
 
 	public Mark logger(final Log logger) {
@@ -211,7 +215,7 @@ public final class Mark {
 
 					final long count=walk
 							.filter(Files::isRegularFile)
-							.filter(path -> !layout(path, layout))
+							.filter(path -> !isLayout(path))
 							.filter(handler::apply)
 							.count();
 
@@ -254,8 +258,6 @@ public final class Mark {
 
 				logger.info(String.format("watching %s", Paths.get("").toAbsolutePath().relativize(source)));
 
-				final Path layout=source.resolve(assets).resolve(this.layout); // !!!
-
 				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
 					for (final WatchEvent<?> event : key.pollEvents()) {
 
@@ -270,13 +272,13 @@ public final class Mark {
 
 						} else if ( event.kind().equals(ENTRY_CREATE) && Files.isRegularFile(path) ) {
 
-							if ( !layout(path, layout) ) {
+							if ( !isLayout(path) ) {
 								handler.apply(path);
 							}
 
 						} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
 
-							if ( layout(path, layout) ) {
+							if ( isLayout(path) ) {
 
 								build();
 
@@ -311,9 +313,6 @@ public final class Mark {
 		this.source=source.toAbsolutePath().normalize();
 		this.target=target.toAbsolutePath().normalize();
 
-		this.assets=source.resolve(assets).toAbsolutePath().normalize();
-		this.layout=source.resolve(layout).toAbsolutePath().normalize();
-
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
 		}
@@ -330,32 +329,30 @@ public final class Mark {
 			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
 		}
 
-		if ( !Files.exists(assets) ) {
-			throw new IllegalArgumentException("missing assets folder {"+assets+"}");
-		}
+		if ( layout.equals(Paths.get(""))) {
 
-		if ( !Files.isDirectory(assets) ) {
-			throw new IllegalArgumentException("assets is not a folder {"+assets+"}");
-		}
+			throw new UnsupportedOperationException("to be implemented"); // !!! tbi
 
-		if ( target.startsWith(assets) || assets.startsWith(target) ) {
-			throw new IllegalArgumentException("overlapping assets/target folders {"+assets+" <-> "+target+"}");
-		}
+		} else {
 
-		if ( !Files.exists(layout) ) {
-			throw new IllegalArgumentException("missing default layout {"+layout+"}");
-		}
+			this.layout=source.resolve(layout).toAbsolutePath().normalize();
 
-		if ( !Files.isRegularFile(layout) ) {
-			throw new IllegalArgumentException("layout is not a plain file {"+layout+"}");
-		}
+			if ( !Files.exists(layout) ) {
+				throw new IllegalArgumentException("missing default layout {"+layout+"}");
+			}
 
-		if ( !layout.startsWith(source) ) {
-			throw new IllegalArgumentException("default layout outside assets folder {"+layout+"}");
+			if ( !Files.isRegularFile(layout) ) {
+				throw new IllegalArgumentException("default layout is not a plain file {"+layout+"}");
+			}
+
+			if ( !layout.startsWith(source) ) {
+				throw new IllegalArgumentException("default layout outside source folder {"+layout+"}");
+			}
+
 		}
 
 		final Collection<Pipe> pipes=asList(
-				new Md(target, layout, shared),
+				new Md(this),
 				new Wild()
 		);
 

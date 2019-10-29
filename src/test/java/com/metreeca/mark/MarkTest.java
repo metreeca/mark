@@ -17,7 +17,7 @@ final class MarkTest {
 				.layout(Paths.get("assets/default.jade"))
 
 				.build()
-				.watch()
+				//.watch()
 				;
 
 	}

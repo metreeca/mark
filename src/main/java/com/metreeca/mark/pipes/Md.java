@@ -4,6 +4,7 @@
 
 package com.metreeca.mark.pipes;
 
+import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
 
 import com.vladsch.flexmark.ast.Heading;
@@ -36,7 +37,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.mark.Mark.base;
 import static com.metreeca.mark.Mark.target;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -50,11 +50,13 @@ import static java.util.stream.Collectors.toMap;
 public final class Md implements Pipe {
 
 	private static final String JadeExtension=".jade";
+
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 
 
-	private final Path root;
-	private final Path layout;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private final Mark mark;
 
 	private final Parser.Builder parsers;
 	private final HtmlRenderer.Builder renderers;
@@ -62,10 +64,14 @@ public final class Md implements Pipe {
 	private final JadeConfiguration jade;
 
 
-	public Md(final Path root, final Path layout, final Map<String, Object> shared) {
+	public Md(final Mark mark) {
 
-		this.root=root;
-		this.layout=layout;
+		if ( mark == null ) {
+			throw new NullPointerException("null mark");
+		}
+
+		this.mark=mark;
+
 		this.jade=new JadeConfiguration();
 
 
@@ -89,37 +95,20 @@ public final class Md implements Pipe {
 
 
 		jade.setPrettyPrint(false);
-		jade.setSharedVariables(shared);
+		jade.setSharedVariables(mark.shared());
 
 		jade.setTemplateLoader(new TemplateLoader() {
 
-			private final Path assets=layout.getParent();
-
-
 			@Override public long getLastModified(final String name) throws IOException {
-				return Files.getLastModifiedTime(resolve(name)).toMillis();
+				return Files.getLastModifiedTime(mark.resolve(name)).toMillis();
 			}
 
 			@Override public Reader getReader(final String name) throws IOException {
-				return Files.newBufferedReader(resolve(name), UTF_8);
+				return Files.newBufferedReader(mark.resolve(name), UTF_8);
 			}
 
 			@Override public String getExtension() {
 				return JadeExtension.substring(1);
-			}
-
-
-			private Path resolve(final String name) {
-				return verify(assets.resolve(name.endsWith(JadeExtension) ? name : name+JadeExtension));
-			}
-
-			private Path verify(final Path path) {
-
-				if ( !path.toAbsolutePath().startsWith(assets) ) {
-					throw new IllegalArgumentException("layout outside source folder {"+path+"}");
-				}
-
-				return path;
 			}
 
 		});
@@ -143,15 +132,12 @@ public final class Md implements Pipe {
 
 				model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-				model.put("base", base(target, root));
+				model.put("base", mark.base(target));
 				model.put("content", content(document, model));
 				model.put("headings", headings(document));
 
 				jade.renderTemplate(
-						jade.getTemplate(layout.getParent()
-								.resolve(model.getOrDefault("layout", layout).toString())
-								.toString()
-						),
+						jade.getTemplate(model.getOrDefault("layout", "").toString()),
 						singletonMap("page", model),
 						writer
 				);

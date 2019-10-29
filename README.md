@@ -15,3 +15,21 @@ Metreeca/Mark is an minimalist static site generator.
 
 home / [www.metreeca.com](https://www.metreeca.com/)  
 forum / [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca)
+
+
+---
+
+# Front Matter
+
+- title
+- layout
+- date
+- canonical
+
+# Page Model
+
+## aaa
+
+- base
+- content
+- headings
