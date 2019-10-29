@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.FileSystems.newFileSystem;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
@@ -40,32 +42,6 @@ import static java.util.function.Predicate.isEqual;
 public final class Mark {
 
 	private static final Pattern ExtensionPattern=Pattern.compile("\\.[^.]+$");
-
-
-	private Path skin() {
-		try {
-
-			final String assets="skins/default.zip";
-			final String layout="assets/default.jade";
-
-			final URL resource=Mark.class.getResource(assets);
-
-			if ( resource == null ) {
-				logger.error("missing assets archive {"+assets+"}");
-			}
-
-			final Path path=newFileSystem(URI.create("jar:"+resource), emptyMap()).getPath(layout);
-
-			if ( !Files.exists(path) ) {
-				logger.error("missing default assets layout {"+assets+" / "+path+"}");
-			}
-
-			return path;
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
 
 
 	public Path base(final Path path) {
@@ -95,7 +71,7 @@ public final class Mark {
 
 			if ( Files.exists(path) ) {
 
-				if ( !Files.isRegularFile(path) ) {
+				if ( !isRegularFile(path) ) {
 					throw new IllegalArgumentException("layout is not a regular file {"+path+"}");
 				}
 
@@ -112,17 +88,6 @@ public final class Mark {
 			}
 
 		}
-	}
-
-
-	private boolean isSource(final Path path) {
-		return path.getFileSystem().equals(source.getFileSystem());
-	}
-
-	private boolean isLayout(final Path path) {
-		return extension(path).equals(extension(layout))
-				// !!! && path.startsWith(layout.getParent())
-				;
 	}
 
 
@@ -276,13 +241,7 @@ public final class Mark {
 				try (final Stream<Path> walk=Files.walk(layout.getRoot())) {
 
 					final long start=currentTimeMillis();
-
-					final long count=walk // !!! factor
-							.filter(Files::isRegularFile)
-							.filter(path -> !isLayout(path))
-							.filter(handler::apply)
-							.count();
-
+					final long count=walk.filter(handler::apply).count();
 					final long stop=currentTimeMillis();
 
 					if ( count > 0 ) {
@@ -300,13 +259,7 @@ public final class Mark {
 				try (final Stream<Path> walk=Files.walk(source)) {
 
 					final long start=currentTimeMillis();
-
-					final long count=walk // !!! factor
-							.filter(Files::isRegularFile)
-							.filter(path -> !isLayout(path))
-							.filter(handler::apply)
-							.count();
-
+					final long count=walk.filter(handler::apply).count();
 					final long stop=currentTimeMillis();
 
 					if ( count > 0 ) {
@@ -341,40 +294,30 @@ public final class Mark {
 				};
 
 				try (final Stream<Path> sources=Files.walk(source)) {
-					sources.filter(Files::isDirectory).forEach(register); // register existing folders
+					sources.filter(Files::isDirectory).forEach(register); // register existing source folders
 				}
 
 				logger.info(String.format("watching %s", Paths.get("").toAbsolutePath().relativize(source)));
 
-				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
+				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch source changes
 					for (final WatchEvent<?> event : key.pollEvents()) {
 
 						final Kind<?> kind=event.kind();
 						final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-						if ( event.kind().equals(ENTRY_CREATE) && Files.isDirectory(path) ) { // register new folders
+						if ( event.kind().equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
 
 							logger.info(source.relativize(path).toString());
 
 							register.accept(path);
 
-						} else if ( event.kind().equals(ENTRY_CREATE) && Files.isRegularFile(path) ) {
+						} else if ( event.kind().equals(ENTRY_CREATE) && isRegularFile(path) ) {
 
-							if ( !isLayout(path) ) {
-								handler.apply(path);
-							}
+							handler.apply(path);
 
-						} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
+						} else if ( event.kind().equals(ENTRY_MODIFY) && isRegularFile(path) ) {
 
-							if ( isLayout(path) ) {
-
-								build();
-
-							} else {
-
-								handler.apply(path);
-
-							}
+							if ( isLayout(path) ) { build(); } else { handler.apply(path); }
 
 						} else if ( kind.equals(OVERFLOW) ) {
 
@@ -398,39 +341,39 @@ public final class Mark {
 
 	private Mark exec(final Consumer<Function<Path, Boolean>> task) {
 
-		this.source=source.toAbsolutePath().normalize();
-		this.target=target.toAbsolutePath().normalize();
+		this.source=path(source);
+		this.target=path(target);
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
 		}
 
-		if ( !Files.isDirectory(source) ) {
+		if ( !isDirectory(source) ) {
 			throw new IllegalArgumentException("source is not a folder {"+source+"}");
 		}
 
-		if ( Files.exists(target) && !Files.isDirectory(target) ) {
+		if ( Files.exists(target) && !isDirectory(target) ) {
 			throw new IllegalArgumentException("target is not a folder {"+target+"}");
 		}
 
 		if ( target.startsWith(source) || source.startsWith(target) ) {
-			throw new IllegalArgumentException("overlapping source/target folders {"+source+" <-> "+target+"}");
+			throw new IllegalArgumentException("overlapping source/target folders {"+source+" // "+target+"}");
 		}
 
 		if ( layout.equals(Paths.get("")) ) {
 
-			this.layout=skin().toAbsolutePath().normalize();
+			this.layout=path(layout("skins/default.zip", "assets/default.jade"));
 
 		} else {
 
-			this.layout=source.resolve(layout).toAbsolutePath().normalize();
+			this.layout=path(source.resolve(layout));
 
 			if ( !Files.exists(layout) ) {
 				throw new IllegalArgumentException("missing default layout {"+layout+"}");
 			}
 
-			if ( !Files.isRegularFile(layout) ) {
-				throw new IllegalArgumentException("default layout is not a plain file {"+layout+"}");
+			if ( !isRegularFile(layout) ) {
+				throw new IllegalArgumentException("default layout is not a regular file {"+layout+"}");
 			}
 
 			if ( !layout.startsWith(source) ) {
@@ -446,26 +389,30 @@ public final class Mark {
 
 		task.accept(_source -> {
 
-			try {
+			if ( isDirectory(_source) || isLayout(_source) ) { return false; } else {
 
-				final Path _common=isSource(_source) ? source.relativize(_source)
-						: Paths.get(_source.getRoot().relativize(_source).toString());
+				try {
 
-				final Path _target=target.resolve(_common);
+					final Path _common=isSource(_source) ? source.relativize(_source)
+							: Paths.get(_source.getRoot().relativize(_source).toString());
 
-				Files.createDirectories(_target.getParent());
+					final Path _target=target.resolve(_common);
 
-				return pipes.stream()
-						.filter(pipe -> pipe.process(_source, _target))
-						.peek(status -> logger.info(_common.toString()))
-						.findFirst()
-						.isPresent();
+					Files.createDirectories(_target.getParent());
 
-			} catch ( final IOException|RuntimeException e ) {
+					return pipes.stream()
+							.filter(pipe -> pipe.process(_source, _target))
+							.peek(status -> logger.info(_common.toString()))
+							.findFirst()
+							.isPresent();
 
-				logger.error(String.format("error while processing %s", _source), e);
+				} catch ( final IOException|RuntimeException e ) {
 
-				return false;
+					logger.error(String.format("error while processing %s", _source), e);
+
+					return false;
+
+				}
 
 			}
 
@@ -473,5 +420,44 @@ public final class Mark {
 
 		return this;
 	}
+
+
+	private Path path(final Path source) {
+		return source.toAbsolutePath().normalize();
+	}
+
+	private Path layout(final String skin, final String layout) {
+		try {
+
+			final URL zip=Mark.class.getResource(skin);
+
+			if ( zip == null ) {
+				logger.error("missing skin archive {"+skin+"}");
+			}
+
+			final Path path=newFileSystem(URI.create("jar:"+zip), emptyMap()).getPath(layout);
+
+			if ( !Files.exists(path) ) {
+				logger.error("missing default skin layout {"+skin+" // "+path+"}");
+			}
+
+			return path;
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+
+	private boolean isSource(final Path path) {
+		return path.getFileSystem().equals(source.getFileSystem());
+	}
+
+	private boolean isLayout(final Path path) {
+		return extension(path).equals(extension(layout))
+				// !!! && path.startsWith(layout.getParent())
+				;
+	}
+
 
 }
