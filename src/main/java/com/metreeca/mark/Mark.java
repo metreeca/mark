@@ -14,6 +14,7 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
@@ -44,27 +45,22 @@ public final class Mark {
 	private Path skin() {
 		try {
 
-			final FileSystem skin=newFileSystem(URI.create("jar:"+Mark.class.getResource("skins/default.zip")), emptyMap());
+			final String assets="skins/default.zip";
+			final String layout="assets/default.jade";
 
-			for (final Path root : skin.getRootDirectories()) {
-				try (final Stream<Path> walk=Files.walk(root)) {
-					walk.filter(Files::isRegularFile).forEachOrdered(source -> {
-						try {
+			final URL resource=Mark.class.getResource(assets);
 
-							final Path target=Paths.get(assets+source.toString());
-
-							Files.createDirectories(target.getParent());
-							Files.copy(source, target);
-
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-
-					});
-				}
+			if ( resource == null ) {
+				logger.error("missing assets archive {"+assets+"}");
 			}
 
-			return assets.resolve(Paths.get("assets/default.jade"));
+			final Path path=newFileSystem(URI.create("jar:"+resource), emptyMap()).getPath(layout);
+
+			if ( !Files.exists(path) ) {
+				logger.error("missing default assets layout {"+assets+" / "+path+"}");
+			}
+
+			return path;
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -84,21 +80,49 @@ public final class Mark {
 	}
 
 	public Path resolve(final String name) {
-		if ( name.isEmpty() || name.equals(extension(layout)) ) {
+		if ( name.isEmpty() || name.equals(extension(layout)) ) { // extension may be forced on empty path by loaders
 
 			return layout;
 
-		} else {
+		} else if ( isSource(layout) ) {
 
 			return layout.getParent().resolve(name);
+
+		} else {
+
+			final Path base=Paths.get(layout.getRoot().relativize(layout.getParent()).toString());
+			final Path path=source.resolve(base).resolve(name);
+
+			if ( Files.exists(path) ) {
+
+				if ( !Files.isRegularFile(path) ) {
+					throw new IllegalArgumentException("layout is not a regular file {"+path+"}");
+				}
+
+				if ( !path.startsWith(source) ) {
+					throw new IllegalArgumentException("layout outside source folder {"+path+"}");
+				}
+
+				return path;
+
+			} else {
+
+				return layout.getParent().resolve(name);
+
+			}
 
 		}
 	}
 
 
+	private boolean isSource(final Path path) {
+		return path.getFileSystem().equals(source.getFileSystem());
+	}
+
 	private boolean isLayout(final Path path) {
-		return path.startsWith(layout.getParent())
-				&& extension(path).equals(extension(layout));
+		return extension(path).equals(extension(layout))
+				// !!! && path.startsWith(layout.getParent())
+				;
 	}
 
 
@@ -138,33 +162,6 @@ public final class Mark {
 	private Map<String, Object> shared=emptyMap();
 
 	private Log logger=new SystemStreamLog();
-
-	private Path assets=assets();
-
-
-	private Path assets() {
-		try {
-
-			final Path assets=Files.createTempDirectory("");
-
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				try (final Stream<Path> walk=Files.walk(this.assets)) {
-
-					walk.sorted(reverseOrder()).forEachOrdered(path -> {
-						try { Files.delete(path); } catch ( final IOException e ) { throw new UncheckedIOException(e); }
-					});
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			}));
-
-			return assets;
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
 
 
 	public Path source() {
@@ -274,9 +271,9 @@ public final class Mark {
 
 			}
 
-			if ( Files.exists(assets) ) { // process skin assets
+			if ( !isSource(layout) ) { // process skin assets
 
-				try (final Stream<Path> walk=Files.walk(assets)) {
+				try (final Stream<Path> walk=Files.walk(layout.getRoot())) {
 
 					final long start=currentTimeMillis();
 
@@ -289,7 +286,7 @@ public final class Mark {
 					final long stop=currentTimeMillis();
 
 					if ( count > 0 ) {
-						logger.info(String.format("generated %,d files in %,.3f s", count, (stop-start)/1000f));
+						logger.info(String.format("extracted %,d files in %,.3f s", count, (stop-start)/1000f));
 					}
 
 				} catch ( final IOException e ) {
@@ -342,8 +339,6 @@ public final class Mark {
 						throw new UncheckedIOException(e);
 					}
 				};
-
-				// !!! watch assets?
 
 				try (final Stream<Path> sources=Files.walk(source)) {
 					sources.filter(Files::isDirectory).forEach(register); // register existing folders
@@ -453,7 +448,9 @@ public final class Mark {
 
 			try {
 
-				final Path _common=(_source.startsWith(source) ? source : assets).relativize(_source);
+				final Path _common=isSource(_source) ? source.relativize(_source)
+						: Paths.get(_source.getRoot().relativize(_source).toString());
+
 				final Path _target=target.resolve(_common);
 
 				Files.createDirectories(_target.getParent());
