@@ -228,6 +228,41 @@
 
 			</plugin>
 
+			<plugin> <!-- https://maven.apache.org/plugins/maven-assembly-plugin/ -->
+
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.1.1</version>
+
+				<executions>
+					<execution>
+
+						<id>generate-default-skin</id>
+						<phase>generate-resources</phase>
+
+						<goals>
+							<goal>single</goal>
+						</goals>
+
+						<configuration>
+
+							<outputDirectory>${project.build.directory}/classes/com/metreeca/mark/skins</outputDirectory>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>default</finalName>
+							<attach>false</attach>
+
+							<descriptors>
+								<descriptor>src/main/assembly/default-skin.xml</descriptor>
+							</descriptors>
+
+						</configuration>
+
+
+					</execution>
+				</executions>
+
+			</plugin>
+
 			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
 
 				<groupId>org.apache.maven.plugins</groupId>
