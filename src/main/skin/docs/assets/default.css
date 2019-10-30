@@ -107,6 +107,10 @@ body > main > * {
 	padding-right: 1rem;
 }
 
+body > * > *:empty {
+	display: none;
+}
+
 body > * > header {
 	flex-shrink: 0;
 	padding-top: 0.5rem;
@@ -183,8 +187,11 @@ body > nav > section > * {
 	display: block;
 }
 
+body > nav > section > *:first-child {
+	margin-top: 1rem;
+}
+
 body > nav > section > a {
-	margin-top: 1em;
 	margin-bottom: 1em;
 	font-size: 125%;
 	color: #999;
@@ -319,7 +326,6 @@ h1,
 h2,
 h3 {
 	clear: both;
-	margin-top: 1em;
 	margin-bottom: 0.5em;
 	font-weight: 300;
 	color: #333;
@@ -328,6 +334,7 @@ h3 {
 * + h1,
 * + h2,
 * + h3 {
+	margin-top: 1em;
 }
 
 h1 {

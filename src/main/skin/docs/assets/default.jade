@@ -32,7 +32,8 @@ html(lang="en")
 
             section
 
-                a(class="title" href="#_top") #{page.title}
+                if page.title && page.path != "index.html"
+                    a(class="title" href="#_top") #{page.title}
 
                 for heading in page.headings
                     #{"h"+heading.level}

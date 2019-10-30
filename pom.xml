@@ -246,13 +246,12 @@
 
 						<configuration>
 
-							<outputDirectory>${project.build.directory}/classes/com/metreeca/mark/skins</outputDirectory>
-							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>default</finalName>
+							<outputDirectory>${project.build.directory}/classes/com/metreeca/mark</outputDirectory>
+							<finalName>skin</finalName>
 							<attach>false</attach>
 
 							<descriptors>
-								<descriptor>src/main/assembly/default-skin.xml</descriptor>
+								<descriptor>src/main/assembly/docs.xml</descriptor>
 							</descriptors>
 
 						</configuration>

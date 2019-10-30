@@ -28,8 +28,7 @@ forum / [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum
 
 # Page Model
 
-## aaa
-
 - base
+- path
 - content
 - headings

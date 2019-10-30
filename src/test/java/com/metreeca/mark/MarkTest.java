@@ -12,7 +12,7 @@ final class MarkTest {
 	public static void main(final String... args) {
 		new Mark()
 
-				.source(Paths.get("src/docs"))
+				.source(Paths.get("docs"))
 				.target(Paths.get("target/docs"))
 				//.layout(Paths.get("assets/default.jade"))
 

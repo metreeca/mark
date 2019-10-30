@@ -19,12 +19,11 @@ import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.lang.Math.max;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isDirectory;
@@ -41,80 +40,30 @@ import static java.util.function.Predicate.isEqual;
 
 public final class Mark {
 
-	private static final Pattern ExtensionPattern=Pattern.compile("\\.[^.]+$");
-
-
-	public Path base(final Path path) {
+	public static String basename(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
 		}
 
-		return path.getParent().equals(target)
-				? Paths.get(".")
-				: path.getParent().relativize(target);
+		final String name=path.getFileName().toString();
+		final int dot=name.lastIndexOf('.');
+
+		return dot >= 0 ? name.substring(0, dot) : name;
+
 	}
 
-	public Path resolve(final String name) {
-		if ( name.isEmpty() || name.equals(extension(layout)) ) { // extension may be forced on empty path by loaders
-
-			return layout;
-
-		} else if ( isSource(layout) ) {
-
-			return layout.getParent().resolve(name);
-
-		} else {
-
-			final Path base=Paths.get(layout.getRoot().relativize(layout.getParent()).toString());
-			final Path path=source.resolve(base).resolve(name);
-
-			if ( Files.exists(path) ) {
-
-				if ( !isRegularFile(path) ) {
-					throw new IllegalArgumentException("layout is not a regular file {"+path+"}");
-				}
-
-				if ( !path.startsWith(source) ) {
-					throw new IllegalArgumentException("layout outside source folder {"+path+"}");
-				}
-
-				return path;
-
-			} else {
-
-				return layout.getParent().resolve(name);
-
-			}
-
-		}
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public static Path target(final Path path, final String extension) {
+	public static String extension(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
 		}
 
-		if ( extension == null ) {
-			throw new NullPointerException("null extension");
-		}
+		final String name=path.getFileName().toString();
+		final int dot=name.lastIndexOf('.');
 
-		return path.getParent().resolve(
-				ExtensionPattern.matcher(path.getFileName().toString()).replaceFirst(extension)
-		);
-	}
+		return dot >= 0 ? name.substring(dot) : "";
 
-
-	private static String extension(final Path path) {
-		return extension(path.toString());
-	}
-
-	private static String extension(final String path) {
-		return path.substring(max(0, path.lastIndexOf('.')));
 	}
 
 
@@ -206,6 +155,66 @@ public final class Mark {
 		this.logger=logger;
 
 		return this;
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	public Path base(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		return Optional.of(path.getParent().relativize(target))
+				.filter(isEqual(Paths.get("")).negate())
+				.orElse(Paths.get("."));
+	}
+
+	public Path path(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		return target().relativize(path);
+	}
+
+
+	public Path resolve(final String name) { // !!! refactor
+		if ( name.isEmpty() || name.equals(extension(layout)) ) { // ;( loaders may force extension on empty paths…
+
+			return layout;
+
+		} else if ( isSource(layout) ) {
+
+			return layout.getParent().resolve(name);
+
+		} else {
+
+			final Path base=relative(layout.getParent());
+			final Path path=source.resolve(base).resolve(name);
+
+			if ( Files.exists(path) ) {
+
+				if ( !isRegularFile(path) ) {
+					throw new IllegalArgumentException("layout is not a regular file {"+path+"}");
+				}
+
+				if ( !path.startsWith(source) ) {
+					throw new IllegalArgumentException("layout outside source folder {"+path+"}");
+				}
+
+				return path;
+
+			} else {
+
+				return layout.getParent().resolve(name);
+
+			}
+
+		}
 	}
 
 
@@ -341,8 +350,8 @@ public final class Mark {
 
 	private Mark exec(final Consumer<Function<Path, Boolean>> task) {
 
-		this.source=path(source);
-		this.target=path(target);
+		this.source=normal(source);
+		this.target=normal(target);
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
@@ -362,11 +371,11 @@ public final class Mark {
 
 		if ( layout.equals(Paths.get("")) ) {
 
-			this.layout=path(layout("skins/default.zip", "assets/default.jade"));
+			this.layout=normal(layout("skin-docs.zip", "assets/default.jade"));
 
 		} else {
 
-			this.layout=path(source.resolve(layout));
+			this.layout=normal(source.resolve(layout));
 
 			if ( !Files.exists(layout) ) {
 				throw new IllegalArgumentException("missing default layout {"+layout+"}");
@@ -393,9 +402,7 @@ public final class Mark {
 
 				try {
 
-					final Path _common=isSource(_source) ? source.relativize(_source)
-							: Paths.get(_source.getRoot().relativize(_source).toString());
-
+					final Path _common=relative(_source);
 					final Path _target=target.resolve(_common);
 
 					Files.createDirectories(_target.getParent());
@@ -422,9 +429,15 @@ public final class Mark {
 	}
 
 
-	private Path path(final Path source) {
-		return source.toAbsolutePath().normalize();
+	private Path normal(final Path path) {
+		return path.toAbsolutePath().normalize();
 	}
+
+	private Path relative(final Path path) {
+		return path.getFileSystem().equals(source.getFileSystem()) ? source.relativize(path)
+				: source.getFileSystem().getPath(path.getRoot().relativize(path).toString());
+	}
+
 
 	private Path layout(final String skin, final String layout) {
 		try {
@@ -432,7 +445,7 @@ public final class Mark {
 			final URL zip=Mark.class.getResource(skin);
 
 			if ( zip == null ) {
-				logger.error("missing skin archive {"+skin+"}");
+				throw new IllegalArgumentException("missing skin archive {"+skin+"}");
 			}
 
 			final Path path=newFileSystem(URI.create("jar:"+zip), emptyMap()).getPath(layout);
@@ -455,8 +468,7 @@ public final class Mark {
 
 	private boolean isLayout(final Path path) {
 		return extension(path).equals(extension(layout))
-				// !!! && path.startsWith(layout.getParent())
-				;
+				&& relative(path).startsWith(relative(layout.getParent()));
 	}
 
 

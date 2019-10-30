@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.metreeca.mark.Mark.target;
+import static com.metreeca.mark.Mark.basename;
+import static com.metreeca.mark.Mark.extension;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
@@ -119,11 +120,13 @@ public final class Md implements Pipe {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public boolean process(final Path source, final Path target) {
-		if ( source.toString().endsWith(".md") ) {
+		if ( extension(source).endsWith(".md") ) {
+
+			final Path effective=target.resolveSibling(basename(target)+".html");
 
 			try (
 					final BufferedReader reader=Files.newBufferedReader(source, UTF_8);
-					final BufferedWriter writer=Files.newBufferedWriter(target(target, ".html"), UTF_8)
+					final BufferedWriter writer=Files.newBufferedWriter(effective, UTF_8)
 			) {
 
 				final Node document=parsers.build().parseReader(reader);
@@ -132,7 +135,8 @@ public final class Md implements Pipe {
 
 				model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-				model.put("base", mark.base(target));
+				model.put("base", mark.base(effective).toString());
+				model.put("path", mark.path(effective).toString());
 				model.put("content", content(document, model));
 				model.put("headings", headings(document));
 
