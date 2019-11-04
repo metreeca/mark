@@ -14,6 +14,7 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
 import java.util.Collection;
@@ -516,7 +517,13 @@ public final class Mark {
 
 	private Path assets(final String name) {
 
-		final String assets=getClass().getResource(name).toString();
+		final URL resource=getClass().getResource(name);
+
+		if ( resource == null ) {
+			throw new NullPointerException("unknown skin {" +name+ "}");
+		}
+
+		final String assets=resource.toString();
 
 		if ( assets.startsWith("file:") ) {
 
