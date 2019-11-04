@@ -101,11 +101,11 @@ public final class Md implements Pipe {
 		jade.setTemplateLoader(new TemplateLoader() {
 
 			@Override public long getLastModified(final String name) throws IOException {
-				return Files.getLastModifiedTime(mark.resolve(name)).toMillis();
+				return Files.getLastModifiedTime(mark.layout(name)).toMillis();
 			}
 
 			@Override public Reader getReader(final String name) throws IOException {
-				return Files.newBufferedReader(mark.resolve(name), UTF_8);
+				return Files.newBufferedReader(mark.layout(name), UTF_8);
 			}
 
 			@Override public String getExtension() {

@@ -256,14 +256,42 @@ public final class Mark {
 	}
 
 
-	public Path resolve(final String name) {
+	public Path layout(final String name) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
 		}
 
-		return name.isEmpty() || name.equals(extension(layout)) ? // ;( loaders may force extension on empty paths…
-				layout : layout.resolveSibling(name);
+		if ( name.isEmpty() || name.equals(extension(layout)) ) { // ;( loaders may force extension on empty paths…
+
+			return layout;
+
+		} else {
+
+			final String base=relative(layout.getParent()).toString();
+
+			for (final Path folder : asList(source, assets)) {
+
+				final Path layout=folder.resolve(base).resolve(name);
+
+				if ( exists(layout) ) {
+
+					if ( !isRegularFile(layout) ) {
+						throw new IllegalArgumentException("layout is not a regular file {"+layout+"}");
+					}
+
+					if ( !layout.startsWith(folder) ) {
+						throw new IllegalArgumentException("layout outside base folder {" +folder+ " // "+layout+"}");
+					}
+
+					return layout;
+				}
+
+			}
+
+			throw new IllegalArgumentException("unknown layout {"+name+"}");
+
+		}
 	}
 
 
