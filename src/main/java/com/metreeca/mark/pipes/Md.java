@@ -8,6 +8,7 @@ import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
 
 import com.vladsch.flexmark.ast.Heading;
+import com.vladsch.flexmark.ast.Link;
 import com.vladsch.flexmark.ast.Text;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
@@ -130,6 +131,16 @@ public final class Md implements Pipe {
 			) {
 
 				final Node document=parsers.build().parseReader(reader);
+
+				new NodeVisitor(new VisitHandler<>(Link.class, link -> { // !!! as post-processing extension
+
+					final BasedSequence url=link.getUrl();
+
+					if ( url.endsWith(".md") ) {
+						link.setUrl(url.removeProperSuffix(".md").append(".html"));
+					}
+
+				})).visit(document);
 
 				final Map<String, Object> model=metadata(document);
 
