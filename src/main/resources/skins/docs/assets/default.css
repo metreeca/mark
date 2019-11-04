@@ -1,9 +1,9 @@
 /*
- * Copyright © 2018 Metreeca srl. All rights reserved.
+ * Copyright © 2019 Metreeca srl. All rights reserved.
  */
-@import url(//fonts.googleapis.com/css?family=Roboto:100,300|Roboto+Condensed:300,700);
-@import url(//fonts.googleapis.com/css?family=Roboto+Mono:400,700);
-@import url(//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(https://fonts.googleapis.com/css?family=Roboto:100,300|Roboto+Condensed:300,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700);
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
 
 *, *::before, *::after {
 	flex: 0 0 auto;
