@@ -19,7 +19,7 @@ Add the pluging to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>0.0.0-SNAPSHOT</version>
+            <version>0.1</version>
 
             <executions>
                 <execution>
