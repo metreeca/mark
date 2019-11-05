@@ -148,8 +148,8 @@ public final class Md implements Pipe {
 
 				model.put("base", mark.base(effective).toString());
 				model.put("path", mark.path(effective).toString());
-				model.put("content", content(document, model));
 				model.put("headings", headings(document));
+				model.put("content", content(document, model));
 
 				jade.renderTemplate(
 						jade.getTemplate(model.getOrDefault("layout", "").toString()),
