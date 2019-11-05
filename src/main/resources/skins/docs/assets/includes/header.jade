@@ -1,8 +1,8 @@
-- var name = "metreeca-link".replace("metreeca-", "")
-- var version = "1.10"
+- var module = project.artifactId.replace("metreeca-", "")
+- var version = project.version
 
 a(class="logo" href="https://www.metreeca.com/")
 span
-    a(href=page.base) #{name}
+    a(href=page.base) #{module}
     =  " / "
-    a(href="https://github.com/metreeca/#{name}/releases/tag/v#{version}" target="_blank") v#{version}
+    a(href="https://github.com/metreeca/#{module}/releases/tag/v#{version}" target="_blank") v#{version}
