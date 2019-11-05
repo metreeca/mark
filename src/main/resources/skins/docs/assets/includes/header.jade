@@ -1,5 +1,5 @@
-- var module = project.artifactId.replace("metreeca-", "")
-- var version = project.version
+- var module = project ? project.artifactId.replace("metreeca-", "") : ""
+- var version = project ?  project.version : ""
 
 a(class="logo" href="https://www.metreeca.com/")
 span
