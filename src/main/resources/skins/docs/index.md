@@ -2,6 +2,12 @@
 title: Samples
 ---
 
+```
+x
+${page.title}
+```
+
+
 Shared theme for Metreeca docs sites.
 
 |Variable|Value|  

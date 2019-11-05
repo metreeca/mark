@@ -7,7 +7,8 @@ package com.metreeca.mark.pipes;
 import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
 
-import com.vladsch.flexmark.ast.*;
+import com.vladsch.flexmark.ast.Heading;
+import com.vladsch.flexmark.ast.Link;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -19,6 +20,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.*;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
+import com.vladsch.flexmark.util.sequence.CharSubSequence;
 import com.vladsch.flexmark.util.sequence.SubSequence;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.exceptions.ExpressionException;
@@ -205,24 +207,28 @@ public final class Md implements Pipe {
 
 	private String content(final Node document, final Map<String, Object> model) {
 
-		new NodeVisitor(new VisitHandler<?>[]{}) { // ;( unable to match abstract node classes with VisitHandler
-
-			@Override public void visit(final Node node) {
-
-				node.setChars(evaluate(node.getChars(), model));
-
-				if ( node instanceof ContentNode ) {
-					((ContentNode)node).setContentLines(((ContentNode)node).getContentLines()
-							.stream()
-							.map(line -> evaluate(line, model))
-							.collect(toList())
-					);
-				}
-
-				super.visit(node);
-			}
-
-		}.visit(document);
+		//new NodeVisitor(new VisitHandler<?>[]{}) { // ;( unable to match abstract node classes with VisitHandler
+		//
+		//	@Override public void visit(final Node node) {
+		//
+		//		super.visit(node);
+		//
+		//		if ( node instanceof ContentNode ) {
+		//
+		//			((ContentNode)node).setContentLines(((ContentNode)node).getContentLines()
+		//					.stream()
+		//					.map(line -> evaluate(line, model))
+		//					.collect(toList())
+		//			);
+		//
+		//		} else {
+		//
+		//			node.setChars(evaluate(node.getChars(), model));
+		//
+		//		}
+		//	}
+		//
+		//}.visit(document);
 
 		return renderers.build().render(document);
 	}
@@ -271,7 +277,7 @@ public final class Md implements Pipe {
 
 		builder.append(chars.subSequence(last, chars.length())); // trailing text
 
-		return SubSequence.of(builder);
+		return CharSubSequence.of(builder);
 	}
 
 }
