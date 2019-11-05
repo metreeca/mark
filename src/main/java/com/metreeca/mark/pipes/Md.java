@@ -7,9 +7,7 @@ package com.metreeca.mark.pipes;
 import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
 
-import com.vladsch.flexmark.ast.Heading;
-import com.vladsch.flexmark.ast.Link;
-import com.vladsch.flexmark.ast.Text;
+import com.vladsch.flexmark.ast.*;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -18,9 +16,7 @@ import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.ast.NodeVisitor;
-import com.vladsch.flexmark.util.ast.VisitHandler;
+import com.vladsch.flexmark.util.ast.*;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import com.vladsch.flexmark.util.sequence.SubSequence;
@@ -149,7 +145,7 @@ public final class Md implements Pipe {
 				model.put("base", mark.base(effective).toString());
 				model.put("path", mark.path(effective).toString());
 				model.put("headings", headings(document));
-				model.put("content", content(document, model));
+				model.put("content", content(document, singletonMap("page", model)));
 
 				jade.renderTemplate(
 						jade.getTemplate(model.getOrDefault("layout", "").toString()),
@@ -198,60 +194,6 @@ public final class Md implements Pipe {
 		return model;
 	}
 
-	private String content(final Node document, final Map<String, Object> model) {
-
-		new NodeVisitor(new VisitHandler<>(Text.class, text -> {
-
-			final BasedSequence chars=text.getChars();
-
-			final Matcher matcher=ExpressionPattern.matcher(chars);
-			final ExpressionHandler handler=jade.getExpressionHandler();
-
-			final StringBuilder builder=new StringBuilder(chars.length());
-
-			int last=0;
-
-			while ( matcher.find() ) {
-
-				final int start=matcher.start();
-				final int end=matcher.end();
-
-				builder.append(chars.subSequence(last, start)); // leading text
-
-				if ( matcher.group().charAt(0) == '\\' ) { // escaped
-
-					builder.append(chars.subSequence(start+1, end)); // expression text
-
-				} else {
-
-					try {
-
-						final JadeModel bindings=new JadeModel(jade.getSharedVariables());
-
-						bindings.putAll(model);
-
-						builder.append(SubSequence.of(handler.evaluateStringExpression(
-								matcher.group(1), bindings // expression value
-						)));
-
-					} catch ( ExpressionException e ) {
-						throw new RuntimeException(e);
-					}
-
-				}
-
-				last=end;
-			}
-
-			builder.append(chars.subSequence(last, chars.length())); // trailing text
-
-			text.setChars(SubSequence.of(builder));
-
-		})).visit(document);
-
-		return renderers.build().render(document);
-	}
-
 	private List<Heading> headings(final Node document) {
 
 		final List<Heading> headings=new ArrayList<>();
@@ -259,6 +201,77 @@ public final class Md implements Pipe {
 		new NodeVisitor(new VisitHandler<>(Heading.class, headings::add)).visit(document);
 
 		return headings;
+	}
+
+	private String content(final Node document, final Map<String, Object> model) {
+
+		new NodeVisitor(new VisitHandler<?>[]{}) { // ;( unable to match abstract node classes with VisitHandler
+
+			@Override public void visit(final Node node) {
+
+				node.setChars(evaluate(node.getChars(), model));
+
+				if ( node instanceof ContentNode ) {
+					((ContentNode)node).setContentLines(((ContentNode)node).getContentLines()
+							.stream()
+							.map(line -> evaluate(line, model))
+							.collect(toList())
+					);
+				}
+
+				super.visit(node);
+			}
+
+		}.visit(document);
+
+		return renderers.build().render(document);
+	}
+
+
+	private BasedSequence evaluate(final CharSequence chars, final Map<String, Object> model) {
+
+		final Matcher matcher=ExpressionPattern.matcher(chars);
+		final ExpressionHandler handler=jade.getExpressionHandler();
+
+		final StringBuilder builder=new StringBuilder(chars.length());
+
+		int last=0;
+
+		while ( matcher.find() ) {
+
+			final int start=matcher.start();
+			final int end=matcher.end();
+
+			builder.append(chars.subSequence(last, start)); // leading text
+
+			if ( matcher.group().charAt(0) == '\\' ) { // escaped
+
+				builder.append(chars.subSequence(start+1, end)); // expression text
+
+			} else {
+
+				try {
+
+					final JadeModel bindings=new JadeModel(jade.getSharedVariables());
+
+					bindings.putAll(model);
+
+					builder.append(SubSequence.of(handler.evaluateStringExpression(
+							matcher.group(1), bindings // expression value
+					)));
+
+				} catch ( ExpressionException e ) {
+					throw new RuntimeException(e);
+				}
+
+			}
+
+			last=end;
+		}
+
+		builder.append(chars.subSequence(last, chars.length())); // trailing text
+
+		return SubSequence.of(builder);
 	}
 
 }
