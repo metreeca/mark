@@ -2,9 +2,20 @@
 title: Samples
 ---
 
-```
-x
-${page.title}
+```java
+final class ${page.title} {
+
+	public static void main(final String... args) {
+		new Mark()
+
+				.source(Paths.get("src/docs"))
+				.target(Paths.get("target/docs"))
+
+				.build();
+				
+	}
+
+}
 ```
 
 

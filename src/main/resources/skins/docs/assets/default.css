@@ -27,9 +27,11 @@ header, footer, nav, h1, h2, h3, dt, th, a, strong, small {
 	font-family: 'Roboto Condensed', Helvetica, Arial, sans-serif;
 }
 
-code {
+code, code[class*=language-], pre[class*=language-] {
 	font-family: "Roboto Mono", monospace;
 	font-weight: 400;
+	line-height: inherit;
+	letter-spacing: -0.01em;
 	color: #333;
 }
 
@@ -539,10 +541,8 @@ abbr {
 	white-space: pre;
 }
 
-code, code[class*=language-] {
-	white-space: pre;
-	letter-spacing: -0.01em;
-	font-size: 85%;
+code, code[class*=language-], pre[class*=language-] {
+	font-size: 90%;
 }
 
 select {
