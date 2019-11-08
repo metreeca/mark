@@ -282,7 +282,7 @@ public final class Mark {
 					}
 
 					if ( !layout.startsWith(folder) ) {
-						throw new IllegalArgumentException("layout outside base folder {" +folder+ " // "+layout+"}");
+						throw new IllegalArgumentException("layout outside base folder {"+folder+" // "+layout+"}");
 					}
 
 					return layout;
@@ -484,7 +484,7 @@ public final class Mark {
 
 		task.accept(_source -> {
 
-			if ( isDirectory(_source) || isLayout(_source) ) { return false; } else {
+			if ( isDirectory(_source) || isLayout(_source) || isHidden(_source) ) { return false; } else {
 
 				try {
 
@@ -520,7 +520,7 @@ public final class Mark {
 		final URL resource=getClass().getResource(name);
 
 		if ( resource == null ) {
-			throw new NullPointerException("unknown skin {" +name+ "}");
+			throw new NullPointerException("unknown skin {"+name+"}");
 		}
 
 		final String assets=resource.toString();
@@ -551,6 +551,10 @@ public final class Mark {
 		}
 	}
 
+
+	private boolean isHidden(final Path path) {
+		return path.getFileName().toString().startsWith(".");
+	}
 
 	private boolean isLayout(final Path path) {
 		return extension(path).equals(extension(layout));
