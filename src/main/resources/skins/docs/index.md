@@ -46,6 +46,10 @@ Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis 
  
 # Typography
 
+## Links
+
+- [self](index.md)
+
 ## Lists
 
 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.

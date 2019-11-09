@@ -4,6 +4,7 @@
 
 package com.metreeca.mark.pipes;
 
+import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
 
 import java.io.IOException;
@@ -15,6 +16,17 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
 public final class Wild implements Pipe {
+
+	public Wild(final Mark mark) {
+
+		if ( mark == null ) {
+			throw new NullPointerException("null mark");
+		}
+
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public boolean process(final Path source, final Path target) {
 		try {

@@ -44,7 +44,34 @@ public final class Mark {
 	private static final Path Base=Paths.get("");
 
 
-	public static String basename(final Path path) {
+	public static Optional<Path> source(final Path path, final String extension) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( extension == null ) {
+			throw new NullPointerException("null extension");
+		}
+
+		return Optional.of(path).filter(p -> extension(p).equalsIgnoreCase(extension));
+	}
+
+	public static Path target(final Path path, final String extension) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( extension == null ) {
+			throw new NullPointerException("null extension");
+		}
+
+		return path.resolveSibling(basename(path)+extension);
+	}
+
+
+	private static String basename(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -54,10 +81,9 @@ public final class Mark {
 		final int dot=name.lastIndexOf('.');
 
 		return dot >= 0 ? name.substring(0, dot) : name;
-
 	}
 
-	public static String extension(final Path path) {
+	private static String extension(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -67,7 +93,6 @@ public final class Mark {
 		final int dot=name.lastIndexOf('.');
 
 		return dot >= 0 ? name.substring(dot) : "";
-
 	}
 
 
@@ -479,7 +504,7 @@ public final class Mark {
 
 		final Collection<Pipe> pipes=asList(
 				new Md(this),
-				new Wild()
+				new Wild(this)
 		);
 
 		task.accept(_source -> {
@@ -565,5 +590,4 @@ public final class Mark {
 				: contains(assets, path) ? assets.relativize(path)
 				: path;
 	}
-
 }
