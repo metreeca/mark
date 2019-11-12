@@ -97,10 +97,10 @@ public final class Jade {
 
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 
-	public Map<String, Object> page(final Map<String, Object> model, final Path target) {
+	private Map<String, Object> page(final Map<String, Object> model, final Path target) {
 
-		model.put("base", mark.base(target));
-		model.put("path", mark.path(target));
+		model.put("base", mark.base(target).toString());
+		model.put("path", mark.path(target).toString());
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 		model.computeIfPresent("content", (key, content) -> evaluate(content.toString(), model));
