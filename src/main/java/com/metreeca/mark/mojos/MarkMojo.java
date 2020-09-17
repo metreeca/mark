@@ -34,6 +34,11 @@ public abstract class MarkMojo extends AbstractMojo {
 	private String layout;
 
 
+	/**
+	 * Creates a mark processor.
+	 *
+	 * @return a new mark processor initialized from the exposed maven configuration properties
+	 */
 	protected Mark mark() {
 		return new Mark()
 
@@ -41,7 +46,7 @@ public abstract class MarkMojo extends AbstractMojo {
 				.target(Paths.get(target))
 
 				.assets(Paths.get(assets == null ? "" : assets)) // ;( maven ignores empty default values…
-				.layout(Paths.get(layout == null? "" : layout)) // ;( maven ignores empty default values…
+				.layout(Paths.get(layout == null ? "" : layout)) // ;( maven ignores empty default values…
 
 				.shared(singletonMap("project", project))
 

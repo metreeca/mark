@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.FileSystems.newFileSystem;
-import static java.nio.file.Files.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -213,7 +212,7 @@ public final class Mark {
 			throw new NullPointerException("null shared model");
 		}
 
-		this.shared=unmodifiableMap(shared);
+		this.shared=shared;
 
 		return this;
 	}
@@ -272,10 +271,20 @@ public final class Mark {
 			throw new NullPointerException("null path");
 		}
 
-		return target().relativize(path);
+		return target.relativize(path);
 	}
 
 
+	/**
+	 * Locates a layout.
+	 *
+	 * @param name the name of the layout to be located
+	 *
+	 * @return the path of the layout identified by {@code name}
+	 *
+	 * @throws NullPointerException     if {@code name} is null
+	 * @throws IllegalArgumentException if unable to locate a layout identified by {@code name}
+	 */
 	public Path layout(final String name) {
 
 		if ( name == null ) {
@@ -294,9 +303,9 @@ public final class Mark {
 
 				final Path layout=folder.resolve(base).resolve(name);
 
-				if ( exists(layout) ) {
+				if ( Files.exists(layout) ) {
 
-					if ( !isRegularFile(layout) ) {
+					if ( !Files.isRegularFile(layout) ) {
 						throw new IllegalArgumentException("layout is not a regular file {"+layout+"}");
 					}
 
@@ -323,8 +332,7 @@ public final class Mark {
 			logger.info(String.format("source = %s", Base.toAbsolutePath().relativize(source)));
 			logger.info(String.format("target = %s", Base.toAbsolutePath().relativize(target)));
 
-
-			if ( exists(target) ) { // clean target folder
+			if ( Files.exists(target) ) { // clean target folder
 
 				try ( final Stream<Path> walk=Files.walk(target) ) {
 
@@ -415,17 +423,17 @@ public final class Mark {
 						final Kind<?> kind=event.kind();
 						final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-						if ( event.kind().equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
+						if ( event.kind().equals(ENTRY_CREATE) && Files.isDirectory(path) ) { // register new folders
 
 							logger.info(source.relativize(path).toString());
 
 							register.accept(path);
 
-						} else if ( event.kind().equals(ENTRY_CREATE) && isRegularFile(path) ) {
+						} else if ( event.kind().equals(ENTRY_CREATE) && Files.isRegularFile(path) ) {
 
 							handler.apply(path);
 
-						} else if ( event.kind().equals(ENTRY_MODIFY) && isRegularFile(path) ) {
+						} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
 
 							if ( isLayout(path) ) { build(); } else { handler.apply(path); }
 
@@ -441,7 +449,11 @@ public final class Mark {
 
 				throw new UncheckedIOException(e);
 
-			} catch ( final InterruptedException ignored ) {}
+			} catch ( final InterruptedException ignored ) {
+
+				logger.error("interrupted…");
+
+			}
 
 		});
 	}
@@ -454,15 +466,15 @@ public final class Mark {
 		this.source=normalize(source);
 		this.target=normalize(target);
 
-		if ( !exists(source) ) {
+		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder {"+source+"}");
 		}
 
-		if ( !isDirectory(source) ) {
+		if ( !Files.isDirectory(source) ) {
 			throw new IllegalArgumentException("source is not a folder {"+source+"}");
 		}
 
-		if ( exists(target) && !isDirectory(target) ) {
+		if ( Files.exists(target) && !Files.isDirectory(target) ) {
 			throw new IllegalArgumentException("target is not a folder {"+target+"}");
 		}
 
@@ -483,11 +495,11 @@ public final class Mark {
 
 		}
 
-		if ( !exists(layout) ) {
+		if ( !Files.exists(layout) ) {
 			throw new IllegalArgumentException("missing default layout {"+layout+"}");
 		}
 
-		if ( !isRegularFile(layout) ) {
+		if ( !Files.isRegularFile(layout) ) {
 			throw new IllegalArgumentException("default layout is not a regular file {"+layout+"}");
 		}
 
@@ -507,7 +519,7 @@ public final class Mark {
 
 		task.accept(_source -> {
 
-			if ( isDirectory(_source) || isLayout(_source) || isHidden(_source) ) { return false; } else {
+			if ( Files.isDirectory(_source) || isLayout(_source) || isHidden(_source) ) { return false; } else {
 
 				try {
 
