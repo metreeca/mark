@@ -21,16 +21,16 @@ public abstract class MarkMojo extends AbstractMojo {
 	private MavenProject project;
 
 
-	@Parameter(defaultValue="${project.basedir}/src/docs/")
+	@Parameter(defaultValue="${project.basedir}/src/docs/", property="mark.source")
 	private String source;
 
-	@Parameter(defaultValue="${project.build.directory}/docs/")
+	@Parameter(defaultValue="${project.build.directory}/docs/", property="mark.target")
 	private String target;
 
-	@Parameter(defaultValue="")
+	@Parameter(defaultValue="", property="mark.assets")
 	private String assets;
 
-	@Parameter(defaultValue="")
+	@Parameter(defaultValue="", property="mark.layout")
 	private String layout;
 
 
@@ -40,7 +40,7 @@ public abstract class MarkMojo extends AbstractMojo {
 				.source(Paths.get(source))
 				.target(Paths.get(target))
 
-				.assets(Paths.get(assets == null? "" : assets)) // ;( maven ignores empty default values…
+				.assets(Paths.get(assets == null ? "" : assets)) // ;( maven ignores empty default values…
 				.layout(Paths.get(layout == null? "" : layout)) // ;( maven ignores empty default values…
 
 				.shared(singletonMap("project", project))

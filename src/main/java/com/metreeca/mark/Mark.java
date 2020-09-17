@@ -320,9 +320,13 @@ public final class Mark {
 	public Mark build() {
 		return exec(handler -> {
 
+			logger.info(String.format("source = %s", Base.toAbsolutePath().relativize(source)));
+			logger.info(String.format("target = %s", Base.toAbsolutePath().relativize(target)));
+
+
 			if ( exists(target) ) { // clean target folder
 
-				try (final Stream<Path> walk=Files.walk(target)) {
+				try ( final Stream<Path> walk=Files.walk(target) ) {
 
 					walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
 

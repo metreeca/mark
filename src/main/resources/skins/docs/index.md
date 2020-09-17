@@ -1,5 +1,5 @@
 ---
-title: Samples
+title: Samples  
 ---
 
 ```java
