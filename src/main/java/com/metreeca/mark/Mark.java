@@ -17,21 +17,15 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.WatchEvent.Kind;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.lang.System.currentTimeMillis;
 import static java.nio.file.FileSystems.newFileSystem;
-import static java.nio.file.Files.exists;
-import static java.nio.file.Files.isDirectory;
-import static java.nio.file.Files.isRegularFile;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
+import static java.nio.file.Files.*;
+import static java.nio.file.StandardWatchEventKinds.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -433,7 +427,7 @@ public final class Mark {
 
 						} else if ( kind.equals(OVERFLOW) ) {
 
-							logger.error("sync lost");
+							logger.error("sync lost ;-(");
 
 						}
 					}
@@ -497,7 +491,7 @@ public final class Mark {
 			throw new IllegalArgumentException("default layout outside assets folder {"+layout+"}");
 		}
 
-		if ( contains(target, assets) || contains(target, source) ) {
+		if ( contains(target, assets) || contains(assets, target) ) {
 			throw new IllegalArgumentException("overlapping target/assets folders {"+target+" // "+assets+"}");
 		}
 
@@ -585,9 +579,11 @@ public final class Mark {
 		return extension(path).equals(extension(layout));
 	}
 
+
 	private Path relative(final Path path) {
 		return contains(source, path) ? source.relativize(path)
 				: contains(assets, path) ? assets.relativize(path)
 				: path;
 	}
+
 }

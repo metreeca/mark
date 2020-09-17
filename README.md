@@ -3,7 +3,7 @@
 
 # metreeca/mark
 
-Metreeca/Mark is an minimalist static site generator, optimized for generating project/app docs. Unlike other solutions it's tightly integrated in the build process as a Maven plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug/Jade](https://naltatis.github.io/jade-syntax-docs/) template and let the generator take care of the details.
+Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug/Jade](https://naltatis.github.io/jade-syntax-docs/) template and let the generator take care of the details…
 
 ## Usage
 
@@ -100,7 +100,7 @@ Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
 
 All the properties available to templates (with the obvious exception of `page.content`) are also available for inclusion inside pages using the `${expression}` syntax.
 
-The template to be used for rendering the page may be explicitly selected setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
+The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
 **⚠︎** Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
