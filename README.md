@@ -1,7 +1,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-mark.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-mark/)
 
-# metreeca/mark – the hassle-free static site generator
+# metreeca/mark
 
 Metreeca/Mark is an minimalist static site generator, optimized for generating project/app docs. Unlike other solutions it's tightly integrated in the build process as a Maven plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug/Jade](https://naltatis.github.io/jade-syntax-docs/) template and let the generator take care of the details.
 
@@ -9,7 +9,7 @@ Metreeca/Mark is an minimalist static site generator, optimized for generating p
 
 ### Configure the plugin
 
-Add the pluging to your build configuration as:
+Add the plugin to your build configuration as:
 
 ```xml
  <build>
@@ -98,9 +98,9 @@ layout: post.pug # optional
 Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
 ```
 
-All of the properties available to templates (with the obvious exception of `page.content`) are also available for inclusion inside pages using the `${expression}` syntax.
+All the properties available to templates (with the obvious exception of `page.content`) are also available for inclusion inside pages using the `${expression}` syntax.
 
-The template to be used for rendering the page may be explicitely selected setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
+The template to be used for rendering the page may be explicitly selected setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
 **⚠︎** Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
@@ -113,7 +113,7 @@ mvn mark:build # or package
 - the `target` folder is cleared
 - `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property
 - cross-links to `.md` files are converted to the corresponding `.html` file
--  templates (that is, files with the same estensions as the default template specified by the `layout` parameter) are ignored
+-  templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
 ```sh
@@ -125,7 +125,7 @@ mvn mark:watch
 
 ## Support
 
-- open an https://github.com/metreeca/mark/issues to report a problem or to suggest a new feature
+- open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
 - open a topic on [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
 
 ## License

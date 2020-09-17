@@ -22,11 +22,11 @@ A clear and concise description of what the bug is.
 - Step to reproduce the behaviour;
 - …
 
-**Expected behaviour**
+**Expected Behaviour**
 
 A clear and concise description of what you expected to happen.
 
-**Actual behaviour**
+**Actual Behaviour**
 
 A clear and concise description of what actually happens
 
