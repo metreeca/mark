@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
@@ -56,6 +57,45 @@ public final class Mark implements Opts {
 	}
 
 
+	public static String basename(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		final String name=path.getFileName().toString();
+		final int dot=name.lastIndexOf('.');
+
+		return dot >= 0 ? name.substring(0, dot) : name;
+	}
+
+	public static String extension(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		final String name=path.getFileName().toString();
+		final int dot=name.lastIndexOf('.');
+
+		return dot >= 0 ? name.substring(dot) : "";
+	}
+
+
+	public static boolean contains(final Path path, final Path child) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( child == null ) {
+			throw new NullPointerException("null child");
+		}
+
+		return path.getFileSystem().equals(child.getFileSystem()) && child.startsWith(path);
+	}
+
+
 	public static Path absolute(final Path path) {
 
 		if ( path == null ) {
@@ -75,49 +115,6 @@ public final class Mark implements Opts {
 	}
 
 
-	private static boolean isHidden(final Path path) {
-		return path.getFileName().toString().startsWith(".");
-	}
-
-	private static boolean contains(final Path path, final Path child) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( child == null ) {
-			throw new NullPointerException("null child");
-		}
-
-		return path.getFileSystem().equals(child.getFileSystem()) && child.startsWith(path);
-	}
-
-
-	private static String basename(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final String name=path.getFileName().toString();
-		final int dot=name.lastIndexOf('.');
-
-		return dot >= 0 ? name.substring(0, dot) : name;
-	}
-
-	private static String extension(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final String name=path.getFileName().toString();
-		final int dot=name.lastIndexOf('.');
-
-		return dot >= 0 ? name.substring(dot) : "";
-	}
-
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private final Path source;
@@ -131,7 +128,7 @@ public final class Mark implements Opts {
 	private final Log logger;
 
 
-	private final String extension;
+	private final String extension; // layout extension
 
 	private final Collection<Pipe> pipes;
 
@@ -205,7 +202,7 @@ public final class Mark implements Opts {
 		this.extension=extension(layout);
 
 		if ( extension.isEmpty() ) {
-			throw new IllegalArgumentException("extensionless layout { "+layout+" }");
+			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
 		}
 
 
@@ -225,21 +222,6 @@ public final class Mark implements Opts {
 				: name.startsWith("@/") ? bundled(name)
 				: absolute(path);
 
-	}
-
-
-	private Path empty() {
-		try {
-
-			final Path empty=absolute(Files.createTempDirectory(null));
-
-			empty.toFile().deleteOnExit();
-
-			return empty;
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
 	}
 
 	private Path bundled(final String name) {
@@ -277,6 +259,20 @@ public final class Mark implements Opts {
 
 			throw new UnsupportedOperationException("unsupported assets scheme {"+name+"}");
 
+		}
+	}
+
+	private Path empty() {
+		try {
+
+			final Path empty=absolute(Files.createTempDirectory(null));
+
+			empty.toFile().deleteOnExit();
+
+			return empty;
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -351,6 +347,24 @@ public final class Mark implements Opts {
 
 
 	/**
+	 * Checks if a path is a layout
+	 *
+	 * @param path the path to be checked
+	 *
+	 * @return {@code true} if {@code path} has the same file extension as the default {@linkplain #layout() layout}
+	 *
+	 * @throws NullPointerException if {@code path} is {@code null}
+	 */
+	public boolean isLayout(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		return extension(path).equals(extension);
+	}
+
+	/**
 	 * Locates a layout.
 	 *
 	 * @param name the name of the layout to be located
@@ -366,35 +380,17 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null name");
 		}
 
-		final Path relative=name.isEmpty() || name.equals(extension) ? layout // ;( handle extension-only paths…
-				: layout.resolveSibling(name.contains(".") ? name : name+extension).normalize();
+		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-		for (final Path folder : asList(source, assets)) {
+		final Path layout=locate(name.isEmpty() || name.equals(extension) ? this.layout
+				: this.layout.resolveSibling(name.contains(".") ? name : name+extension).normalize()
+		);
 
-			final Path absolute=folder.resolve(relative);
-
-			if ( Files.exists(absolute) ) {
-
-				if ( !Files.isRegularFile(absolute) ) {
-					throw new IllegalArgumentException("layout is not a regular file { "+absolute+" }");
-				}
-
-				if ( !absolute.startsWith(folder) ) {
-					throw new IllegalArgumentException("layout outside base folder { "+folder+" <-> "+absolute+" }");
-				}
-
-				return absolute;
-			}
-
+		if ( !Files.isRegularFile(layout) ) {
+			throw new IllegalArgumentException("layout is not a regular file { "+relative(layout)+" }");
 		}
 
-		throw new IllegalArgumentException("unknown layout { "+name+" }");
-
-	}
-
-
-	public boolean isLayout(final Path path) {
-		return extension(path).equals(extension);
+		return layout;
 	}
 
 
@@ -425,25 +421,37 @@ public final class Mark implements Opts {
 	 *
 	 * <p>Generates a processed version of a site resource in the {@linkplain Opts#target() target} site folder.</p>
 	 *
-	 * @param source the path of the site resource to be processed, relative to the {@linkplain Opts#source() source}
-	 *               site folder
+	 * @param resource the path of the site resource to be processed, relative either to the {@linkplain Opts#source()
+	 *                 resource} site folder or to the {@linkplain Opts#assets() assets} folder
 	 *
-	 * @return {@code true} if {@code source} was successfully processed; {@code false} otherwise
+	 * @return {@code true} if {@code resource} was successfully processed; {@code false} otherwise
 	 *
-	 * @throws NullPointerException if {@code source} is null
+	 * @throws NullPointerException if {@code resource} is null
 	 */
-	public boolean process(final Path source) {
+	public boolean process(final Path resource) {
 
-		if ( source == null ) {
+		if ( resource == null ) {
 			throw new NullPointerException("null resource");
 		}
 
-		if ( Files.isDirectory(source) || isLayout(source) || isHidden(source) ) { return false; } else {
+		try {
 
-			try {
+			final Path source=locate(resource);
 
-				final Path common=_common(source);
-				final Path target=this.target.resolve(common.toString()); // possibly on different filesystems
+			if ( Files.isDirectory(source) || Files.isHidden(source) || isLayout(source) ) { return false; } else {
+
+				// relativize the source path wrt its input folder (on possibly incompatible filesystem)
+
+				final Path common=contains(this.source, source) ? this.source.relativize(source)
+						: contains(assets, source) ? assets.relativize(source)
+						: source;
+
+				// define the absolute target path (use strings to handle incompatible filesystems)
+
+				final Path target=this.target.resolve(common.toString());
+
+
+				// create the output directory and process using the first matching pipe
 
 				Files.createDirectories(target.getParent());
 
@@ -453,27 +461,48 @@ public final class Mark implements Opts {
 						.findFirst()
 						.isPresent();
 
-			} catch ( final IOException|RuntimeException e ) {
-
-				logger.error(format("error while processing %s", source), e);
-
-				return false;
-
 			}
 
-		}
+		} catch ( final IOException|RuntimeException e ) {
 
+			logger.error(format("error while processing %s", source), e);
+
+			return false;
+
+		}
 	}
 
 
-	private Path _common(final Path resource) {
-		return (
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				contains(source, resource) ? source.relativize(resource)
-						: contains(assets, resource) ? assets.relativize(resource)
-						: resource
+	/**
+	 * @param resource the possibly relative path of a site resource
+	 *
+	 * @return the absolute path of {@code resource} either under the source or the assets folders
+	 *
+	 * @throws IllegalArgumentException if {@code resource} is not a known path under an input folder
+	 */
+	private Path locate(final Path resource) {
+		if ( resource.isAbsolute() ) {
 
-		).normalize();
+			if ( Stream.of(source, assets).noneMatch(resource::startsWith) ) {
+				throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
+			}
+
+			return resource.normalize();
+
+		} else {
+
+			return Stream.of(source, assets)
+
+					.map(folder -> folder.resolve(resource))
+					.filter(Files::exists)
+					.map(this::locate)
+					.findFirst()
+
+					.orElseThrow(() -> new IllegalArgumentException("unknown resource { "+relative(resource)+" }"));
+
+		}
 	}
 
 }

@@ -30,8 +30,11 @@ final class MarkTest {
 
 
 	public static void main(final String... args) {
-		new Mark(new Opts() {
+		new Mark(opts()).exec(new Build());
+	}
 
+	private static Opts opts() {
+		return new Opts() {
 
 			@Override public Path source() { return Paths.get("src/test/samples"); }
 
@@ -56,8 +59,7 @@ final class MarkTest {
 
 			@Override public Log logger() { return new SystemStreamLog(); }
 
-
-		}).exec(new Build());
+		};
 	}
 
 }
