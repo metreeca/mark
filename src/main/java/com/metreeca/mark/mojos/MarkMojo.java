@@ -1,18 +1,22 @@
 /*
- * Copyright © 2019 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.mark.mojos;
 
-import com.metreeca.mark.Mark;
+import com.metreeca.mark.Opts;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
 
 
 public abstract class MarkMojo extends AbstractMojo {
@@ -27,30 +31,50 @@ public abstract class MarkMojo extends AbstractMojo {
 	@Parameter(defaultValue="${project.build.directory}/docs/", property="mark.target")
 	private String target;
 
-	@Parameter(defaultValue="", property="mark.assets")
+	@Parameter(defaultValue="@", property="mark.assets")
 	private String assets;
 
-	@Parameter(defaultValue="", property="mark.layout")
+	@Parameter(defaultValue="assets/default.jade", property="mark.layout")
 	private String layout;
 
 
 	/**
-	 * Creates a mark processor.
+	 * Retrieves site generation options.
 	 *
-	 * @return a new mark processor initialized from the exposed maven configuration properties
+	 * @return site generation options initialized from the exposed maven configuration properties
 	 */
-	protected Mark mark() {
-		return new Mark()
+	protected Opts opts() {
+		return new MojoOpts(this);
+	}
 
-				.source(Paths.get(source))
-				.target(Paths.get(target))
 
-				.assets(Paths.get(assets == null ? "" : assets)) // ;( maven ignores empty default values…
-				.layout(Paths.get(layout == null ? "" : layout)) // ;( maven ignores empty default values…
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				.shared(singletonMap("project", project))
+	private static final class MojoOpts implements Opts {
 
-				.logger(getLog());
+		private final MarkMojo mojo;
+
+
+		private MojoOpts(final MarkMojo mojo) {
+
+			this.mojo=mojo;
+		}
+
+		@Override public Path source() { return Paths.get(mojo.source); }
+
+		@Override public Path target() { return Paths.get(mojo.target); }
+
+		@Override public Path assets() { return Paths.get(mojo.assets); }
+
+		@Override public Path layout() { return Paths.get(mojo.layout); }
+
+
+		@Override public Map<String, Object> shared() {
+			return unmodifiableMap(singletonMap("project", mojo.project));
+		}
+
+		@Override public Log logger() { return mojo.getLog(); }
+
 	}
 
 }

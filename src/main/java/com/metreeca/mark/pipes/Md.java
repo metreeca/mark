@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.mark.pipes;

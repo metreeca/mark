@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.mark.steps;
@@ -140,7 +140,7 @@ public final class Jade {
 							matcher.group(1), bindings // expression value
 					)));
 
-				} catch ( ExpressionException e ) {
+				} catch ( final ExpressionException e ) {
 					throw new RuntimeException(e);
 				}
 
