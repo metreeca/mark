@@ -62,7 +62,7 @@ code, code[class*=language-], pre[class*=language-] {
 	width: 1em;
 	height: 1em;
 	vertical-align: -10%;
-	background-image: url(icons/logo.svg);
+	background-image: url(index.svg);
 	background-origin: content-box;
 	background-size: contain;
 	background-position: center;

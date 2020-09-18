@@ -5,6 +5,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.tasks.Build;
+import com.metreeca.mark.tasks.Watch;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -29,12 +30,10 @@ final class MarkTest {
 	}
 
 
-	public static void main(final String... args) {
-		new Mark(opts()).exec(new Build());
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static Opts opts() {
-		return new Opts() {
+	public static void main(final String... args) {
+		new Mark(new Opts() {
 
 			@Override public Path source() { return Paths.get("src/test/samples"); }
 
@@ -42,7 +41,7 @@ final class MarkTest {
 
 			@Override public Path assets() { return Paths.get("src/main/themes/docs"); }
 
-			@Override public Path layout() { return Paths.get("assets/default.jade"); }
+			@Override public Path layout() { return Paths.get("layouts/default.jade"); }
 
 
 			@Override public Map<String, Object> shared() {
@@ -59,7 +58,7 @@ final class MarkTest {
 
 			@Override public Log logger() { return new SystemStreamLog(); }
 
-		};
+		}).exec(new Build()).exec(new Watch());
 	}
 
 }

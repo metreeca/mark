@@ -76,24 +76,21 @@ public final class Jade {
 			throw new NullPointerException("null model");
 		}
 
-		try (final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8)) {
+		final String layout=mark.layout(model.getOrDefault("layout", "").toString()).toString();
 
-			jade.renderTemplate(
-					jade.getTemplate(model.getOrDefault("layout", "").toString()),
-					page(model, target),
-					writer
-			);
+		try ( final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8) ) {
 
-			return target;
+			jade.renderTemplate(jade.getTemplate(layout), page(model, target), writer);
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
 		}
 
+		return target;
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Variable Replacement //////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 

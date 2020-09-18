@@ -34,7 +34,7 @@ public abstract class MarkMojo extends AbstractMojo {
 	@Parameter(defaultValue="@", property="mark.assets")
 	private String assets;
 
-	@Parameter(defaultValue="assets/default.jade", property="mark.layout")
+	@Parameter(defaultValue="layouts/default.jade", property="mark.layout")
 	private String layout;
 
 
