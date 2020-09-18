@@ -30,6 +30,9 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Mark implements Opts {
 
+	private static final Path base=Paths.get("").toAbsolutePath();
+
+
 	public static Optional<Path> source(final Path path, final String extension) {
 
 		if ( path == null ) {
@@ -111,7 +114,9 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path");
 		}
 
-		return Paths.get("").toAbsolutePath().relativize(path.toAbsolutePath());
+		return base.getFileSystem().equals(path.getFileSystem())
+				? base.relativize(path.toAbsolutePath())
+				: path;
 	}
 
 
@@ -240,7 +245,7 @@ public final class Mark implements Opts {
 
 		} else if ( scheme.equals("jar") ) {
 
-			final String path=url.getPath();
+			final String path=url.toString();
 
 			final int mark=path.indexOf('!');
 
@@ -411,9 +416,9 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null task");
 		}
 
-
-		logger.info(format("%s %s ›› %s",
-				task.getClass().getSimpleName().toLowerCase(Locale.ROOT), relative(source), relative(target)
+		logger.info(format("%s %s + %s ›› %s",
+				task.getClass().getSimpleName().toLowerCase(Locale.ROOT),
+				relative(source), relative(assets), relative(target)
 		));
 
 		task.exec(this);
@@ -500,11 +505,13 @@ public final class Mark implements Opts {
 
 			return Stream.of(source, assets)
 
-					.map(folder -> folder.resolve(resource))
+					.map(folder -> folder.resolve(resource.toString())) // handle incompatible filesystems
+					.map(Path::toAbsolutePath)
 					.filter(Files::exists)
-					.map(this::locate)
-					.findFirst()
 
+					.map(this::locate)
+
+					.findFirst()
 					.orElseThrow(() -> new IllegalArgumentException("unknown resource { "+relative(resource)+" }"));
 
 		}

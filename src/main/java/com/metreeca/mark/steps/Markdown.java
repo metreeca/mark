@@ -72,11 +72,15 @@ public final class Markdown {
 			throw new NullPointerException("null source");
 		}
 
-		try (final BufferedReader reader=Files.newBufferedReader(source, UTF_8)) {
+		try ( final BufferedReader reader=Files.newBufferedReader(source, UTF_8) ) {
 
 			final Node document=parsers.build().parseReader(reader);
 
-			new NodeVisitor(new VisitHandler<>(Link.class, link -> { // !!! as post-processing extension (https://github.com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples/SyntheticLinkSample.java)
+			// !!! as post-processing extension (https://github
+			// .com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples
+			// /SyntheticLinkSample.java)
+
+			new NodeVisitor(new VisitHandler<>(Link.class, link -> {
 
 				final BasedSequence url=link.getUrl();
 
