@@ -29,6 +29,7 @@ public final class Watch implements Task {
 	@Override public void exec(final Mark mark) {
 
 		final Path source=mark.source();
+		final Path assets=mark.assets();
 
 		final Log logger=mark.logger();
 
@@ -49,6 +50,12 @@ public final class Watch implements Task {
 
 			try ( final Stream<Path> sources=Files.walk(source) ) {
 				sources.filter(Files::isDirectory).forEach(register); // register existing source folders
+			}
+
+			if ( source.getFileSystem().equals(assets.getFileSystem()) ) { // ignore bundled assets
+				try ( final Stream<Path> assetses=Files.walk(assets) ) {
+					assetses.filter(Files::isDirectory).forEach(register); // register existing assets folders
+				}
 			}
 
 			for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch source changes
