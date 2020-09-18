@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -33,6 +34,10 @@ public final class Mark implements Opts {
 	private static final Path root=Paths.get("/");
 	private static final Path base=Paths.get("").toAbsolutePath();
 
+	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static Optional<Path> source(final Path path, final String extension) {
 
@@ -244,13 +249,18 @@ public final class Mark implements Opts {
 			final String head=mark >= 0 ? path.substring(0, mark) : path;
 			final String tail=mark >= 0 ? path.substring(mark+1) : "/";
 
-			try {
+			final FileSystem bundle=bundles.computeIfAbsent(URI.create(head), uri -> {
+				try {
 
-				return newFileSystem(URI.create(head), emptyMap()).getPath(tail);
+					return newFileSystem(uri, emptyMap());
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+
+			});
+
+			return bundle.getPath(tail);
 
 		} else {
 
