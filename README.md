@@ -21,22 +21,22 @@ Add the plugin to your build configuration as:
             <artifactId>mark-maven-plugin</artifactId>
             <version>0.0.0-SNAPSHOT</version>
 
-            <executions>
+            <configuration> <!-- optional -->
+                <source>src/docs</source>
+                <target>target/docs</target>
+                <layout>layouts/default.jade</layout>
+            </configuration>
+            
+            <executions> <!-- optional -->
                 <execution>
-
+                    
                     <id>generate-docs</id>
-                    <phase>generate-resources</phase>
-
+                    <phase>site</phase>
+                    
                     <goals>
                         <goal>build</goal>
                     </goals>
-
-                    <configuration>
-                        <source>src/docs</source>
-                        <target>target/docs</target>
-                        <layout>assets/default.jade</layout>
-                    </configuration>
-
+                    
                 </execution>
             </executions>
 
@@ -46,13 +46,15 @@ Add the plugin to your build configuration as:
 </build>
 ```
 
-The following configuration parameters are available:
+The following optional configuration parameters are available:
 
 | parameter | value                                                  | default       |
 | --------- | ------------------------------------------------------ | ------------- |
 | `source`  | the source folder for the site                         | `src/docs`    |
 | `target`  | the target folder for the generated site               | `target/docs` |
-| `layout`  | the path of default page template relative to `source` | required      |
+| `layout`  | the path of default page template relative to `source` | `layouts/default.jade`      |
+
+The plugin binds by default the `build` goal to the `site` maven phase.
 
 ### Define a default template
 
