@@ -56,7 +56,7 @@ The following configuration parameters are available:
 
 ### Define a default template
 
-Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance as:
+Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
 ```jade
 doctype html
@@ -82,7 +82,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.content`  | the content of the page rendered as HTML                     |
 | `project.*`     | Maven project properties                                     |
 
-**⚠︎** Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.
+> :warning: **Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
 ### Define site content
 
@@ -102,7 +102,7 @@ All the properties available to templates (with the obvious exception of `page.c
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
-**⚠︎** Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
+> :warning: **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
 ### Generate the site
 
@@ -120,8 +120,8 @@ mvn mark:build # or package
 mvn mark:watch
 ```
 
-- the site is generated as detailed above
-- on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified,  the whole site is regenerated
+- the site is generated as described above
+- on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
 
 ## Support
 
