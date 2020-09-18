@@ -51,8 +51,6 @@ public final class Watch implements Task {
 				sources.filter(Files::isDirectory).forEach(register); // register existing source folders
 			}
 
-			logger.info(String.format("watching %s", Mark.relative(source)));
-
 			for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch source changes
 				for (final WatchEvent<?> event : key.pollEvents()) {
 

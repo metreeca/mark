@@ -57,7 +57,7 @@ public final class Mark implements Opts {
 	}
 
 
-	public static String basename(final Path path) {
+	private static String basename(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -69,7 +69,7 @@ public final class Mark implements Opts {
 		return dot >= 0 ? name.substring(0, dot) : name;
 	}
 
-	public static String extension(final Path path) {
+	private static String extension(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -82,7 +82,7 @@ public final class Mark implements Opts {
 	}
 
 
-	public static boolean contains(final Path path, final Path child) {
+	private static boolean contains(final Path path, final Path child) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -96,7 +96,7 @@ public final class Mark implements Opts {
 	}
 
 
-	public static Path absolute(final Path path) {
+	private static Path absolute(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -105,7 +105,7 @@ public final class Mark implements Opts {
 		return path.toAbsolutePath().normalize();
 	}
 
-	public static Path relative(final Path path) {
+	private static Path relative(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -410,6 +410,11 @@ public final class Mark implements Opts {
 		if ( task == null ) {
 			throw new NullPointerException("null task");
 		}
+
+
+		logger.info(format("%s %s ›› %s",
+				task.getClass().getSimpleName().toLowerCase(Locale.ROOT), relative(source), relative(target)
+		));
 
 		task.exec(this);
 

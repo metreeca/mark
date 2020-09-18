@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.relative;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.isEqual;
@@ -34,10 +33,6 @@ public final class Build implements Task {
 		final Path assets=mark.assets();
 
 		final Log logger=mark.logger();
-
-		logger.info(String.format("source = %s", relative(source)));
-		logger.info(String.format("target = %s", relative(target)));
-
 
 		if ( Files.exists(target) ) { // clean target folder
 
