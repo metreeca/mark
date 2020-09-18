@@ -76,7 +76,7 @@ public final class Jade {
 			throw new NullPointerException("null model");
 		}
 
-		final String layout=mark.layout(model.getOrDefault("layout", "").toString()).toString();
+		final String layout=model.getOrDefault("layout", mark.layout()).toString();
 
 		try ( final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8) ) {
 

@@ -30,6 +30,7 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Mark implements Opts {
 
+	private static final Path root=Paths.get("/");
 	private static final Path base=Paths.get("").toAbsolutePath();
 
 
@@ -62,10 +63,6 @@ public final class Mark implements Opts {
 
 	private static String basename(final Path path) {
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
 
@@ -73,10 +70,6 @@ public final class Mark implements Opts {
 	}
 
 	private static String extension(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
 
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
@@ -86,37 +79,20 @@ public final class Mark implements Opts {
 
 
 	private static boolean contains(final Path path, final Path child) {
+		return compatible(path, child) && child.startsWith(path);
+	}
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( child == null ) {
-			throw new NullPointerException("null child");
-		}
-
-		return path.getFileSystem().equals(child.getFileSystem()) && child.startsWith(path);
+	private static boolean compatible(final Path x, final Path y) {
+		return x.getFileSystem().equals(y.getFileSystem());
 	}
 
 
 	private static Path absolute(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
 		return path.toAbsolutePath().normalize();
 	}
 
 	private static Path relative(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		return base.getFileSystem().equals(path.getFileSystem())
-				? base.relativize(path.toAbsolutePath())
-				: path;
+		return compatible(base, path) ? base.relativize(path.toAbsolutePath()) : path;
 	}
 
 
@@ -155,7 +131,8 @@ public final class Mark implements Opts {
 		this.target=absolute(requireNonNull(opts.target(), "null opts target path"));
 
 		this.assets=assets(requireNonNull(opts.assets(), "null opts assets path"));
-		this.layout=requireNonNull(opts.layout(), "null opts layout path").normalize();
+		this.layout=layout(requireNonNull(opts.layout(), "null opts layout path"));
+
 
 		if ( !Files.exists(source) ) {
 			throw new IllegalArgumentException("missing source folder { "+relative(source)+" }");
@@ -177,6 +154,7 @@ public final class Mark implements Opts {
 			throw new IllegalArgumentException("assets is not a folder { "+relative(assets)+" }");
 		}
 
+
 		if ( contains(source, target) || contains(target, source) ) {
 			throw new IllegalArgumentException(
 					"overlapping source/target folders { "+relative(source)+" <-> "+relative(target)+" }"
@@ -195,10 +173,6 @@ public final class Mark implements Opts {
 			);
 		}
 
-		if ( layout.isAbsolute() ) {
-			throw new IllegalArgumentException("absolute layout path { "+layout+" }");
-		}
-
 
 		this.shared=requireNonNull(opts.shared(), "null opts shared variables");
 		this.logger=requireNonNull(opts.logger(), "null opts system logger");
@@ -210,7 +184,6 @@ public final class Mark implements Opts {
 			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
 		}
 
-
 		this.pipes=asList( // !!! in field initializer after decoupling constructor from this
 				new Md(this),
 				new Wild(this)
@@ -218,6 +191,10 @@ public final class Mark implements Opts {
 
 	}
 
+
+	private Path layout(final Path path) {
+		return root.resolve(path).normalize(); // root-relative layout path
+	}
 
 	private Path assets(final Path path) {
 
@@ -227,6 +204,21 @@ public final class Mark implements Opts {
 				: name.startsWith("@/") ? bundled(name)
 				: absolute(path);
 
+	}
+
+
+	private Path empty() {
+		try {
+
+			final Path empty=absolute(Files.createTempDirectory(null));
+
+			empty.toFile().deleteOnExit();
+
+			return empty;
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	private Path bundled(final String name) {
@@ -264,20 +256,6 @@ public final class Mark implements Opts {
 
 			throw new UnsupportedOperationException("unsupported assets scheme {"+name+"}");
 
-		}
-	}
-
-	private Path empty() {
-		try {
-
-			final Path empty=absolute(Files.createTempDirectory(null));
-
-			empty.toFile().deleteOnExit();
-
-			return empty;
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -374,7 +352,7 @@ public final class Mark implements Opts {
 	 *
 	 * @param name the name of the layout to be located
 	 *
-	 * @return the path of the layout identified by {@code name}
+	 * @return the absolute path of the layout identified by {@code name}
 	 *
 	 * @throws NullPointerException     if {@code name} is null
 	 * @throws IllegalArgumentException if unable to locate a layout identified by {@code name}
@@ -387,9 +365,10 @@ public final class Mark implements Opts {
 
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-		final Path layout=locate(name.isEmpty() || name.equals(extension) ? this.layout
-				: this.layout.resolveSibling(name.contains(".") ? name : name+extension).normalize()
-		);
+		final Path layout=locate(root.relativize(
+				name.isEmpty() || name.equals(extension) ? this.layout
+						: this.layout.resolveSibling(name.contains(".") ? name : name+extension).normalize()
+		));
 
 		if ( !Files.isRegularFile(layout) ) {
 			throw new IllegalArgumentException("layout is not a regular file { "+relative(layout)+" }");
@@ -507,7 +486,7 @@ public final class Mark implements Opts {
 			throw new IllegalArgumentException("unknown resource { "+relative(resource)+" }");
 		}
 
-		if ( Stream.of(source, assets).noneMatch(absolute::startsWith) ) {
+		if ( Stream.of(source, assets).noneMatch(folder -> contains(folder, absolute)) ) {
 			throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
 		}
 

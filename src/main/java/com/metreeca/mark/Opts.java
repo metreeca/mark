@@ -30,7 +30,7 @@ public interface Opts {
 	public Path assets();
 
 	/**
-	 * @return the path of the default site layout, relative to the {@linkplain #source() source} site folder
+	 * @return the root-relative path of the default site layout
 	 */
 	public Path layout();
 

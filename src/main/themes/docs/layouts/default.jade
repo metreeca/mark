@@ -1,6 +1,6 @@
 doctype html
 
-- var prism = "1.21.0" //- select from https://cdnjs.com/libraries/prism
+- var prism = "//cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
 
 html(lang="en")
 
@@ -15,10 +15,10 @@ html(lang="en")
 
         //- prism.js code highlighting
 
-        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/!{prism}/themes/prism.min.css")
+        link(rel="stylesheet" href="!{prism}/themes/prism.min.css")
 
-        script(type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/!{prism}/components/prism-core.min.js")
-        script(type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/!{prism}/plugins/autoloader/prism-autoloader.min.js")
+        script(type="text/javascript" src="!{prism}/components/prism-core.min.js")
+        script(type="text/javascript" src="!{prism}/plugins/autoloader/prism-autoloader.min.js")
 
         //- default stylesheet (at last to override prism.js)
 
