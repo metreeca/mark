@@ -493,28 +493,26 @@ public final class Mark implements Opts {
 	 * @throws IllegalArgumentException if {@code resource} is not a known path under an input folder
 	 */
 	private Path locate(final Path resource) {
-		if ( resource.isAbsolute() ) {
 
-			if ( Stream.of(source, assets).noneMatch(resource::startsWith) ) {
-				throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
-			}
+		final Path absolute=resource.isAbsolute() ? resource : Stream.of(source, assets)
 
-			return resource.normalize();
+				.map(folder -> folder.resolve(resource.toString())) // as string to handle incompatible filesystems
+				.map(Path::toAbsolutePath)
+				.filter(Files::exists)
 
-		} else {
+				.findFirst()
+				.orElse(resource);
 
-			return Stream.of(source, assets)
-
-					.map(folder -> folder.resolve(resource.toString())) // handle incompatible filesystems
-					.map(Path::toAbsolutePath)
-					.filter(Files::exists)
-
-					.map(this::locate)
-
-					.findFirst()
-					.orElseThrow(() -> new IllegalArgumentException("unknown resource { "+relative(resource)+" }"));
-
+		if ( !Files.exists(absolute) ) {
+			throw new IllegalArgumentException("unknown resource { "+relative(resource)+" }");
 		}
+
+		if ( Stream.of(source, assets).noneMatch(absolute::startsWith) ) {
+			throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
+		}
+
+		return absolute.normalize();
+
 	}
 
 }
