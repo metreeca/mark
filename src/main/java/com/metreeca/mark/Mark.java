@@ -16,6 +16,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -116,7 +117,7 @@ public final class Mark implements Opts {
 
 	private final String extension; // layout extension
 
-	private final Collection<Pipe> pipes;
+	private final Collection<Function<Mark, Pipe>> factories=asList(Md::new, Wild::new);
 
 
 	/**
@@ -182,17 +183,11 @@ public final class Mark implements Opts {
 		this.shared=requireNonNull(opts.shared(), "null opts shared variables");
 		this.logger=requireNonNull(opts.logger(), "null opts system logger");
 
-
 		this.extension=extension(layout);
 
 		if ( extension.isEmpty() ) {
 			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
 		}
-
-		this.pipes=asList( // !!! in field initializer after decoupling constructor from this
-				new Md(this),
-				new Wild(this)
-		);
 
 	}
 
@@ -454,7 +449,8 @@ public final class Mark implements Opts {
 
 				Files.createDirectories(target.getParent());
 
-				return pipes.stream()
+				return factories.stream()
+						.map(factory -> factory.apply(this))
 						.filter(pipe -> pipe.process(source, target))
 						.peek(status -> logger.info(common.toString()))
 						.findFirst()
