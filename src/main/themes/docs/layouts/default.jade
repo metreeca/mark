@@ -1,6 +1,13 @@
 doctype html
 
+- var home = project ? project.organization.url : ""
+- var owner = project ? project.organization.name.toLowerCase() : ""
+
+- var module = project ? project.artifactId.replace(owner+"-", "") : ""
+- var version = project ?  project.version.replace("-SNAPSHOT", "") : ""
+
 - var prism = "//cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
+
 
 html(lang="en")
 
@@ -34,7 +41,11 @@ html(lang="en")
 
             header
 
-                include ../includes/header
+                span
+                    a(href="#{home}") #{owner}
+                    | /
+                    a(href="#{page.base}/index.html") #{module}
+                        span v#{version}
 
                 //- icon dynamically managed by default.css
 
@@ -51,12 +62,13 @@ html(lang="en")
 
         main
 
-            header(id="_top") #{page.title}
+            header(id="_top") #{empty(page.title) ? project.name : page.title}
 
             section !{page.content}
 
             footer
 
-                include ../includes/footer
+                | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+                | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
         script(type="text/javascript" src="!{page.base}/index.js")
