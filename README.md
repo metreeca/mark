@@ -98,7 +98,7 @@ layout: post.pug # optional
 Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
 ```
 
-All the properties available to templates (with the obvious exception of `page.content`) are also available for inclusion inside pages using the `${expression}` syntax.
+All the properties available to templates (with the obvious exception of `page.content`) are also available for interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim). 
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 

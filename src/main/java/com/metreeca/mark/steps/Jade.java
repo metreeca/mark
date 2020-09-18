@@ -28,6 +28,11 @@ import static java.util.Collections.singletonMap;
 
 public final class Jade {
 
+	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	private final Mark mark;
 
 	private final JadeConfiguration jade;
@@ -91,8 +96,6 @@ public final class Jade {
 
 
 	//// Variable Replacement //////////////////////////////////////////////////////////////////////////////////////////
-
-	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 
 	private Map<String, Object> page(final Map<String, Object> model, final Path target) {
 
