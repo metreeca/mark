@@ -50,7 +50,16 @@ final class MarkTest {
 
 								entry("groupId", "com.metreeca"),
 								entry("artifactId", "metreeca-work"),
-								entry("version", "1.2.3")
+								entry("version", "1.2.3-SNAPSHOT"),
+
+								entry("name", "Metreeca Static Site Generator"),
+								entry("description", "A minimalist static site generator."),
+								entry("url", "https://github.com/metreeca/mark"),
+
+								entry("organization", map(
+										entry("name", "Metreeca"),
+										entry("url", "https://www.metreeca.com/")
+								))
 
 						))
 				);
