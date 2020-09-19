@@ -68,22 +68,22 @@ public final class Crawl implements Task {
 			final Set<String> external=links.stream() // verified external link targets
 					.map(Map.Entry::getValue)
 					.filter(URLPattern.asPredicate())
-					.distinct()
-					.filter(url -> {
-						try {
-
-							logger.info(format("checking %s", url));
-
-							return validate(url);
-
-						} catch ( final IOException e ) {
-
-							logger.warn(e.toString());
-
-							return false;
-
-						}
-					})
+					//.distinct()
+					//.filter(url -> {
+					//	try {
+					//
+					//		logger.info(format("checking %s", url));
+					//
+					//		return validate(url);
+					//
+					//	} catch ( final IOException e ) {
+					//
+					//		logger.warn(e.toString());
+					//
+					//		return false;
+					//
+					//	}
+					//})
 					.collect(toSet());
 
 			final long broken=links.stream()
