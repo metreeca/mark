@@ -135,7 +135,7 @@ public final class Crawl implements Task {
 							.map(link -> URLPattern.matcher(link).matches() ? link
 									: link.startsWith("//") ? "http:"+link
 									: link.startsWith("#") ? self+link
-									: base.relativize(path.resolveSibling(link).normalize()).toString()
+									: base.relativize(path.resolveSibling(clean(link)).normalize()).toString()
 							)
 							.map(link -> new SimpleImmutableEntry<>(self, link))
 
@@ -147,6 +147,13 @@ public final class Crawl implements Task {
 
 		}
 
+	}
+
+	private String clean(final String link) { // remove query compinets fom local links (e.g. javadocs)
+
+		final int question=link.indexOf('?');
+
+		return question < 0 ? link : link.substring(0, question);
 	}
 
 
@@ -217,6 +224,7 @@ public final class Crawl implements Task {
 			});
 
 			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new NodeIterator((NodeList)xpath
+
 					.compile(query)
 					.evaluate(document, XPathConstants.NODESET)
 
