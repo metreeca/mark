@@ -1,9 +1,7 @@
 /*
  * Copyright © 2019-2020 Metreeca srl. All rights reserved.
  */
-@import url(https://fonts.googleapis.com/css?family=Roboto:100,300|Roboto+Condensed:300,700);
-@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,700);
-@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
 
 *, *::before, *::after {
 	flex: 0 0 auto;
@@ -35,246 +33,239 @@ code, code[class*=language-], pre[class*=language-] {
 	color: #333;
 }
 
-/**** Icons ***********************************************************************************************************/
-
-.icon::before {
-	display: inline-block;
-	text-rendering: auto;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	font-size: inherit;
-	line-height: 1;
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-}
-
-.icon:not(:empty)::before {
-	position: relative;
-	top: -0.1em;
-	width: 1.33em;
-	font-size: 90%;
-}
-
 
 /**** Layout **********************************************************************************************************/
 
 html {
+
 	height: 100%;
 	width: 100%;
 	font-size: 12pt;
 	color: #000;
 	background-color: #FFF;
+
+	> body {
+
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		height: 100%;
+		width: 100%;
+		text-align: center;
+		overflow: hidden;
+
+		> input {
+
+			display: none;
+
+			&:not(:checked) {
+
+				~ nav > :not(header) {
+					display: none;
+				}
+
+			}
+
+			&:checked {
+
+				~ nav {
+				}
+
+				~ main {
+					height: 0; /* don't hide to enable navigation from TOC */
+					flex-grow: 0;
+				}
+
+			}
+
+		}
+
+		> * {
+
+			display: flex;
+			align-items: stretch;
+			flex-direction: column;
+
+			> *:empty {
+				display: none;
+			}
+
+			> header {
+
+				flex-shrink: 0;
+
+				padding-top: 0.75rem;
+				padding-bottom: 0.5rem;
+				font-size: 1.5rem;
+				overflow: hidden;
+
+			}
+
+			> section {
+				flex-grow: 1;
+				flex-shrink: 1;
+				padding-top: 1rem;
+				padding-bottom: 1rem;
+			}
+
+			> footer {
+				flex-shrink: 0;
+				padding-top: 0.75rem;
+				padding-bottom: 0.75rem;
+				font-size: 0.8rem;
+				color: #999;
+			}
+
+		}
+
+		> nav {
+
+			flex-shrink: 1; /* enable TOC scrolling */
+
+			> * {
+				padding-left: 0.5rem;
+				padding-right: 0.5rem;
+			}
+
+			> header {
+
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+
+				border-bottom-style: solid;
+				white-space: nowrap;
+				box-shadow: 0 0 0.5rem 0.5rem #FFF;
+				z-index: 1;
+
+				> span {
+					flex-shrink: 1;
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
+
+				> span > a > span {
+					margin-left: 0.25em;
+					font-size: 90%;
+				}
+
+				> label {
+
+					@size: 1.25em;
+
+					display: block;
+					width: @size;
+					height: @size;
+					margin-left: 0.25em;
+
+					background-color: #CCC;
+
+					::before {
+						content: ""
+					}
+
+				}
+
+			}
+
+			> section {
+
+				overflow-x: hidden;
+				overflow-y: auto;
+
+				a {
+					font-weight: inherit;
+				}
+
+				> * {
+					display: block;
+				}
+
+				> a:first-child {
+					margin-bottom: 1em;
+					white-space: normal;
+					font-size: 110%;
+					color: #999;
+				}
+
+				> h1,
+				> h2,
+				> h3 {
+					padding: 0;
+					margin: 0;
+					border: none;
+					font-size: inherit;
+					font-weight: 300;
+				}
+
+				> h1 {
+					font-weight: 700;
+				}
+
+				> h1 + h1 {
+					margin-top: 0.5em;
+				}
+
+				> * + h1 {
+					margin-top: 0.75em;
+				}
+
+				> h2 + h2 {
+					margin-top: 0;
+				}
+
+				> * + h2 {
+					margin-top: 0.5em;
+				}
+
+				> h3 {
+					display: none;
+				}
+
+			}
+
+		}
+
+		> main {
+
+			flex-shrink: 1;
+			flex-grow: 1;
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			> * {
+				max-width: 50rem;
+				padding-left: 1rem;
+				padding-right: 1rem;
+			}
+
+			> header {
+				font-weight: 300;
+				color: #999;
+			}
+
+			> footer {
+
+				a {
+
+					font: inherit !important;
+					color: inherit !important;
+
+					:hover {
+						text-decoration: underline;
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
 }
 
-body {
-	display: flex;
-	flex-direction: column;
-	align-items: stretch;
-	height: 100%;
-	width: 100%;
-	text-align: center;
-	overflow: hidden;
-}
-
-body > input {
-	display: none;
-}
-
-body > * {
-	display: flex;
-	align-items: stretch;
-	flex-direction: column;
-}
-
-body > nav > * {
-	padding-left: 0.5rem;
-	padding-right: 0.5rem;
-}
-
-body > main > * {
-	padding-left: 1rem;
-	padding-right: 1rem;
-}
-
-body > * > *:empty {
-	display: none;
-}
-
-body > * > header {
-	flex-shrink: 0;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	padding-top: 0.75rem;
-	padding-bottom: 0.5rem;
-	font-size: 1.5rem;
-	overflow: hidden;
-}
-
-body > * > header > :last-child {
-	margin-left: auto;
-}
-
-body > * > section {
-	flex-grow: 1;
-	flex-shrink: 1;
-	padding-top: 0;
-	padding-bottom: 1rem;
-}
-
-body > * > footer {
-	flex-shrink: 0;
-	padding-top: 0.75rem;
-	padding-bottom: 0.75rem;
-	font-size: 0.8rem;
-	color: #999;
-}
-
-/**** Navigation ******************************************************************************************************/
-
-body > nav > header {
-	display: flex;
-	flex-direction: row;
-	align-items: baseline;
-	justify-content: space-between;
-	border-bottom-style: solid;
-	white-space: nowrap;
-	box-shadow: 0 0 0.5rem 0.5rem #FFF;
-	z-index: 1;
-}
-
-body > nav > header > span {
-	flex-shrink: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-body > nav > header > span > a > span {
-	margin-left: 0.25em;
-	font-size: 90%;
-}
-
-
-body > nav > header > label {
-	width: 1.25rem;
-	margin-left: 0.25rem;
-}
-
-body > nav > header > label::before {
-	content: "\f0c9"; /* fa-bars */
-}
-
-body > input:checked ~ nav {
-	flex-shrink: 1; /* enable TOC scrolling */
-}
-
-body > input:checked ~ nav > header > label::before {
-	content: "\f00d"; /* fa-times */
-}
-
-body > input:not(:checked) ~ nav > :not(header) {
-	display: none;
-}
-
-body > nav > section {
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-body > nav > section > * {
-	display: block;
-}
-
-body > nav > section > *:first-child {
-	margin-top: 1rem;
-}
-
-body > nav > section > a {
-	margin-bottom: 1em;
-	white-space: normal;
-	font-variant: small-caps;
-	font-size: 125%;
-	line-height: 1.1;
-	color: #999;
-}
-
-body > nav > section a {
-	font-weight: inherit;
-}
-
-/**** Navigation/TOC **************************************************************************************************/
-
-body > nav > section > h1,
-body > nav > section > h2,
-body > nav > section > h3 {
-	padding: 0;
-	margin: 0;
-	border: none;
-	font-size: inherit;
-	font-weight: 300;
-}
-
-body > nav > section > h1 {
-	font-weight: 700;
-}
-
-body > nav > section > h1 + h1 {
-	margin-top: 0.5em;
-}
-
-body > nav > section > * + h1 {
-	margin-top: 0.75em;
-}
-
-body > nav > section > h2 + h2 {
-	margin-top: 0;
-}
-
-body > nav > section > * + h2 {
-	margin-top: 0.5em;
-}
-
-body > nav > section > h3 {
-	display: none;
-}
-
-/**** Main ************************************************************************************************************/
-
-body > input:checked ~ main {
-	height: 0;
-	flex-grow: 0;
-}
-
-body > main {
-	flex-shrink: 1;
-	flex-grow: 1;
-	overflow-x: hidden;
-	overflow-y: auto;
-}
-
-body > main > * {
-	max-width: 50rem;
-}
-
-body > main > header {
-	margin-top: 0.5em;
-	margin-bottom: 1em;
-	font-weight: 300;
-	font-variant: small-caps;
-	line-height: 1.1;
-	color: #999;
-}
-
-body > main > footer > a {
-	font: inherit !important;
-	color: inherit !important;
-}
-
-body > main > footer > a:hover {
-	text-decoration: underline;
-}
 
 /**** Admonitions *****************************************************************************************************/
 
@@ -355,19 +346,6 @@ body > main > footer > a:hover {
 }
 
 
-.note::before,
-.warning::before {
-	display: inline-block;
-	width: 1.5em;
-	height: 0;
-	margin-left: -1.5em;
-	vertical-align: -5%;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-size: 1.25em;
-}
-
-
 /**** Typography ******************************************************************************************************/
 
 h1,
@@ -428,17 +406,19 @@ li {
 }
 
 dt {
+
 	font-weight: 700;
 	font-size: 95%;
 	color: #333;
-}
 
-* + dt {
-	margin-top: 1em;
-}
+	* + & {
+		margin-top: 1em;
+	}
 
-dt * {
-	font-weight: 700;
+	* {
+		font-weight: 700;
+	}
+
 }
 
 dd {
@@ -558,11 +538,6 @@ a[target=_blank]:after {
 	margin-left: 0.5em;
 }
 
-a[target].icon:after,
-a[target][href*="metreeca"]:after {
-	display: none;
-}
-
 a.more:after {
 	content: "›››";
 	display: inline-block;
@@ -608,11 +583,12 @@ select {
 	border-style: solid;
 }
 
+
 /**** Left-Aligned Body ***********************************************************************************************/
 
 @media screen and (min-width: 480px), print {
 
-	body {
+	html > body {
 		text-align: left;
 	}
 
@@ -635,62 +611,86 @@ select {
 
 }
 
+
 /**** Side TOC ********************************************************************************************************/
 
 @media screen and (min-width: 640px), print {
 
-	body {
-		flex-direction: row;
-	}
+	html {
 
-	body > * > section {
-		padding-top: 0.25rem;
-	}
+		> body {
 
-	body > nav {
-		width: 15rem;
-		border-right-style: solid;
-	}
+			flex-direction: row;
 
-	body > nav > * {
-		padding-left: 0.75rem;
-		padding-right: 0.75rem;
-	}
+			> * {
 
-	body > nav > header {
-		justify-content: flex-start;
-		border-bottom: none;
-		box-shadow: none;
-	}
+				> section {
+					padding-top: 0.75rem;
+				}
 
-	body > nav > header > label {
-		display: none;
-	}
+			}
 
-	body > nav > section {
-		display: block !important;
-	}
+			> nav {
 
-	body > main > * {
-		padding-left: 2.5rem;
-		padding-right: 2.5rem;
-	}
+				width: 15rem;
+				border-right-style: solid;
 
-	body > main > header {
-		margin-top: 0;
-		margin-bottom: 0.75rem;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+				> * {
+					padding-left: 0.75rem;
+					padding-right: 0.75rem;
+				}
+
+				> header {
+
+					border-bottom: none;
+					box-shadow: none;
+
+					> label {
+						display: none;
+					}
+
+				}
+
+				> section {
+					display: block !important;
+				}
+
+			}
+
+			> main {
+
+				> * {
+					padding-left: 2.5rem;
+					padding-right: 2.5rem;
+				}
+
+				> header {
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				}
+
+			}
+
+		}
 	}
 
 }
+
 
 /**** Printed *********************************************************************************************************/
 
 @media print {
 
-	body > nav {
-		display: none !important;
+	html {
+
+		> body {
+
+			> nav {
+				display: none !important;
+			}
+
+		}
+
 	}
 
 }

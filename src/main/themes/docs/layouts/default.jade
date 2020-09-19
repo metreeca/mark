@@ -6,6 +6,8 @@ doctype html
 - var module = project ? project.artifactId.replace(owner+"-", "") : ""
 - var version = project ?  project.version.replace("-SNAPSHOT", "") : ""
 
+- var title = empty(page.title) ? project.name : page.title
+
 - var prism = "//cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
 
 
@@ -13,7 +15,7 @@ html(lang="en")
 
     head
 
-        title #{page.title} #{page.title && project.name ? " | " : ""} #{project.name}
+        title #{title} #{title && project.name ? " | " : ""} #{project.name}
 
         meta(name="viewport" content="width=device-width,initial-scale=1")
         meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
@@ -49,26 +51,27 @@ html(lang="en")
 
                 //- icon dynamically managed by default.css
 
-                label(for="toggle" class="icon")
+                label(for="toggle")
 
             section
 
-                if page.title && page.path != "index.html"
-                    a(class="title" href="#_top") #{page.title}
+                if title && !empty(page.headings)
+                    a(class="title" href="#_top") #{title}
 
-                for heading in page.headings
+		        for heading in page.headings
                     #{"h"+heading.level}
                         a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
 
         main
 
-            header(id="_top") #{empty(page.title) ? project.name : page.title}
+            header(id="_top") #{title}
 
             section !{page.content}
 
             footer
 
                 | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+                = ' '
                 | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
         script(type="text/javascript" src="!{page.base}/index.js")
