@@ -1,4 +1,4 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-mark.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-mark/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
 # metreeca/mark
 
