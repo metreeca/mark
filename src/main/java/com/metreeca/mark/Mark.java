@@ -16,6 +16,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -23,6 +24,7 @@ import static java.nio.file.FileSystems.newFileSystem;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
 
@@ -35,6 +37,8 @@ public final class Mark implements Opts {
 	private static final Path base=Paths.get("").toAbsolutePath();
 
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
+
+	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +406,7 @@ public final class Mark implements Opts {
 		}
 
 		logger.info(format("%s %s + %s ›› %s",
-				task.getClass().getSimpleName().toLowerCase(Locale.ROOT),
+				task.getClass().getSimpleName().toLowerCase(ROOT),
 				relative(source), relative(assets), relative(target)
 		));
 
@@ -452,8 +456,19 @@ public final class Mark implements Opts {
 
 				return factories.stream()
 						.map(factory -> factory.apply(this))
-						.filter(pipe -> pipe.process(source, target))
-						.peek(status -> logger.info(common.toString()))
+						.filter(pipe -> {
+							try {
+
+								return pipe.process(source, target);
+
+							} catch ( final Exception e ) {
+
+								logger.error(report(pipe, e.getMessage()));
+
+								return false;
+							}
+						})
+						.peek(pipe -> logger.info(report(pipe, common)))
 						.findFirst()
 						.isPresent();
 
@@ -499,6 +514,13 @@ public final class Mark implements Opts {
 
 		return absolute.normalize();
 
+	}
+
+	private String report(final Pipe pipe, final Object message) {
+		return format("%s › %s",
+				pipe.getClass().getSimpleName().toLowerCase(ROOT),
+				MessagePattern.matcher(message.toString()).replaceAll("; ")
+		);
 	}
 
 }

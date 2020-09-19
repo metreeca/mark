@@ -39,7 +39,6 @@ public final class Less implements Pipe {
 				final String less=new String(Files.readAllBytes(path), UTF_8);
 				final String css=compile(path.toUri().toURL(), less, true);
 
-
 				return Files.write(target(target, ".css"), css.getBytes(UTF_8));
 
 			} catch ( final IOException e ) {
