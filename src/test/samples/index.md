@@ -58,7 +58,7 @@ The plugin binds by default the `build` goal to the `site` maven phase.
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
-```jade
+```pug
 doctype html
 
 html(lang="en")
@@ -106,7 +106,7 @@ The template to be used for rendering the page may be explicitly selected by set
 
 ## Generate the site
 
-```sh
+```shell
 mvn mark:build # or package
 ```
 
@@ -122,7 +122,7 @@ mvn mark:build # or package
 
 ## Watch site sources
 
-```sh
+```shell
 mvn mark:watch
 ```
 

@@ -14,8 +14,11 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.sun.net.httpserver.HttpServer.create;
@@ -32,7 +35,16 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class Serve implements Task {
 
-	public static final int port=2020;
+	private static final int port=2020;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final int OK=200;
+	private static final int NotFound=400;
+	private static final int NotAllowed=405;
+
+	private static final Pattern BodyPattern=Pattern.compile("</body>");
+	private static final String LiveJS="<script type='text/javascript' src='https://livejs.com/live.js'></script>$0";
 
 
 	/**
@@ -134,13 +146,13 @@ public final class Serve implements Task {
 
 				} else {
 
-					exchange.sendResponseHeaders(400, 0L);
+					exchange.sendResponseHeaders(NotFound, 0L);
 
 				}
 
 			} else {
 
-				exchange.sendResponseHeaders(405, 0L);
+				exchange.sendResponseHeaders(NotAllowed, 0L);
 
 			}
 
@@ -155,15 +167,25 @@ public final class Serve implements Task {
 
 		final String mime=types.getOrDefault(Mark.extension(file), "application/octet-stream");
 
-		final byte[] data=Files.readAllBytes(file);
+		final boolean head=exchange.getRequestMethod().equals("HEAD");
+		final boolean html=mime.equals("text/html");
+
+		final byte[] data=html
+				? BodyPattern.matcher(new String(Files.readAllBytes(file), UTF_8)).replaceAll(LiveJS).getBytes(UTF_8)
+				: Files.readAllBytes(file);
 
 		exchange.getResponseHeaders().set("Content-Type", mime);
-		exchange.sendResponseHeaders(200, data.length);
+		exchange.getResponseHeaders().set("Last-Modified", Files
+				.getLastModifiedTime(file)
+				.toInstant()
+				.atOffset(ZoneOffset.UTC)
+				.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+		);
 
-		if ( exchange.getRequestMethod().equals("GET") ) {
-			try ( final OutputStream output=exchange.getResponseBody() ) {
-				output.write(data);
-			}
+		exchange.sendResponseHeaders(OK, head ? -1 : data.length);
+
+		if ( !head ) {
+			try ( final OutputStream output=exchange.getResponseBody() ) { output.write(data); }
 		}
 	}
 

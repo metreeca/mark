@@ -107,7 +107,7 @@ The template to be used for rendering the page may be explicitly selected by set
 
 ### Generate the site
 
-```sh
+```shell
 mvn mark:build # or package
 ```
 
@@ -123,7 +123,7 @@ mvn mark:build # or package
 
 ### Watch site sources
 
-```sh
+```shell
 mvn mark:watch
 ```
 
@@ -132,13 +132,16 @@ mvn mark:watch
 
 ### Serve the generated site
 
-```sh
+```shell
 mvn mark:serve
 ```
 
 - the site is generated and watched as described above
 - the generated site is served on a development grade HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
+- pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com)
+
+> :warning: **Live page reloading assumes `UTF-8`.**
 
 ## Support
 
