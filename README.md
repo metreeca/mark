@@ -105,7 +105,7 @@ The template to be used for rendering the page may be explicitly selected by set
 
 > :warning: **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
-### Generate the site
+### Generate site
 
 ```shell
 mvn mark:build # or package
@@ -139,7 +139,7 @@ mvn mark:watch
 - the site is generated as described above
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
 
-### Serve the generated site
+### Serve generated site
 
 ```shell
 mvn mark:serve

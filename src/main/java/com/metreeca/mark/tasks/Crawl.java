@@ -84,14 +84,20 @@ public final class Crawl implements Task {
 					})
 					.collect(toSet());
 
-			links.stream()
+			final long broken=links.stream()
 
 					.filter(link -> !internal.contains(link.getValue()))
 					.filter(link -> !external.contains(link.getValue()))
 
-					.forEach(link -> logger.warn(format("✗ %s ›› %s", link.getKey(), link.getValue())));
+					.peek(link -> logger.warn(format("%s ~› %s", link.getKey(), link.getValue())))
+
+					.count();
 
 			final long stop=currentTimeMillis();
+
+			if ( broken > 0 ) {
+				logger.warn(format("%d broken links", broken));
+			}
 
 			if ( !links.isEmpty() ) {
 				logger.info(format("processed %,d files in %,.3f s", links.size(), (stop-start)/1000.0f));
