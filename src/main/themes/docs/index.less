@@ -140,14 +140,21 @@ html {
 				z-index: 1;
 
 				> span {
+
 					flex-shrink: 1;
 					overflow: hidden;
 					text-overflow: ellipsis;
-				}
 
-				> span > a > span {
-					margin-left: 0.25em;
-					font-size: 90%;
+					> a + a::before {
+						content: "›";
+						padding: 0.25em;
+					}
+
+					> a + a > span {
+						margin-left: 0.25em;
+						font-size: 90%;
+					}
+
 				}
 
 				> label {
