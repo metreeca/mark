@@ -24,7 +24,7 @@ html {
 }
 
 header, footer, nav, h1, h2, h3, dt, th, a, strong, small {
-	font-family: 'Roboto Condensed', Helvetica, Arial, sans-serif;
+	font-family: "Roboto Condensed", Helvetica, Arial, sans-serif;
 }
 
 code, code[class*=language-], pre[class*=language-] {
@@ -163,7 +163,7 @@ body > nav > header > label {
 }
 
 body > nav > header > label::before {
-	content: '\f0c9'; /* fa-bars */
+	content: "\f0c9"; /* fa-bars */
 }
 
 body > input:checked ~ nav {
@@ -171,7 +171,7 @@ body > input:checked ~ nav {
 }
 
 body > input:checked ~ nav > header > label::before {
-	content: '\f00d'; /* fa-times */
+	content: "\f00d"; /* fa-times */
 }
 
 body > input:not(:checked) ~ nav > :not(header) {
@@ -276,32 +276,84 @@ body > main > footer > a:hover {
 	text-decoration: underline;
 }
 
-/**** Panels **********************************************************************************************************/
+/**** Admonitions *****************************************************************************************************/
 
-.note,
-.warning {
-	padding: 0.5em 0.75em 0.5em 2.5em;
+.adm-hidden {
+	display: none;
+}
+
+.adm-block {
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
 	border-style: dotted;
 	border-left: solid 3px;
 	margin-top: 1.5em;
 	font-size: 90%;
 	background-color: #EEE;
+
+	.color(@color) {
+
+		border-left-color: @color;
+
+		svg {
+			color: @color;
+		}
+
+	}
+
+	& + & {
+		margin-top: 0.25em;
+	}
+
+	&.adm-note, &.adm-info {
+		.color(#789);
+	}
+
+	&.adm-warning {
+		.color(#F80);
+	}
+
+	> * {
+
+		padding: 0.5em;
+
+	}
+
+	> .adm-heading {
+
+		@size: 1.75em;
+
+		flex: 0;
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		svg {
+			width: @size;
+			height: @size;
+		}
+
+		span {
+			display: none;
+		}
+
+	}
+
+	> .adm-body {
+
+		flex: 1;
+
+		> p {
+			margin: 0;
+		}
+	}
+
 }
 
-.note + .note,
-.note + .warning,
-.warning + .warning,
-.warning + .note {
-	margin-top: -0.5em;
-}
-
-.note {
-	border-left-color: #789;
-}
-
-.warning {
-	border-left-color: #F80;
-}
 
 .note::before,
 .warning::before {
@@ -315,15 +367,6 @@ body > main > footer > a:hover {
 	font-size: 1.25em;
 }
 
-.note::before {
-	content: '\f05a'; /* fa-info-circle */
-	color: #789;
-}
-
-.warning::before {
-	content: '\f06a'; /* fa-exclamation-circle */
-	color: #F80;
-}
 
 /**** Typography ******************************************************************************************************/
 
@@ -372,7 +415,7 @@ ul {
 }
 
 ul > li::before {
-	content: '›';
+	content: "›";
 	margin-right: 0.25em;
 }
 
@@ -509,19 +552,19 @@ a:hover, button:active {
 }
 
 a[target=_blank]:after {
-	content: '\f08e'; /* external link */
+	content: "\f08e"; /* external link */
 	font-family: FontAwesome;
 	font-size: 66%;
 	margin-left: 0.5em;
 }
 
 a[target].icon:after,
-a[target][href*='metreeca']:after {
+a[target][href*="metreeca"]:after {
 	display: none;
 }
 
 a.more:after {
-	content: '›››';
+	content: "›››";
 	display: inline-block;
 	margin-left: 0.25em;
 }
@@ -545,9 +588,20 @@ abbr {
 	white-space: pre;
 }
 
-code, code[class*=language-], pre[class*=language-] {
+code {
+	white-space: nowrap;
+	font-size: 90% !important;
+}
+
+pre[class*=language-] {
+
 	margin-bottom: 1.5em;
-	font-size: 90%;
+
+	code {
+		tab-size: 2;
+		white-space: pre;
+	}
+
 }
 
 select {

@@ -8,6 +8,7 @@ import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.Link;
+import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
@@ -50,6 +51,7 @@ public final class Markdown {
 						TocExtension.create(),
 						TablesExtension.create(),
 						DefinitionExtension.create(),
+						AdmonitionExtension.create(),
 						AutolinkExtension.create()
 				))
 
