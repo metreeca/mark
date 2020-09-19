@@ -56,15 +56,15 @@ html(lang="en")
             section
 
                 if title && !empty(page.headings)
-                    a(class="title" href="#_top") #{title}
+                    a(class="title" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
 
-		        for heading in page.headings
+	            for heading in page.headings
                     #{"h"+heading.level}
                         a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
 
         main
 
-            header(id="_top") #{title}
+            header #{title}
 
             section !{page.content}
 
