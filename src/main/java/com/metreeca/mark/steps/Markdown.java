@@ -88,6 +88,8 @@ public final class Markdown {
 
 				if ( url.endsWith(".md") ) {
 					link.setUrl(url.removeProperSuffix(".md").append(".html"));
+				} else {
+					link.setUrl(url.replace(".md#", ".html#"));
 				}
 
 			})).visit(document);

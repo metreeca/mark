@@ -1,6 +1,7 @@
 Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug](https://naltatis.github.io/jade-syntax-docs/)/[Less](http://lesscss.org/) template and let the generator take care of the details…
 
 - [samples](samples.md)
+- [headings](samples.md#headings)
 - [redirect](redirect.md)
 - [broken](broken.md)
 
