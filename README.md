@@ -1,9 +1,8 @@
-
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-mark.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-mark/)
 
 # metreeca/mark
 
-Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug/Jade](https://naltatis.github.io/jade-syntax-docs/) template and let the generator take care of the details…
+Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug](https://naltatis.github.io/jade-syntax-docs/)/[Less](http://lesscss.org/) template and let the generator take care of the details…
 
 ## Usage
 
@@ -19,7 +18,7 @@ Add the plugin to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>0.0.0-SNAPSHOT</version>
+            <version>${mark.version}</version>
 
             <configuration> <!-- optional -->
                 <source>src/docs</source>
@@ -113,10 +112,16 @@ mvn mark:build # or package
 ```
 
 - the `target` folder is cleared
-- `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property
-- cross-links to `.md` files are converted to the corresponding `.html` file
+- files matching one of the following files extensions in  the `source` folder are processed by the corresponding pipeline
 -  templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
+
+| file extension | processing pipeline                                          |
+| -------------- | ------------------------------------------------------------ |
+| `.md`          | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
+| `.less`        | `.less` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
+
+### Watch site sources
 
 ```sh
 mvn mark:watch

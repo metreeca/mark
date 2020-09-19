@@ -4,8 +4,7 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.pipes.Md;
-import com.metreeca.mark.pipes.Wild;
+import com.metreeca.mark.pipes.*;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -115,9 +114,11 @@ public final class Mark implements Opts {
 	private final Log logger;
 
 
-	private final String extension; // layout extension
+	private final String template; // template layout extension
 
-	private final Collection<Function<Mark, Pipe>> factories=asList(Md::new, Wild::new);
+	private final Collection<Function<Mark, Pipe>> factories=asList( // pipe factories
+			Md::new, Less::new, Wild::new
+	);
 
 
 	/**
@@ -183,9 +184,9 @@ public final class Mark implements Opts {
 		this.shared=requireNonNull(opts.shared(), "null opts shared variables");
 		this.logger=requireNonNull(opts.logger(), "null opts system logger");
 
-		this.extension=extension(layout);
+		this.template=extension(layout);
 
-		if ( extension.isEmpty() ) {
+		if ( template.isEmpty() ) {
 			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
 		}
 
@@ -349,7 +350,7 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path");
 		}
 
-		return extension(path).equals(extension);
+		return extension(path).equals(template);
 	}
 
 	/**
@@ -371,8 +372,8 @@ public final class Mark implements Opts {
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
 		final Path layout=locate(root.relativize(
-				name.isEmpty() || name.equals(extension) ? this.layout
-						: this.layout.resolveSibling(name.contains(".") ? name : name+extension).normalize()
+				name.isEmpty() || name.equals(template) ? this.layout
+						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
 		));
 
 		if ( !Files.isRegularFile(layout) ) {
