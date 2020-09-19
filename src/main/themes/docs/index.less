@@ -157,23 +157,6 @@ html {
 
 				}
 
-				> label {
-
-					@size: 1.25em;
-
-					display: block;
-					width: @size;
-					height: @size;
-					margin-left: 0.25em;
-
-					background-color: #CCC;
-
-					::before {
-						content: ""
-					}
-
-				}
-
 			}
 
 			> section {
@@ -192,7 +175,7 @@ html {
 				> a:first-child {
 					margin-bottom: 1em;
 					white-space: normal;
-					font-size: 110%;
+					font-size: 125%;
 					color: #999;
 				}
 
@@ -267,6 +250,71 @@ html {
 
 			}
 
+		}
+
+	}
+
+}
+
+
+/**** Toggle **********************************************************************************************************/
+
+label:empty {
+
+	@size: 0.66em;
+	@color: #000;
+	@weight: 0.11em;
+
+	display: block;
+	position: relative;
+	width: @size;
+	height: @size;
+	margin-left: 0.25em;
+
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: @weight;
+		background-color: @color;
+		box-sizing: content-box;
+	}
+
+	body > input:not(:checked) ~ * & {
+
+		background-color: @color;
+
+		&::before,
+		&::after {
+			height: calc(1.05 * @weight);
+			background-color: #FFF;
+		}
+
+		&::before {
+			top: calc(@size / 5);
+		}
+
+		&::after {
+			bottom: calc(@size / 5);
+		}
+	}
+
+	body > :checked ~ * & {
+
+		&::before,
+		&::after {
+			top: calc(@size / 2 - @weight / 2);
+		}
+
+		&::before {
+			transform: rotate(45deg);
+		}
+
+		&::after {
+			transform: rotate(-45deg);
 		}
 
 	}
@@ -639,7 +687,7 @@ select {
 
 			> nav {
 
-				width: 15rem;
+				width: 17.5rem;
 				border-right-style: solid;
 
 				> * {
@@ -652,7 +700,7 @@ select {
 					border-bottom: none;
 					box-shadow: none;
 
-					> label {
+					> label:empty {
 						display: none;
 					}
 
