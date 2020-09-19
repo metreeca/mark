@@ -8,8 +8,7 @@ assignees: ''
 
 **Is your feature request related to a problem or a specific use case?**
 
-A clear and concise description of what the problem or the use case is.
-E.g. I'm always frustrated when [...]
+A clear and concise description of what the problem or the use case is. E.g. I'm always frustrated when [...]
 
 **Describe the solution you'd like**
 

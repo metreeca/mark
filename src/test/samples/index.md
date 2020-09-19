@@ -1,12 +1,11 @@
-[![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/metreeca-mark.svg)](https://search.maven.org/artifact/com.metreeca/metreeca-mark/)
-
-# metreeca/mark
-
 Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug](https://naltatis.github.io/jade-syntax-docs/)/[Less](http://lesscss.org/) template and let the generator take care of the details…
 
-## Usage
+- [samples](samples.md)
+- [redirect](redirect.md)
 
-### Configure the plugin
+# Usage
+
+## Configure the plugin
 
 Add the plugin to your build configuration as:
 
@@ -55,7 +54,7 @@ The following optional configuration parameters are available:
 
 The plugin binds by default the `build` goal to the `site` maven phase.
 
-### Define a default template
+## Define a default template
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
@@ -85,7 +84,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 
 > :warning: **Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
-### Define site content
+## Define site content
 
 Define site pages as `.md` files under the `source` folder, for instance as:
 
@@ -105,7 +104,7 @@ The template to be used for rendering the page may be explicitly selected by set
 
 > :warning: **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
-### Generate the site
+## Generate the site
 
 ```sh
 mvn mark:build # or package
@@ -121,7 +120,7 @@ mvn mark:build # or package
 | `.md`          | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
 | `.less`        | `.less` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
 
-### Watch site sources
+## Watch site sources
 
 ```sh
 mvn mark:watch
@@ -130,11 +129,11 @@ mvn mark:watch
 - the site is generated as described above
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
 
-## Support
+# Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
 - open a topic on [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
 
-## License
+# License
 
 This project is licensed under the MIT License – see [LICENSE](LICENSE) file for details

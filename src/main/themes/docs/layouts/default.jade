@@ -1,0 +1,76 @@
+doctype html
+
+- var home = project ? project.organization.url : ""
+- var owner = project ? project.organization.name.toLowerCase() : ""
+
+- var module = project ? project.artifactId.replace(owner+"-", "") : ""
+- var version = project ?  project.version.replace("-SNAPSHOT", "") : ""
+
+- var title = empty(page.title) ? project.name : page.title
+
+- var prism = "//cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
+
+
+html(lang="en")
+
+    head
+
+        title #{title} #{title && project.name ? " | " : ""} #{project.name}
+
+        meta(name="viewport" content="width=device-width,initial-scale=1")
+        meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+
+        link(rel="shortcut icon" href="!{page.base}/index.svg")
+
+        //- prism.js code highlighting
+
+        link(rel="stylesheet" href="!{prism}/themes/prism.min.css")
+
+        script(type="text/javascript" src="!{prism}/components/prism-core.min.js")
+        script(type="text/javascript" src="!{prism}/plugins/autoloader/prism-autoloader.min.js")
+
+        //- default stylesheet (at last to override prism.js)
+
+        link(rel="stylesheet" type="text/css" href="!{page.base}/index.css")
+
+    body
+
+        //- hidden menu toggle for mobile view
+
+        input(id="toggle" type="checkbox")
+
+        nav
+
+            header
+
+                span
+                    a(href="#{home}") #{owner}
+                    a(href="#{page.base}/index.html") #{module}
+                        span v#{version}
+
+                //- icon dynamically managed by default.css
+
+                label(for="toggle")
+
+            section
+
+                if title && !empty(page.headings)
+                    a(class="title" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
+
+                for heading in page.headings
+                    #{"h"+heading.level}
+                        a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
+
+        main
+
+            header #{title}
+
+            section !{page.content}
+
+            footer
+
+                | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+                = ' '
+                | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
+
+        script(type="text/javascript" src="!{page.base}/index.js")

@@ -1,218 +1,300 @@
 /*
- * Copyright © 2019 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl. All rights reserved.
  */
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.pipes.Md;
-import com.metreeca.mark.pipes.Wild;
+import com.metreeca.mark.pipes.*;
 
-import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
-import java.nio.file.WatchEvent.Kind;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.lang.System.currentTimeMillis;
+import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
-import static java.nio.file.Files.exists;
-import static java.nio.file.Files.isDirectory;
-import static java.nio.file.Files.isRegularFile;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.Comparator.reverseOrder;
-import static java.util.function.Predicate.isEqual;
+import static java.util.Locale.ROOT;
+import static java.util.Objects.requireNonNull;
 
 
-public final class Mark {
+/**
+ * Site generation engine.
+ */
+public final class Mark implements Opts {
 
-	private static final Path Base=Paths.get("");
+	private static final Path root=Paths.get("/");
+	private static final Path base=Paths.get("").toAbsolutePath();
+
+	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
+
+	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 
-	public static String basename(final Path path) {
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	public static Optional<Path> source(final Path path, final String extension) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
 		}
+
+		if ( extension == null ) {
+			throw new NullPointerException("null extension");
+		}
+
+		return Optional.of(path).filter(p -> extension(p).equalsIgnoreCase(extension));
+	}
+
+	public static Path target(final Path path, final String extension) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		if ( extension == null ) {
+			throw new NullPointerException("null extension");
+		}
+
+		return path.resolveSibling(basename(path)+extension);
+	}
+
+
+	private static String basename(final Path path) {
 
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
 
 		return dot >= 0 ? name.substring(0, dot) : name;
-
 	}
 
-	public static String extension(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
+	private static String extension(final Path path) {
 
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
 
 		return dot >= 0 ? name.substring(dot) : "";
-
 	}
 
 
-	private static Path normalize(final Path path) {
+	private static boolean contains(final Path path, final Path child) {
+		return compatible(path, child) && child.startsWith(path);
+	}
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
+	private static boolean compatible(final Path x, final Path y) {
+		return x.getFileSystem().equals(y.getFileSystem());
+	}
 
+
+	private static Path absolute(final Path path) {
 		return path.toAbsolutePath().normalize();
 	}
 
-	private static Path resolve(final Path path, final Path child) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( child == null ) {
-			throw new NullPointerException("null child");
-		}
-
-		return path.getFileSystem().equals(child.getFileSystem()) ? path.resolve(child) : child;
-	}
-
-	private static boolean contains(final Path path, final Path child) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		if ( child == null ) {
-			throw new NullPointerException("null child");
-		}
-
-		return path.getFileSystem().equals(child.getFileSystem()) && child.startsWith(path);
+	private static Path relative(final Path path) {
+		return compatible(base, path) ? base.relativize(path.toAbsolutePath()) : path;
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Path source=Base;
-	private Path target=Base;
+	private final Path source;
+	private final Path target;
 
-	private Path assets=Base;
-	private Path layout=Base;
+	private final Path assets;
+	private final Path layout;
 
-	private Map<String, Object> shared=emptyMap();
+	private final Map<String, Object> shared;
 
-	private Log logger=new SystemStreamLog();
+	private final Log logger;
 
 
-	public Path source() {
+	private final String template; // template layout extension
+
+	private final Collection<Function<Mark, Pipe>> factories=asList( // pipe factories
+			Md::new, Less::new, Wild::new
+	);
+
+
+	/**
+	 * Creates a site generation engine
+	 *
+	 * @param opts the site generation options
+	 *
+	 * @throws NullPointerException if {@code opts} is null or one of its methods returns a null value
+	 */
+	public Mark(final Opts opts) {
+
+		if ( opts == null ) {
+			throw new NullPointerException("null opts");
+		}
+
+		this.source=absolute(requireNonNull(opts.source(), "null opts source path"));
+		this.target=absolute(requireNonNull(opts.target(), "null opts target path"));
+
+		this.assets=assets(requireNonNull(opts.assets(), "null opts assets path"));
+		this.layout=layout(requireNonNull(opts.layout(), "null opts layout path"));
+
+
+		if ( !Files.exists(source) ) {
+			throw new IllegalArgumentException("missing source folder { "+relative(source)+" }");
+		}
+
+		if ( !Files.isDirectory(source) ) {
+			throw new IllegalArgumentException("source is not a folder { "+relative(source)+" }");
+		}
+
+		if ( Files.exists(target) && !Files.isDirectory(target) ) {
+			throw new IllegalArgumentException("target is not a folder { "+relative(target)+" }");
+		}
+
+		if ( !Files.exists(assets) ) {
+			throw new IllegalArgumentException("missing assets folder { "+relative(assets)+" }");
+		}
+
+		if ( !Files.isDirectory(assets) ) {
+			throw new IllegalArgumentException("assets is not a folder { "+relative(assets)+" }");
+		}
+
+
+		if ( contains(source, target) || contains(target, source) ) {
+			throw new IllegalArgumentException(
+					"overlapping source/target folders { "+relative(source)+" <-> "+relative(target)+" }"
+			);
+		}
+
+		if ( contains(source, assets) || contains(assets, source) ) {
+			throw new IllegalArgumentException(
+					"overlapping source/assets folders { "+relative(source)+" <-> "+relative(assets)+" }"
+			);
+		}
+
+		if ( contains(target, assets) || contains(assets, target) ) {
+			throw new IllegalArgumentException(
+					"overlapping target/assets folders { "+relative(target)+" <-> "+relative(assets)+" }"
+			);
+		}
+
+
+		this.shared=requireNonNull(opts.shared(), "null opts shared variables");
+		this.logger=requireNonNull(opts.logger(), "null opts system logger");
+
+		this.template=extension(layout);
+
+		if ( template.isEmpty() ) {
+			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
+		}
+
+	}
+
+
+	private Path layout(final Path path) {
+		return root.resolve(path).normalize(); // root-relative layout path
+	}
+
+	private Path assets(final Path path) {
+
+		final String name=path.toString();
+
+		return name.equals("@") ? empty()
+				: name.startsWith("@/") ? bundled(name)
+				: absolute(path);
+
+	}
+
+
+	private Path empty() {
+		try {
+
+			final Path empty=absolute(Files.createTempDirectory(null));
+
+			empty.toFile().deleteOnExit();
+
+			return empty;
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private Path bundled(final String name) {
+
+		final URL url=getClass().getClassLoader().getResource(name);
+
+		if ( url == null ) {
+			throw new NullPointerException("unknown theme {"+name+"}");
+		}
+
+		final String scheme=url.getProtocol();
+
+		if ( scheme.equals("file") ) {
+
+			return absolute(Paths.get(url.getPath()));
+
+		} else if ( scheme.equals("jar") ) {
+
+			final String path=url.toString();
+
+			final int mark=path.indexOf('!');
+
+			final String head=mark >= 0 ? path.substring(0, mark) : path;
+			final String tail=mark >= 0 ? path.substring(mark+1) : "/";
+
+			final FileSystem bundle=bundles.computeIfAbsent(URI.create(head), uri -> {
+				try {
+
+					return newFileSystem(uri, emptyMap());
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+
+			});
+
+			return bundle.getPath(tail);
+
+		} else {
+
+			throw new UnsupportedOperationException("unsupported assets scheme {"+name+"}");
+
+		}
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override public Path source() {
 		return source;
 	}
 
-	public Mark source(final Path source) {
-
-		if ( source == null ) {
-			throw new NullPointerException("null source");
-		}
-
-		this.source=source; // cwd-relative
-
-		return this;
-	}
-
-
-	public Path target() {
+	@Override public Path target() {
 		return target;
 	}
 
-	public Mark target(final Path target) {
-
-		if ( target == null ) {
-			throw new NullPointerException("null target");
-		}
-
-		this.target=target; // cwd-relative
-
-		return this;
-	}
-
-
-	public Path assets() {
+	@Override public Path assets() {
 		return assets;
 	}
 
-	public Mark assets(final Path assets) {
-
-		if ( assets == null ) {
-			throw new NullPointerException("null assets");
-		}
-
-		this.assets=assets; // source-relative
-
-		return this;
-	}
-
-
-	public Path layout() {
+	@Override public Path layout() {
 		return layout;
 	}
 
-	public Mark layout(final Path layout) {
 
-		if ( layout == null ) {
-			throw new NullPointerException("null layout");
-		}
-
-		this.layout=layout; // assets-relative
-
-		return this;
-	}
-
-
-	public Map<String, Object> shared() {
+	@Override public Map<String, Object> shared() {
 		return unmodifiableMap(shared);
 	}
 
-	public Mark shared(final Map<String, Object> shared) {
-
-		if ( shared == null ) {
-			throw new NullPointerException("null shared model");
-		}
-
-		this.shared=unmodifiableMap(shared);
-
-		return this;
-	}
-
-
-	public Log logger() {
+	@Override public Log logger() {
 		return logger;
-	}
-
-	public Mark logger(final Log logger) {
-
-		if ( logger == null ) {
-			throw new NullPointerException("null logger");
-		}
-
-		this.logger=logger;
-
-		return this;
 	}
 
 
@@ -233,8 +315,8 @@ public final class Mark {
 			throw new NullPointerException("null path");
 		}
 
-		return Optional.of(path.getParent().relativize(target))
-				.filter(isEqual(Base).negate())
+		return Optional.of(path.getParent().relativize(target).normalize())
+				.filter(p -> !p.toString().isEmpty())
 				.orElse(Paths.get("."));
 	}
 
@@ -253,313 +335,192 @@ public final class Mark {
 			throw new NullPointerException("null path");
 		}
 
-		return target().relativize(path);
+		return target.relativize(path).normalize();
 	}
 
 
+	/**
+	 * Checks if a path is a layout
+	 *
+	 * @param path the path to be checked
+	 *
+	 * @return {@code true} if {@code path} has the same file extension as the default {@linkplain #layout() layout}
+	 *
+	 * @throws NullPointerException if {@code path} is {@code null}
+	 */
+	public boolean isLayout(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		return extension(path).equals(template);
+	}
+
+	/**
+	 * Locates a layout.
+	 *
+	 * @param name the name of the layout to be located
+	 *
+	 * @return the absolute path of the layout identified by {@code name}
+	 *
+	 * @throws NullPointerException     if {@code name} is null
+	 * @throws IllegalArgumentException if unable to locate a layout identified by {@code name}
+	 */
 	public Path layout(final String name) {
 
 		if ( name == null ) {
 			throw new NullPointerException("null name");
 		}
 
-		if ( name.isEmpty() || name.equals(extension(layout)) ) { // ;( loaders may force extension on empty paths…
+		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-			return layout;
+		final Path layout=locate(root.relativize(
+				name.isEmpty() || name.equals(template) ? this.layout
+						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
+		));
 
-		} else {
-
-			final String base=relative(layout.getParent()).toString();
-
-			for (final Path folder : asList(source, assets)) {
-
-				final Path layout=folder.resolve(base).resolve(name);
-
-				if ( exists(layout) ) {
-
-					if ( !isRegularFile(layout) ) {
-						throw new IllegalArgumentException("layout is not a regular file {"+layout+"}");
-					}
-
-					if ( !layout.startsWith(folder) ) {
-						throw new IllegalArgumentException("layout outside base folder {" +folder+ " // "+layout+"}");
-					}
-
-					return layout;
-				}
-
-			}
-
-			throw new IllegalArgumentException("unknown layout {"+name+"}");
-
+		if ( !Files.isRegularFile(layout) ) {
+			throw new IllegalArgumentException("layout is not a regular file { "+relative(layout)+" }");
 		}
+
+		return layout;
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public Mark build() {
-		return exec(handler -> {
+	/**
+	 * Executes a site generation task.
+	 *
+	 * @param task the site generation task to be executed
+	 *
+	 * @return this engine
+	 *
+	 * @throws NullPointerException if {@code resource} is null
+	 */
+	public Mark exec(final Task task) {
 
-			if ( exists(target) ) { // clean target folder
-
-				try (final Stream<Path> walk=Files.walk(target)) {
-
-					walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
-
-						try {
-
-							Files.delete(path);
-
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-
-					});
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-
-			}
-
-			if ( !contains(source, assets) ) { // process skin assets
-
-				try (final Stream<Path> walk=Files.walk(assets)) {
-
-					final long start=currentTimeMillis();
-					final long count=walk.filter(handler::apply).count();
-					final long stop=currentTimeMillis();
-
-					if ( count > 0 ) {
-						logger.info(String.format("extracted %,d files in %,.3f s", count, (stop-start)/1000f));
-					}
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-
-			}
-
-			if ( !contains(assets, source) ) { // process source folder
-
-				try (final Stream<Path> walk=Files.walk(source)) {
-
-					final long start=currentTimeMillis();
-					final long count=walk.filter(handler::apply).count();
-					final long stop=currentTimeMillis();
-
-					if ( count > 0 ) {
-						logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000f));
-					}
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-
-			}
-
-		});
-	}
-
-	public void watch() {
-		exec(handler -> {
-
-			try (final WatchService service=source.getFileSystem().newWatchService()) {
-
-				final Consumer<Path> register=path -> {
-					try {
-
-						path.register(service,
-								new Kind<?>[] {ENTRY_CREATE, ENTRY_MODIFY},
-								SensitivityWatchEventModifier.HIGH
-						);
-
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				};
-
-				try (final Stream<Path> sources=Files.walk(source)) {
-					sources.filter(Files::isDirectory).forEach(register); // register existing source folders
-				}
-
-				logger.info(String.format("watching %s", Base.toAbsolutePath().relativize(source)));
-
-				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch source changes
-					for (final WatchEvent<?> event : key.pollEvents()) {
-
-						final Kind<?> kind=event.kind();
-						final Path path=((Path)key.watchable()).resolve((Path)event.context());
-
-						if ( event.kind().equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
-
-							logger.info(source.relativize(path).toString());
-
-							register.accept(path);
-
-						} else if ( event.kind().equals(ENTRY_CREATE) && isRegularFile(path) ) {
-
-							handler.apply(path);
-
-						} else if ( event.kind().equals(ENTRY_MODIFY) && isRegularFile(path) ) {
-
-							if ( isLayout(path) ) { build(); } else { handler.apply(path); }
-
-						} else if ( kind.equals(OVERFLOW) ) {
-
-							logger.error("sync lost");
-
-						}
-					}
-				}
-
-			} catch ( final IOException e ) {
-
-				throw new UncheckedIOException(e);
-
-			} catch ( final InterruptedException ignored ) {}
-
-		});
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private Mark exec(final Consumer<Function<Path, Boolean>> task) {
-
-		this.source=normalize(source);
-		this.target=normalize(target);
-
-		if ( !exists(source) ) {
-			throw new IllegalArgumentException("missing source folder {"+source+"}");
+		if ( task == null ) {
+			throw new NullPointerException("null task");
 		}
 
-		if ( !isDirectory(source) ) {
-			throw new IllegalArgumentException("source is not a folder {"+source+"}");
-		}
+		logger.info(format("%s %s + %s ›› %s",
+				task.getClass().getSimpleName().toLowerCase(ROOT),
+				relative(source), relative(assets), relative(target)
+		));
 
-		if ( exists(target) && !isDirectory(target) ) {
-			throw new IllegalArgumentException("target is not a folder {"+target+"}");
-		}
-
-		if ( contains(source, target) || contains(target, source) ) {
-			throw new IllegalArgumentException("overlapping source/target folders {"+source+" // "+target+"}");
-		}
-
-
-		if ( assets.equals(Base) && layout.equals(Base) ) {
-
-			this.assets=normalize(assets("/skins/docs"));
-			this.layout=normalize(assets.resolve("assets/default.jade"));
-
-		} else {
-
-			this.assets=normalize(resolve(source, assets));
-			this.layout=normalize(resolve(assets, layout));
-
-		}
-
-		if ( !exists(layout) ) {
-			throw new IllegalArgumentException("missing default layout {"+layout+"}");
-		}
-
-		if ( !isRegularFile(layout) ) {
-			throw new IllegalArgumentException("default layout is not a regular file {"+layout+"}");
-		}
-
-		if ( !contains(assets, layout) ) {
-			throw new IllegalArgumentException("default layout outside assets folder {"+layout+"}");
-		}
-
-		if ( contains(target, assets) || contains(target, source) ) {
-			throw new IllegalArgumentException("overlapping target/assets folders {"+target+" // "+assets+"}");
-		}
-
-
-		final Collection<Pipe> pipes=asList(
-				new Md(this),
-				new Wild()
-		);
-
-		task.accept(_source -> {
-
-			if ( isDirectory(_source) || isLayout(_source) ) { return false; } else {
-
-				try {
-
-					final Path _common=relative(_source);
-					final Path _target=target.resolve(_common.toString()); // possibly on different filesystems
-
-					Files.createDirectories(_target.getParent());
-
-					return pipes.stream()
-							.filter(pipe -> pipe.process(_source, _target))
-							.peek(status -> logger.info(_common.toString()))
-							.findFirst()
-							.isPresent();
-
-				} catch ( final IOException|RuntimeException e ) {
-
-					logger.error(String.format("error while processing %s", _source), e);
-
-					return false;
-
-				}
-
-			}
-
-		});
+		task.exec(this);
 
 		return this;
 	}
 
-
-	private Path assets(final String name) {
-
-		final URL resource=getClass().getResource(name);
+	/**
+	 * Processes a site resource.
+	 *
+	 * <p>Generates a processed version of a site resource in the {@linkplain Opts#target() target} site folder.</p>
+	 *
+	 * @param resource the path of the site resource to be processed, relative either to the {@linkplain Opts#source()
+	 *                 resource} site folder or to the {@linkplain Opts#assets() assets} folder
+	 *
+	 * @return {@code true} if {@code resource} was successfully processed; {@code false} otherwise
+	 *
+	 * @throws NullPointerException if {@code resource} is null
+	 */
+	public boolean process(final Path resource) {
 
 		if ( resource == null ) {
-			throw new NullPointerException("unknown skin {" +name+ "}");
+			throw new NullPointerException("null resource");
 		}
 
-		final String assets=resource.toString();
+		try {
 
-		if ( assets.startsWith("file:") ) {
+			final Path source=locate(resource);
 
-			return normalize(Paths.get(assets.substring("file:".length())));
+			if ( Files.isDirectory(source) || Files.isHidden(source) || isLayout(source) ) { return false; } else {
 
-		} else if ( assets.startsWith("jar:") ) {
+				// relativize the source path wrt its input folder (on possibly incompatible filesystem)
 
-			final int mark=assets.indexOf('!');
+				final Path common=contains(this.source, source) ? this.source.relativize(source)
+						: contains(assets, source) ? assets.relativize(source)
+						: source;
 
-			final String head=mark >= 0 ? assets.substring(0, mark) : assets;
-			final String tail=mark >= 0 ? assets.substring(mark+1) : "/";
+				// define the absolute target path (use strings to handle incompatible filesystems)
 
-			try {
+				final Path target=this.target.resolve(common.toString());
 
-				return newFileSystem(URI.create(head), emptyMap()).getPath(tail);
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
+				// create the output directory and process using the first matching pipe
+
+				Files.createDirectories(target.getParent());
+
+				return factories.stream()
+						.map(factory -> factory.apply(this))
+						.filter(pipe -> {
+							try {
+
+								return pipe.process(source, target);
+
+							} catch ( final Exception e ) {
+
+								logger.error(report(pipe, e.getMessage()));
+
+								return false;
+							}
+						})
+						.peek(pipe -> logger.info(report(pipe, common)))
+						.findFirst()
+						.isPresent();
+
 			}
 
-		} else {
+		} catch ( final IOException|RuntimeException e ) {
 
-			throw new UnsupportedOperationException("unsupported assets scheme {"+assets+"}");
+			logger.error(format("error while processing %s", source), e);
+
+			return false;
 
 		}
 	}
 
 
-	private boolean isLayout(final Path path) {
-		return extension(path).equals(extension(layout));
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * @param resource the possibly relative path of a site resource
+	 *
+	 * @return the absolute path of {@code resource} either under the source or the assets folders
+	 *
+	 * @throws IllegalArgumentException if {@code resource} is not a known path under an input folder
+	 */
+	private Path locate(final Path resource) {
+
+		final Path absolute=resource.isAbsolute() ? resource : Stream.of(source, assets)
+
+				.map(folder -> folder.resolve(resource.toString())) // as string to handle incompatible filesystems
+				.map(Path::toAbsolutePath)
+				.filter(Files::exists)
+
+				.findFirst()
+				.orElse(resource);
+
+		if ( !Files.exists(absolute) ) {
+			throw new IllegalArgumentException("unknown resource { "+relative(resource)+" }");
+		}
+
+		if ( Stream.of(source, assets).noneMatch(folder -> contains(folder, absolute)) ) {
+			throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
+		}
+
+		return absolute.normalize();
+
 	}
 
-	private Path relative(final Path path) {
-		return contains(source, path) ? source.relativize(path)
-				: contains(assets, path) ? assets.relativize(path)
-				: path;
+	private String report(final Pipe pipe, final Object message) {
+		return format("%s › %s",
+				pipe.getClass().getSimpleName().toLowerCase(ROOT),
+				MessagePattern.matcher(message.toString()).replaceAll("; ")
+		);
 	}
 
 }
