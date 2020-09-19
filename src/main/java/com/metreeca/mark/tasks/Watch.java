@@ -21,7 +21,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
  * Site watching task.
  *
  * <p>Generates a processed version of the {@linkplain Opts#source() source} site folder in the
- * {@linkplain Opts#target() target} site folder, monitoring the {@linkplain Opts#source() source} site folder for
+ * {@linkplain Opts#target() target} site folder, watching the {@linkplain Opts#source() source} site folder for
  * further changes to by synchronized.</p>
  */
 public final class Watch implements Task {

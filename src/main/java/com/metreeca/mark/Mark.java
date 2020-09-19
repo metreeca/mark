@@ -43,6 +43,7 @@ public final class Mark implements Opts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 	public static Optional<Path> source(final Path path, final String extension) {
 
 		if ( path == null ) {
@@ -70,7 +71,11 @@ public final class Mark implements Opts {
 	}
 
 
-	private static String basename(final Path path) {
+	public static String basename(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
 
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
@@ -78,7 +83,11 @@ public final class Mark implements Opts {
 		return dot >= 0 ? name.substring(0, dot) : name;
 	}
 
-	private static String extension(final Path path) {
+	public static String extension(final Path path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
 
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');

@@ -130,6 +130,16 @@ mvn mark:watch
 - the site is generated as described above
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
 
+### Serve the generated site
+
+```sh
+mvn mark:serve
+```
+
+- the site is generated and watched as described above
+- the generated site is served on a development grade HTTP server for testing purposes
+- on supported systems, the served site is automatically opened in the default user browser
+
 ## Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature

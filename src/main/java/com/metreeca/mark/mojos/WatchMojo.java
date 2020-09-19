@@ -14,7 +14,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name="watch") public class WatchMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts()).exec(new Build()).exec(new Watch());
+		new Mark(opts())
+				.exec(new Build())
+				.exec(new Watch());
 	}
 
 }
