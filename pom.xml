@@ -119,6 +119,12 @@
 			<version>1.10</version>
 		</dependency>
 
+		<dependency> <!-- TagSoup SAX HTML Parser -->
+			<groupId>org.ccil.cowan.tagsoup</groupId>
+			<artifactId>tagsoup</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

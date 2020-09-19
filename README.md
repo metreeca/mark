@@ -121,6 +121,15 @@ mvn mark:build # or package
 | `.md`          | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
 | `.less`        | `.less` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
 
+### Verify links
+
+```shell
+mvn mark:crawl
+```
+
+- the site is generated as described above
+- HTML files under the `target` folder are scanned and dangling links reported
+
 ### Watch site sources
 
 ```shell
