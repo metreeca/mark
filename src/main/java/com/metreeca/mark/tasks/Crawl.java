@@ -125,7 +125,7 @@ public final class Crawl implements Task {
 
 					Stream.of(new SimpleImmutableEntry<>(self, self)), // document self flink
 
-					nodes(document, "//@id|//html:a/@name")// anchors self links
+					nodes(document, "//@id|//html:a/@name") // anchors self links
 							.map(Node::getTextContent)
 							.map(anchor -> self+"#"+anchor)
 							.map(anchor -> new SimpleImmutableEntry<>(anchor, anchor)),
@@ -149,11 +149,24 @@ public final class Crawl implements Task {
 
 	}
 
-	private String clean(final String link) { // remove query compinets fom local links (e.g. javadocs)
+
+	private String clean(final String link) { // fix glitches in local links
+		return index(query(link));
+	}
+
+	private String index(final String link) { // add missing index files
+
+		return link.endsWith("/") ? link+"index.html"
+				: link.endsWith(".") ? link+"/index.html"
+				: link;
+
+	}
+
+	private String query(final String link) { // remove query components (e.g. javadocs)
 
 		final int question=link.indexOf('?');
 
-		return question < 0 ? link : link.substring(0, question);
+		return question >= 0 ? link.substring(0, question) : link;
 	}
 
 
