@@ -11,6 +11,7 @@ import org.ccil.cowan.tagsoup.Parser;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
@@ -18,7 +19,8 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.xpath.*;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -72,11 +74,11 @@ public final class Crawl implements Task {
 
 							logger.info(format("checking %s", url));
 
-							return url.startsWith("http") ? connect(url) : validate(url);
+							return validate(url);
 
-						} catch ( final ProtocolException e ) {
+						} catch ( final IOException e ) {
 
-							logger.warn(e.getMessage());
+							logger.warn(e.toString());
 
 							return false;
 
@@ -123,12 +125,12 @@ public final class Crawl implements Task {
 
 					Stream.of(new SimpleImmutableEntry<>(self, self)), // document self flink
 
-					nodes(document, "//@id")// anchors self links
+					nodes(document, "//@id|//html:a/@name")// anchors self links
 							.map(Node::getTextContent)
 							.map(anchor -> self+"#"+anchor)
 							.map(anchor -> new SimpleImmutableEntry<>(anchor, anchor)),
 
-					nodes(document, "//@href") // actual links
+					nodes(document, "//@href|//@src") // actual links
 							.map(Node::getTextContent)
 							.map(link -> URLPattern.matcher(link).matches() ? link
 									: link.startsWith("//") ? "http:"+link
@@ -193,10 +195,28 @@ public final class Crawl implements Task {
 	private Stream<Node> nodes(final Document document, final String query) {
 		try {
 
-			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new NodeIterator((NodeList)XPathFactory
+			final XPath xpath=XPathFactory
 
 					.newInstance()
-					.newXPath()
+					.newXPath();
+
+			xpath.setNamespaceContext(new NamespaceContext() {
+
+				@Override public String getNamespaceURI(final String prefix) {
+					return prefix.equals("html") ? "http://www.w3.org/1999/xhtml" : null;
+				}
+
+				@Override public String getPrefix(final String namespaceURI) {
+					throw new UnsupportedOperationException("prefix lookup");
+				}
+
+				@Override public Iterator<String> getPrefixes(final String namespaceURI) {
+					throw new UnsupportedOperationException("prefixes lookup");
+				}
+
+			});
+
+			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new NodeIterator((NodeList)xpath
 					.compile(query)
 					.evaluate(document, XPathConstants.NODESET)
 
@@ -208,9 +228,13 @@ public final class Crawl implements Task {
 	}
 
 
-	private boolean connect(final String url) throws ProtocolException {
+	private boolean validate(final String url) throws IOException {
+		if ( url.startsWith("javascript:") ) {
 
-		try {
+			return true;
+
+		} else if ( url.startsWith("http") ) {
+
 			final HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();
 
 			connection.setRequestMethod("HEAD");
@@ -229,27 +253,14 @@ public final class Crawl implements Task {
 
 			return connection.getResponseCode()/100 == 2;
 
-		} catch ( final ProtocolException e ) {
+		} else {
 
-			throw e;
+			new URL(url); // only well-formedness tests
 
-		} catch ( final IOException e ) {
-
-			throw new UncheckedIOException(e);
+			return true;
 
 		}
-	}
 
-	private boolean validate(final String url) { // only well-formedness tests
-		try {
-
-			return new URL(url) != null;
-
-		} catch ( final MalformedURLException e ) {
-
-			return false;
-
-		}
 	}
 
 
