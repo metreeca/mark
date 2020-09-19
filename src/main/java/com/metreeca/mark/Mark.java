@@ -43,7 +43,6 @@ public final class Mark implements Opts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 	public static Optional<Path> source(final Path path, final String extension) {
 
 		if ( path == null ) {
@@ -470,11 +469,12 @@ public final class Mark implements Opts {
 
 								return pipe.process(source, target);
 
-							} catch ( final Exception e ) {
+							} catch ( final RuntimeException e ) {
 
 								logger.error(report(pipe, e.getMessage()));
 
 								return false;
+
 							}
 						})
 						.peek(pipe -> logger.info(report(pipe, common)))
