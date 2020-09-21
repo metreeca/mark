@@ -336,7 +336,6 @@ label:empty {
 
 	border-style: dotted;
 	border-left: solid 3px;
-	margin-top: 1.5em;
 	font-size: 90%;
 	background-color: #EEE;
 
@@ -348,6 +347,10 @@ label:empty {
 			color: @color;
 		}
 
+	}
+
+	& + :not(&) {
+		margin-top: 1.5em;
 	}
 
 	& + & {
