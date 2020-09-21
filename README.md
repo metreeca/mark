@@ -83,7 +83,8 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.content`  | the content of the page rendered as HTML                     |
 | `project.*`     | Maven project properties                                     |
 
-> :warning: **Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
+> :warning: 
+> **Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
 ### Define site content
 
@@ -103,7 +104,8 @@ All the properties available to templates (with the obvious exception of `page.c
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
-> :warning: **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
+> :warning: 
+> **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
 ### Generate site
 
@@ -127,8 +129,10 @@ mvn mark:build # or package
 mvn mark:crawl
 ```
 
-- the site is generated as described above
 - HTML files under the `target` folder are scanned and dangling links reported
+
+> :warning: 
+> **Crawling doesn't automaticaly generate the site, in order to support incremental operations while watching site sources.**
 
 ### Watch site sources
 
@@ -150,7 +154,8 @@ mvn mark:serve
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com)
 
-> :warning: **Live page reloading assumes `UTF-8`.**
+> :warning: 
+> **Live page reloading assumes `UTF-8`.**
 
 ## Support
 
