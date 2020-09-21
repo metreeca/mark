@@ -6,8 +6,8 @@ package com.metreeca.mark.pipes;
 
 import com.metreeca.mark.Mark;
 import com.metreeca.mark.Pipe;
-import com.metreeca.mark.steps.Jade;
 import com.metreeca.mark.steps.Markdown;
+import com.metreeca.mark.steps.Pug;
 
 import java.nio.file.Path;
 
@@ -18,7 +18,7 @@ import static com.metreeca.mark.Mark.target;
 public final class Md implements Pipe {
 
 	private final Markdown markdown;
-	private final Jade jade;
+	private final Pug pug;
 
 
 	public Md(final Mark mark) {
@@ -28,7 +28,7 @@ public final class Md implements Pipe {
 		}
 
 		this.markdown=new Markdown(mark);
-		this.jade=new Jade(mark);
+		this.pug=new Pug(mark);
 	}
 
 
@@ -37,7 +37,7 @@ public final class Md implements Pipe {
 	@Override public boolean process(final Path source, final Path target) {
 		return source(source, ".md")
 				.map(markdown::read)
-				.map(model -> jade.write(target(target, ".html"), model))
+				.map(model -> pug.write(target(target, ".html"), model))
 				.isPresent();
 	}
 

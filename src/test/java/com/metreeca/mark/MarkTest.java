@@ -47,7 +47,7 @@ public final class MarkTest {
 
 		@Override public Path assets() { return Paths.get("src/main/themes/docs"); }
 
-		@Override public Path layout() { return Paths.get("layouts/default.jade"); }
+		@Override public Path layout() { return Paths.get("layouts/default.pug"); }
 
 
 		@Override public Map<String, Object> shared() {

@@ -107,10 +107,10 @@
 			<version>0.62.2</version>
 		</dependency>
 
-		<dependency>
+		<dependency> <!-- https://github.com/neuland/pug4j -->
 			<groupId>de.neuland-bfi</groupId>
-			<artifactId>jade4j</artifactId>
-			<version>1.3.2</version>
+			<artifactId>pug4j</artifactId>
+			<version>2.0.0-alpha-2</version>
 		</dependency>
 
 		<dependency> <!-- https://github.com/i-net-software/jlessc -->

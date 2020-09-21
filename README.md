@@ -2,11 +2,11 @@
 
 # metreeca/mark
 
-Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of [Markdown](https://guides.github.com/features/mastering-markdown/#syntax) pages and a [Pug](https://naltatis.github.io/jade-syntax-docs/)/[Less](http://lesscss.org/) template and let the generator take care of the details…
+Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
 
-## Usage
+# Usage
 
-### Configure the plugin
+## Configure the plugin
 
 Add the plugin to your build configuration as:
 
@@ -23,7 +23,7 @@ Add the plugin to your build configuration as:
             <configuration> <!-- optional -->
                 <source>src/docs</source>
                 <target>target/docs</target>
-                <layout>layouts/default.jade</layout>
+                <layout>layouts/default.pug</layout>
             </configuration>
             
             <executions> <!-- optional -->
@@ -47,19 +47,19 @@ Add the plugin to your build configuration as:
 
 The following optional configuration parameters are available:
 
-| parameter | value                                                  | default       |
-| --------- | ------------------------------------------------------ | ------------- |
-| `source`  | the source folder for the site                         | `src/docs`    |
-| `target`  | the target folder for the generated site               | `target/docs` |
-| `layout`  | the path of default page template relative to `source` | `layouts/default.jade`      |
+| parameter | default       | value                                                  | 
+| --------- | ------------- | ------------------------------------------------------ | 
+| `source`  | `src/docs`    | the source folder for the site                         | 
+| `target`  | `target/docs` | the target folder for the generated site               | 
+| `layout`  | `layouts/default.pug`| the path of default page template relative to `source` | 
 
 The plugin binds by default the `build` goal to the `site` maven phase.
 
-### Define a default template
+## Define a default template
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
-```jade
+```pug
 doctype html
 
 html(lang="en")
@@ -68,7 +68,18 @@ html(lang="en")
 
         title #{page.title} " | " #{project.name}
         
-        ⋮
+    body
+
+        header
+
+            "Example Site"
+
+        main
+            !{page.body}
+
+        footer
+
+            "© 2020 Example"
 ```
 
 The following properties are available for inclusion using the `#/!{expression}` syntax:
@@ -84,9 +95,9 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `project.*`     | Maven project properties                                     |
 
 > :warning: 
-> **Pug templates are rendered using [jade4j](https://github.com/neuland/jade4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
+> **Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
-### Define site content
+## Define site content
 
 Define site pages as `.md` files under the `source` folder, for instance as:
 
@@ -107,7 +118,7 @@ The template to be used for rendering the page may be explicitly selected by set
 > :warning: 
 > **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
-### Generate site
+## Generate site
 
 ```shell
 mvn mark:build # or package
@@ -123,7 +134,7 @@ mvn mark:build # or package
 | `.md`          | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
 | `.less`        | `.less` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
 
-### Verify links
+## Verify links
 
 ```shell
 mvn mark:crawl
@@ -134,7 +145,7 @@ mvn mark:crawl
 > :warning: 
 > **Crawling doesn't automaticaly generate the site, in order to support incremental operations while watching site sources.**
 
-### Watch site sources
+## Watch site sources
 
 ```shell
 mvn mark:watch
@@ -143,7 +154,7 @@ mvn mark:watch
 - the site is generated as described above
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
 
-### Serve generated site
+## Serve generated site
 
 ```shell
 mvn mark:serve
@@ -154,14 +165,14 @@ mvn mark:serve
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com)
 
-> :warning: 
+> :warning:
 > **Live page reloading assumes `UTF-8`.**
 
-## Support
+# Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
 - open a topic on [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
 
-## License
+# License
 
 This project is licensed under the MIT License – see [LICENSE](LICENSE) file for details

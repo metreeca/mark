@@ -7,11 +7,11 @@ package com.metreeca.mark.steps;
 import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.util.sequence.SubSequence;
-import de.neuland.jade4j.JadeConfiguration;
-import de.neuland.jade4j.exceptions.ExpressionException;
-import de.neuland.jade4j.expression.ExpressionHandler;
-import de.neuland.jade4j.model.JadeModel;
-import de.neuland.jade4j.template.TemplateLoader;
+import de.neuland.pug4j.PugConfiguration;
+import de.neuland.pug4j.exceptions.ExpressionException;
+import de.neuland.pug4j.expression.ExpressionHandler;
+import de.neuland.pug4j.model.PugModel;
+import de.neuland.pug4j.template.TemplateLoader;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,7 +26,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Collections.singletonMap;
 
 
-public final class Jade {
+public final class Pug {
 
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");
 
@@ -35,22 +35,22 @@ public final class Jade {
 
 	private final Mark mark;
 
-	private final JadeConfiguration jade;
+	private final PugConfiguration pug;
 
 
-	public Jade(final Mark mark) {
+	public Pug(final Mark mark) {
 
 		if ( mark == null ) {
 			throw new NullPointerException("null mark");
 		}
 
 		this.mark=mark;
-		this.jade=new JadeConfiguration();
+		this.pug=new PugConfiguration();
 
-		jade.setPrettyPrint(false);
-		jade.setSharedVariables(mark.shared());
+		pug.setPrettyPrint(false);
+		pug.setSharedVariables(mark.shared());
 
-		jade.setTemplateLoader(new TemplateLoader() {
+		pug.setTemplateLoader(new TemplateLoader() {
 
 			@Override public long getLastModified(final String name) throws IOException {
 				return Files.getLastModifiedTime(mark.layout(name)).toMillis();
@@ -61,7 +61,11 @@ public final class Jade {
 			}
 
 			@Override public String getExtension() {
-				return "jade";
+				return "pug";
+			}
+
+			@Override public String getBase() {
+				return "";
 			}
 
 		});
@@ -85,7 +89,7 @@ public final class Jade {
 
 		try ( final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8) ) {
 
-			jade.renderTemplate(jade.getTemplate(layout), page(model, target), writer);
+			pug.renderTemplate(pug.getTemplate(layout), page(model, target), writer);
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -111,7 +115,7 @@ public final class Jade {
 	private String evaluate(final CharSequence chars, final Map<String, Object> model) {
 
 		final Matcher matcher=ExpressionPattern.matcher(chars);
-		final ExpressionHandler handler=jade.getExpressionHandler();
+		final ExpressionHandler handler=pug.getExpressionHandler();
 
 		final StringBuilder builder=new StringBuilder(chars.length());
 
@@ -132,7 +136,7 @@ public final class Jade {
 
 				try {
 
-					final JadeModel bindings=new JadeModel(jade.getSharedVariables());
+					final PugModel bindings=new PugModel(pug.getSharedVariables());
 
 					bindings.putAll(model);
 
