@@ -90,7 +90,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 | --------------- | ------------------------------------------------------------ |
 | `page.*`        | page front matter properties                                 |
 | `page.date`     | the page date in ISO format; defaults to the current date, unless specified in the front matter |
-| `page.base`     | the path of the site root relative to the page               |
+| `page.root`     | the path of the site root relative to the page               |
 | `page.path`     | the path of the page relative to the site root               |
 | `page.headings` | a list of page [headings](https://javadoc.io/doc/com.vladsch.flexmark/flexmark/undefined/com/vladsch/flexmark/ast/Heading.html); use `heading.anchorRefId`, `heading.level` and `heading.text` to generate TOCs |
 | `page.content`  | the content of the page rendered as HTML                     |

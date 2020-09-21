@@ -103,7 +103,7 @@ public final class Pug {
 
 	private Map<String, Object> page(final Map<String, Object> model, final Path target) {
 
-		model.put("base", mark.base(target).toString());
+		model.put("root", mark.root(target).toString());
 		model.put("path", mark.path(target).toString());
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));

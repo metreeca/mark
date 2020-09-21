@@ -317,7 +317,7 @@ public final class Mark implements Opts {
 	 *
 	 * @throws NullPointerException if {@code path} is null
 	 */
-	public Path base(final Path path) {
+	public Path root(final Path path) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
