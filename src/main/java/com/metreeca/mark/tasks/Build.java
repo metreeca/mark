@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static java.lang.System.currentTimeMillis;
-import static java.util.Comparator.reverseOrder;
-import static java.util.function.Predicate.isEqual;
 
 /**
  * Site building task.
@@ -25,9 +23,6 @@ import static java.util.function.Predicate.isEqual;
 public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
-
-		clean(mark);
-
 		try (
 				final Stream<Path> assets=Files.walk(mark.assets());
 				final Stream<Path> sources=Files.walk(mark.source())
@@ -43,35 +38,6 @@ public final class Build implements Task {
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
-		}
-
-	}
-
-
-	private void clean(final Mark mark) {
-
-		final Path target=mark.target();
-
-		if ( Files.exists(target) ) { // clean target folder
-
-			try ( final Stream<Path> walk=Files.walk(target) ) {
-
-				walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
-
-					try {
-
-						Files.delete(path);
-
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-
-				});
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-
 		}
 	}
 

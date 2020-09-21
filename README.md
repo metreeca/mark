@@ -26,14 +26,13 @@ Add the plugin to your build configuration as:
                 <layout>layouts/default.pug</layout>
             </configuration>
             
-            <executions> <!-- optional -->
-                <execution>
-                    
-                    <id>generate-docs</id>
-                    <phase>site</phase>
+            <executions>
+                <execution> <!-- example -->
                     
                     <goals>
+                        <goal>clean</goal>
                         <goal>build</goal>
+                        <goal>crawl</goal>
                     </goals>
                     
                 </execution>
@@ -119,26 +118,35 @@ The template to be used for rendering the page may be explicitly selected by set
 > :warning: 
 > **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
+# Goals
+
+## Clean site
+
+```shell
+mvn mark:clean # by default in the pre-clean phase
+```
+
+- all files in the `target` folder are recursively removed
+
 ## Generate site
 
 ```shell
-mvn mark:build # or package
+mvn mark:build # by default in the pre-site phase
 ```
 
-- the `target` folder is cleared
 - files matching one of the following files extensions in  the `source` folder are processed by the corresponding pipeline
 -  templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-| file extension | processing pipeline                                          |
-| -------------- | ------------------------------------------------------------ |
-| `.md`          | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
-| `.less`        | `.less` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
+| file extension      | processing pipeline                                          |
+| ------------------- | ------------------------------------------------------------ |
+| `.md`               | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
+| `.less`<br />`.css` | `.less` and ``.css` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
 
 ## Verify links
 
 ```shell
-mvn mark:crawl
+mvn mark:crawl # by default in the post-site phase
 ```
 
 - HTML files under the `target` folder are scanned and dangling links reported
