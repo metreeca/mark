@@ -13,12 +13,11 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.reverseOrder;
-import static java.util.function.Predicate.isEqual;
 
 /**
  * Site cleaning task.
  *
- * <p>Cleans the {@linkplain Opts#target() target} site folder.</p>
+ * <p>Removes the {@linkplain Opts#target() target} site folder.</p>
  */
 public final class Clean implements Task {
 
@@ -30,7 +29,7 @@ public final class Clean implements Task {
 
 			try ( final Stream<Path> walk=Files.walk(target) ) {
 
-				walk.sorted(reverseOrder()).filter(isEqual(target).negate()).forEachOrdered(path -> {
+				walk.sorted(reverseOrder()).forEachOrdered(path -> {
 
 					try {
 

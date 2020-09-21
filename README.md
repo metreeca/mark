@@ -126,7 +126,7 @@ The template to be used for rendering the page may be explicitly selected by set
 mvn mark:clean # by default in the pre-clean phase
 ```
 
-- all files in the `target` folder are recursively removed
+- the `target` folder is deleted
 
 ## Generate site
 
