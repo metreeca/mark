@@ -91,7 +91,7 @@ public final class Mark implements Opts {
 		final String name=path.getFileName().toString();
 		final int dot=name.lastIndexOf('.');
 
-		return dot >= 0 ? name.substring(dot) : "";
+		return dot >= 0 ? name.substring(dot).toLowerCase(ROOT) : "";
 	}
 
 

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.metreeca.mark.Mark.extension;
 import static com.sun.net.httpserver.HttpServer.create;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -165,7 +166,7 @@ public final class Serve implements Task {
 
 	private void get(final HttpExchange exchange, final Path file) throws IOException {
 
-		final String mime=types.getOrDefault(Mark.extension(file), "application/octet-stream");
+		final String mime=types.getOrDefault(extension(file), "application/octet-stream");
 
 		final boolean head=exchange.getRequestMethod().equals("HEAD");
 		final boolean html=mime.equals("text/html");
