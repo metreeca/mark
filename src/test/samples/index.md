@@ -70,19 +70,18 @@ html(lang="en")
     head
 
         title #{page.title} " | " #{project.name}
-        
+
+        meta(charset="UTF-8")
+
     body
 
         header
+            h1 Example Site
 
-            "Example Site"
-
-        main
-            !{page.body}
+        main !{page.content}
 
         footer
-
-            "© 2020 Example"
+            small © 2020 Example
 ```
 
 The following properties are available for inclusion using the `#/!{expression}` syntax:
