@@ -17,6 +17,9 @@ import static com.metreeca.mark.Mark.target;
 
 public final class Md implements Pipe {
 
+	private final Mark mark; // !!! remove
+
+
 	private final Markdown markdown;
 	private final Pug pug;
 
@@ -26,6 +29,8 @@ public final class Md implements Pipe {
 		if ( mark == null ) {
 			throw new NullPointerException("null mark");
 		}
+
+		this.mark=mark;
 
 		this.markdown=new Markdown(mark);
 		this.pug=new Pug(mark);
@@ -37,6 +42,7 @@ public final class Md implements Pipe {
 	@Override public boolean process(final Path source, final Path target) {
 		return source(source, ".md")
 				.map(markdown::read)
+				.map(page -> mark.model(target, page)) // !!!
 				.map(model -> pug.write(target(target, ".html"), model))
 				.isPresent();
 	}

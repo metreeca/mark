@@ -16,14 +16,11 @@ import de.neuland.pug4j.template.TemplateLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
-import static java.util.Collections.singletonMap;
 
 
 public final class Pug {
@@ -32,8 +29,6 @@ public final class Pug {
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private final Mark mark;
 
 	private final PugConfiguration pug;
 
@@ -44,12 +39,9 @@ public final class Pug {
 			throw new NullPointerException("null mark");
 		}
 
-		this.mark=mark;
 		this.pug=new PugConfiguration();
 
-		pug.setPrettyPrint(false);
-		pug.setSharedVariables(mark.shared());
-
+		pug.setPrettyPrint(false); // minified output
 		pug.setTemplateLoader(new TemplateLoader() {
 
 			@Override public long getLastModified(final String name) throws IOException {
@@ -85,11 +77,11 @@ public final class Pug {
 			throw new NullPointerException("null model");
 		}
 
-		final String layout=model.getOrDefault("layout", mark.layout()).toString();
+		final String layout=model.getOrDefault("layout", "").toString();
 
 		try ( final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8) ) {
 
-			pug.renderTemplate(pug.getTemplate(layout), page(model, target), writer);
+			pug.renderTemplate(pug.getTemplate(layout), evaluate(model), writer);
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -101,23 +93,27 @@ public final class Pug {
 
 	//// Variable Replacement //////////////////////////////////////////////////////////////////////////////////////////
 
-	private Map<String, Object> page(final Map<String, Object> model, final Path target) {
+	private Map<String, Object> evaluate(final Map<String, Object> model) {
 
-		model.put("root", mark.root(target).toString());
-		model.put("path", mark.path(target).toString());
+		model.computeIfPresent("page", (p, page) -> {
 
-		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
-		model.computeIfPresent("body", (key, body) -> evaluate(body.toString(), model));
+			if ( page instanceof Map ) {
+				((Map<Object, Object>)page).computeIfPresent("body", (b, body) -> evaluate(body.toString(), model));
+			}
 
-		return singletonMap("page", model);
+			return page;
+
+		});
+
+		return model;
 	}
 
-	private String evaluate(final CharSequence chars, final Map<String, Object> model) {
+	private String evaluate(final CharSequence body, final Map<String, Object> model) {
 
-		final Matcher matcher=ExpressionPattern.matcher(chars);
+		final Matcher matcher=ExpressionPattern.matcher(body);
 		final ExpressionHandler handler=pug.getExpressionHandler();
 
-		final StringBuilder builder=new StringBuilder(chars.length());
+		final StringBuilder builder=new StringBuilder(body.length());
 
 		int last=0;
 
@@ -126,11 +122,11 @@ public final class Pug {
 			final int start=matcher.start();
 			final int end=matcher.end();
 
-			builder.append(chars.subSequence(last, start)); // leading text
+			builder.append(body.subSequence(last, start)); // leading text
 
 			if ( matcher.group().charAt(0) == '\\' ) { // escaped
 
-				builder.append(chars.subSequence(start+1, end)); // expression text
+				builder.append(body.subSequence(start+1, end)); // expression text
 
 			} else {
 
@@ -153,7 +149,7 @@ public final class Pug {
 			last=end;
 		}
 
-		builder.append(chars.subSequence(last, chars.length())); // trailing text
+		builder.append(body.subSequence(last, body.length())); // trailing text
 
 		return builder.toString();
 	}

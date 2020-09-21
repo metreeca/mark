@@ -13,6 +13,7 @@ import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -490,6 +492,22 @@ public final class Mark implements Opts {
 			return false;
 
 		}
+	}
+
+
+	public Map<String, Object> model(final Path target, final Map<String, Object> page) {
+
+		page.put("root", root(target).toString());
+		page.put("path", path(target).toString());
+
+		page.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
+
+		final Map<String, Object> model=new HashMap<>(shared());
+
+		model.put("page", page);
+		model.put("pages", emptyMap()); // !!!
+
+		return model;
 	}
 
 
