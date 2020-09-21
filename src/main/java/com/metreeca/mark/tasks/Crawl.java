@@ -99,6 +99,8 @@ public final class Crawl implements Task {
 
 			if ( broken > 0 ) {
 				logger.warn(format("%d broken links", broken));
+			} else {
+				logger.info("no broken links");
 			}
 
 			if ( !links.isEmpty() ) {
