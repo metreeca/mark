@@ -72,11 +72,11 @@ public final class Watch implements Task {
 
 					} else if ( event.kind().equals(ENTRY_CREATE) && Files.isRegularFile(path) ) {
 
-						mark.process(path);
+						mark.process(Stream.of(path));
 
 					} else if ( event.kind().equals(ENTRY_MODIFY) && Files.isRegularFile(path) ) {
 
-						if ( mark.isLayout(path) ) { mark.exec(new Build()); } else { mark.process(path); }
+						if ( mark.isLayout(path) ) { mark.exec(new Build()); } else { mark.process(Stream.of(path)); }
 
 					} else if ( kind.equals(OVERFLOW) ) {
 

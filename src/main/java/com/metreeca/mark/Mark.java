@@ -22,10 +22,13 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.isHidden;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 
@@ -45,30 +48,25 @@ public final class Mark implements Opts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public static Optional<Path> source(final Path path, final String extension) {
+	public static Optional<Path> target(final Path source, final String to, final String... from) {
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
+		if ( source == null ) {
+			throw new NullPointerException("null source");
 		}
 
-		if ( extension == null ) {
-			throw new NullPointerException("null extension");
+		if ( to == null ) {
+			throw new NullPointerException("null target extension");
 		}
 
-		return Optional.of(path).filter(p -> extension(p).equalsIgnoreCase(extension));
-	}
-
-	public static Path target(final Path path, final String extension) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
+		if ( from == null || Arrays.stream(from).anyMatch(Objects::isNull) ) {
+			throw new NullPointerException("null source extension");
 		}
 
-		if ( extension == null ) {
-			throw new NullPointerException("null extension");
-		}
+		final String extension=extension(source);
 
-		return path.resolveSibling(basename(path)+extension);
+		return Arrays.stream(from).anyMatch(extension::equalsIgnoreCase)
+				? Optional.of(source.resolveSibling(basename(source)+to))
+				: Optional.empty();
 	}
 
 
@@ -134,6 +132,8 @@ public final class Mark implements Opts {
 			Md::new, Less::new, Wild::new
 	);
 
+	private final Map<Path, Page> resources=new LinkedHashMap<>();
+
 
 	/**
 	 * Creates a site generation engine
@@ -159,11 +159,11 @@ public final class Mark implements Opts {
 			throw new IllegalArgumentException("missing source folder { "+relative(source)+" }");
 		}
 
-		if ( !Files.isDirectory(source) ) {
+		if ( !isDirectory(source) ) {
 			throw new IllegalArgumentException("source is not a folder { "+relative(source)+" }");
 		}
 
-		if ( Files.exists(target) && !Files.isDirectory(target) ) {
+		if ( Files.exists(target) && !isDirectory(target) ) {
 			throw new IllegalArgumentException("target is not a folder { "+relative(target)+" }");
 		}
 
@@ -171,7 +171,7 @@ public final class Mark implements Opts {
 			throw new IllegalArgumentException("missing assets folder { "+relative(assets)+" }");
 		}
 
-		if ( !Files.isDirectory(assets) ) {
+		if ( !isDirectory(assets) ) {
 			throw new IllegalArgumentException("assets is not a folder { "+relative(assets)+" }");
 		}
 
@@ -311,45 +311,6 @@ public final class Mark implements Opts {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Computes the relative base path of the site root.
-	 *
-	 * @param path the reference path
-	 *
-	 * @return the relative path of the root of the generated site wrt {@code path}
-	 *
-	 * @throws NullPointerException if {@code path} is null
-	 */
-	public Path root(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		return Optional.of(path.getParent().relativize(target).normalize())
-				.filter(p -> !p.toString().isEmpty())
-				.orElse(Paths.get("."));
-	}
-
-	/**
-	 * Computes the relative path of a page.
-	 *
-	 * @param path the reference path
-	 *
-	 * @return the relative path of {@code path} wrt the root of the generated site
-	 *
-	 * @throws NullPointerException if {@code path} is null
-	 */
-	public Path path(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		return target.relativize(path).normalize();
-	}
-
-
-	/**
 	 * Checks if a path is a layout
 	 *
 	 * @param path the path to be checked
@@ -385,7 +346,7 @@ public final class Mark implements Opts {
 
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-		final Path layout=locate(root.relativize(
+		final Path layout=source(root.relativize(
 				name.isEmpty() || name.equals(template) ? this.layout
 						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
 		));
@@ -426,128 +387,193 @@ public final class Mark implements Opts {
 	}
 
 	/**
-	 * Processes a site resource.
+	 * Processes site resources.
 	 *
-	 * <p>Generates a processed version of a site resource in the {@linkplain Opts#target() target} site folder.</p>
+	 * <p>Generates processed version of site resources in the {@linkplain Opts#target() target} site folder.</p>
 	 *
-	 * @param resource the path of the site resource to be processed, relative either to the {@linkplain Opts#source()
-	 *                 resource} site folder or to the {@linkplain Opts#assets() assets} folder
+	 * @param paths the paths of the site resources to be processed, relative either to the {@linkplain Opts#source()
+	 *              source} site folder or to the {@linkplain Opts#assets() assets} folder
 	 *
-	 * @return {@code true} if {@code resource} was successfully processed; {@code false} otherwise
+	 * @return the number of processed resources
 	 *
-	 * @throws NullPointerException if {@code resource} is null
+	 * @throws NullPointerException if {@code source} is null
 	 */
-	public boolean process(final Path resource) {
+	public long process(final Stream<Path> paths) {
 
-		if ( resource == null ) {
-			throw new NullPointerException("null resource");
+		if ( paths == null ) {
+			throw new NullPointerException("null path stream");
 		}
 
-		try {
+		// locate, compile and collect resources
 
-			final Path source=locate(resource);
-
-			if ( Files.isDirectory(source) || Files.isHidden(source) || isLayout(source) ) { return false; } else {
-
-				// relativize the source path wrt its input folder (on possibly incompatible filesystem)
-
-				final Path common=contains(this.source, source) ? this.source.relativize(source)
-						: contains(assets, source) ? assets.relativize(source)
-						: source;
-
-				// define the absolute target path (use strings to handle incompatible filesystems)
-
-				final Path target=this.target.resolve(common.toString());
+		final long count=paths
+				.sorted(comparing(Path::toString)) // !!!compare only common path
+				.map(this::source)
+				.map(this::compile)
+				.filter(Optional::isPresent)
+				.count();
 
 
-				// create the output directory and process using the first matching pipe
+		// generate and collect extended resource data models
 
-				Files.createDirectories(target.getParent());
+		final List<Page> resources=new ArrayList<>();
+		final List<Map<String, Object>> models=new ArrayList<>();
 
-				return factories.stream()
-						.map(factory -> factory.apply(this))
-						.filter(pipe -> {
-							try {
+		for (final Page resource : this.resources.values()) {
 
-								return pipe.process(source, target);
+			final Path path=common(resource.path()).normalize();
+			final Map<String, Object> meta=new HashMap<>(resource.model());
 
-							} catch ( final RuntimeException e ) {
+			// extend raw resource data models
 
-								logger.error(report(pipe, e.getMessage()));
+			meta.put("root", Optional
+					.ofNullable(path.getParent())
+					.map(parent -> root.resolve(parent).relativize(root)) // ;( must be both absolute
+					.map(Path::toString)
+					.orElse(".")
+			);
 
-								return false;
+			meta.put("base", Optional
+					.ofNullable(path.getParent())
+					.map(Path::toString)
+					.orElse(".")
+			);
 
-							}
-						})
-						.peek(pipe -> logger.info(report(pipe, common)))
-						.findFirst()
-						.isPresent();
+			meta.put("path", path.toString());
 
-			}
+			meta.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-		} catch ( final IOException|RuntimeException e ) {
 
-			logger.error(format("error while processing %s", source), e);
+			// collect extended models
 
-			return false;
+			models.add(meta);
+
+
+			// create the root data model
+
+			final Map<String, Object> model=new HashMap<>(shared());
+
+			model.put("page", meta);
+			model.put("pages", models); //; collected extended models
+
+
+			// collect extended pages rendering from the root model
+
+			resources.add(new Page(path, model) {
+				@Override public void render(final Path target, final Map<String, Object> model) {
+					resource.render(target, model);
+				}
+			});
 
 		}
-	}
 
+		resources.forEach(this::render);
 
-	public Map<String, Object> model(final Path target, final Map<String, Object> page) {
-
-		page.put("root", root(target).toString());
-		page.put("path", path(target).toString());
-
-		page.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
-
-		final Map<String, Object> model=new HashMap<>(shared());
-
-		model.put("page", page);
-		model.put("pages", emptyMap()); // !!!
-
-		return model;
+		return count;
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * @param resource the possibly relative path of a site resource
-	 *
-	 * @return the absolute path of {@code resource} either under the source or the assets folders
-	 *
-	 * @throws IllegalArgumentException if {@code resource} is not a known path under an input folder
-	 */
-	private Path locate(final Path resource) {
+	private Optional<Page> compile(final Path source) {
+		try {
 
-		final Path absolute=resource.isAbsolute() ? resource : Stream.of(source, assets)
+			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : factories
 
-				.map(folder -> folder.resolve(resource.toString())) // as string to handle incompatible filesystems
+					.stream()
+					.map(factory -> factory.apply(this))
+
+					.map(pipe -> {
+						try {
+
+							return pipe.process(source);
+
+						} catch ( final RuntimeException e ) {
+
+							logger.error(format("%s › %s",
+									pipe.getClass().getSimpleName().toLowerCase(ROOT),
+									MessagePattern.matcher(e.getMessage()).replaceAll("; ")
+							));
+
+							return Optional.<Page>empty();
+
+						}
+					})
+
+					.filter(Optional::isPresent)
+					.map(Optional::get)
+
+					.peek(page -> resources.put(source, page))
+
+					.findFirst();
+
+		} catch ( final IOException e ) {
+
+			throw new UncheckedIOException(e);
+
+		}
+	}
+
+	private Mark render(final Page page) {
+		try {
+
+			logger.info(page.path().toString());
+
+			// make sure the output folder exists, then render page
+
+			final Path target=target(page.path());
+
+			Files.createDirectories(target.getParent());
+
+			page.render(target, page.model());
+
+			return this;
+
+		} catch ( final IOException e ) {
+
+			throw new UncheckedIOException(e);
+
+		}
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private Path source(final Path path) {
+
+		final Path absolute=path.isAbsolute() ? path : Stream.of(source, assets)
+
+				.map(folder -> folder.resolve(path.toString())) // use strings to handle incompatible filesystems
 				.map(Path::toAbsolutePath)
 				.filter(Files::exists)
 
 				.findFirst()
-				.orElse(resource);
+				.orElse(path);
 
 		if ( !Files.exists(absolute) ) {
-			throw new IllegalArgumentException("unknown resource { "+relative(resource)+" }");
+			throw new IllegalArgumentException("unknown resource { "+relative(path)+" }");
 		}
 
 		if ( Stream.of(source, assets).noneMatch(folder -> contains(folder, absolute)) ) {
-			throw new IllegalArgumentException("resource outside input folders { "+relative(resource)+" }");
+			throw new IllegalArgumentException("resource outside input folders { "+relative(path)+" }");
 		}
 
 		return absolute.normalize();
 
 	}
 
-	private String report(final Pipe pipe, final Object message) {
-		return format("%s › %s",
-				pipe.getClass().getSimpleName().toLowerCase(ROOT),
-				MessagePattern.matcher(message.toString()).replaceAll("; ")
-		);
+	private Path target(final Path path) {
+		return target.resolve(path.toString()); // use strings to handle incompatible filesystems
+	}
+
+	private Path common(final Path path) {
+		return Paths.get((
+
+				contains(source, path) ? source.relativize(path)
+						: contains(assets, path) ? assets.relativize(path)
+						: path
+
+		).toString()); // use strings to handle incompatible filesystems
 	}
 
 }

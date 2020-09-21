@@ -47,11 +47,11 @@ Add the plugin to your build configuration as:
 
 The following optional configuration parameters are available:
 
-| parameter | default       | value                                                  | 
-| --------- | ------------- | ------------------------------------------------------ | 
-| `source`  | `src/docs`    | the source folder for the site                         | 
-| `target`  | `target/docs` | the target folder for the generated site               | 
-| `layout`  | `layouts/default.pug`| the path of default page template relative to `source` | 
+| parameter | default       | value                                                  |
+| --------- | ------------- | ------------------------------------------------------ |
+| `source`  | `src/docs`    | the source folder for the site                         |
+| `target`  | `target/docs` | the target folder for the generated site               |
+| `layout`  | `layouts/default.pug`| the path of default page template relative to `source` |
 
 The plugin binds by default the `build` goal to the `site` maven phase.
 
@@ -88,9 +88,11 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.*`        | page front matter properties                                 |
 | `page.date`     | the page date in ISO format; defaults to the current date, unless specified in the front matter |
 | `page.root`     | the path of the site root relative to the page               |
+| `page.base` | the path of the page folder relative to the site root |
 | `page.path`     | the path of the page relative to the site root               |
 | `page.headings` | a list of page [headings](https://javadoc.io/doc/com.vladsch.flexmark/flexmark/undefined/com/vladsch/flexmark/ast/Heading.html); use `heading.anchorRefId`, `heading.level` and `heading.text` to generate TOCs |
 | `page.body`  | page content rendered as HTML                     |
+| `pages[]` | a list containing  `page` objects for all site files |
 | `project.*`     | Maven project properties                                     |
 
 > :warning: 

@@ -16,6 +16,7 @@ import de.neuland.pug4j.template.TemplateLoader;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,11 +78,11 @@ public final class Pug {
 			throw new NullPointerException("null model");
 		}
 
-		final String layout=model.getOrDefault("layout", "").toString();
+		final String layout=layout(model).toString();
 
 		try ( final BufferedWriter writer=Files.newBufferedWriter(target, UTF_8) ) {
 
-			pug.renderTemplate(pug.getTemplate(layout), evaluate(model), writer);
+			pug.renderTemplate(pug.getTemplate(layout), set(model), writer);
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -91,22 +92,50 @@ public final class Pug {
 	}
 
 
-	//// Variable Replacement //////////////////////////////////////////////////////////////////////////////////////////
+	//// !!! refactor //////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Map<String, Object> evaluate(final Map<String, Object> model) {
+	private Object layout(final Map<String, Object> model) {
 
-		model.computeIfPresent("page", (p, page) -> {
+		final Object page=model.get("page");
+
+		if ( page instanceof Map ) {
+
+			return ((Map<String, Object>)page).getOrDefault("layout", "");
+
+		} else {
+
+			return "";
+
+		}
+	}
+
+	private Map<String, Object> set(final Map<String, Object> model) {
+
+		final Map<String, Object> _model=new HashMap<>(model);
+
+		_model.computeIfPresent("page", (p, page) -> {
 
 			if ( page instanceof Map ) {
-				((Map<Object, Object>)page).computeIfPresent("body", (b, body) -> evaluate(body.toString(), model));
-			}
 
-			return page;
+				final Map<Object, Object> _page=new HashMap<>((Map<Object, Object>)page);
+
+				_page.computeIfPresent("body", (b, body) -> evaluate(body.toString(), model));
+
+				return _page;
+
+			} else {
+
+				return page;
+
+			}
 
 		});
 
-		return model;
+		return _model;
 	}
+
+
+	//// Variable Replacement //////////////////////////////////////////////////////////////////////////////////////////
 
 	private String evaluate(final CharSequence body, final Map<String, Object> model) {
 

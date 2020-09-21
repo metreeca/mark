@@ -4,20 +4,20 @@
 
 package com.metreeca.mark.pipes;
 
-import com.metreeca.mark.Mark;
-import com.metreeca.mark.Pipe;
+import com.metreeca.mark.*;
 import com.metreeca.mark.steps.Markdown;
 import com.metreeca.mark.steps.Pug;
 
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Optional;
 
-import static com.metreeca.mark.Mark.source;
 import static com.metreeca.mark.Mark.target;
 
 
 public final class Md implements Pipe {
 
-	private final Mark mark; // !!! remove
+	// !!! remove
 
 
 	private final Markdown markdown;
@@ -30,8 +30,6 @@ public final class Md implements Pipe {
 			throw new NullPointerException("null mark");
 		}
 
-		this.mark=mark;
-
 		this.markdown=new Markdown(mark);
 		this.pug=new Pug(mark);
 	}
@@ -39,12 +37,12 @@ public final class Md implements Pipe {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public boolean process(final Path source, final Path target) {
-		return source(source, ".md")
-				.map(markdown::read)
-				.map(page -> mark.model(target, page)) // !!!
-				.map(model -> pug.write(target(target, ".html"), model))
-				.isPresent();
+	@Override public Optional<Page> process(final Path source) {
+		return target(source, ".html", ".md").map(target -> new Page(target, markdown.read(source)) {
+			@Override public void render(final Path target, final Map<String, Object> model) {
+				pug.write(target, model);
+			}
+		});
 	}
 
 }

@@ -6,8 +6,6 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import org.apache.maven.plugin.logging.Log;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -28,11 +26,31 @@ public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		final Path source=mark.source();
-		final Path target=mark.target();
-		final Path assets=mark.assets();
+		clean(mark);
 
-		final Log logger=mark.logger();
+		try (
+				final Stream<Path> assets=Files.walk(mark.assets());
+				final Stream<Path> sources=Files.walk(mark.source())
+		) {
+
+			final long start=currentTimeMillis();
+			final long count=mark.process(Stream.concat(assets, sources));
+			final long stop=currentTimeMillis();
+
+			if ( count > 0 ) {
+				mark.logger().info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000.0f));
+			}
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
+		}
+
+	}
+
+
+	private void clean(final Mark mark) {
+
+		final Path target=mark.target();
 
 		if ( Files.exists(target) ) { // clean target folder
 
@@ -55,35 +73,6 @@ public final class Build implements Task {
 			}
 
 		}
-
-		try ( final Stream<Path> walk=Files.walk(assets) ) { // process theme assets
-
-			final long start=currentTimeMillis();
-			final long count=walk.filter(mark::process).count();
-			final long stop=currentTimeMillis();
-
-			if ( count > 0 ) {
-				logger.info(String.format("extracted %,d files in %,.3f s", count, (stop-start)/1000.0f));
-			}
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-
-		try ( final Stream<Path> walk=Files.walk(source) ) { // process source folder
-
-			final long start=currentTimeMillis();
-			final long count=walk.filter(mark::process).count();
-			final long stop=currentTimeMillis();
-
-			if ( count > 0 ) {
-				logger.info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000.0f));
-			}
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-
 	}
 
 }
