@@ -107,7 +107,7 @@ public final class Pug {
 		model.put("path", mark.path(target).toString());
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
-		model.computeIfPresent("content", (key, content) -> evaluate(content.toString(), model));
+		model.computeIfPresent("body", (key, body) -> evaluate(body.toString(), model));
 
 		return singletonMap("page", model);
 	}

@@ -97,7 +97,7 @@ public final class Markdown {
 			final Map<String, Object> model=metadata(document);
 
 			model.put("headings", headings(document));
-			model.put("content", content(document));
+			model.put("body", body(document));
 
 			return model;
 
@@ -144,7 +144,7 @@ public final class Markdown {
 		return headings;
 	}
 
-	private String content(final Node document) {
+	private String body(final Node document) {
 		return renderers.build().render(document);
 	}
 

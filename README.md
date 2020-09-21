@@ -75,7 +75,7 @@ html(lang="en")
         header
             h1 Example Site
 
-        main !{page.content}
+        main !{page.body}
 
         footer
             small © 2020 Example
@@ -90,7 +90,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.root`     | the path of the site root relative to the page               |
 | `page.path`     | the path of the page relative to the site root               |
 | `page.headings` | a list of page [headings](https://javadoc.io/doc/com.vladsch.flexmark/flexmark/undefined/com/vladsch/flexmark/ast/Heading.html); use `heading.anchorRefId`, `heading.level` and `heading.text` to generate TOCs |
-| `page.content`  | the content of the page rendered as HTML                     |
+| `page.body`  | page content rendered as HTML                     |
 | `project.*`     | Maven project properties                                     |
 
 > :warning: 
@@ -110,7 +110,7 @@ layout: post.pug # optional
 Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
 ```
 
-All the properties available to templates (with the obvious exception of `page.content`) are also available for interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim). 
+All the properties available to templates (with the obvious exception of `page.body`) are also available for interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim). 
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
