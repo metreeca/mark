@@ -66,7 +66,7 @@ public final class Serve implements Task {
 	 */
 	private static final Map<String, String> types=Stream
 
-			.of(Serve.class.getSimpleName())
+			.of(Serve.class.getSimpleName()+".tsv")
 
 			.map(Serve.class::getResource)
 
@@ -88,9 +88,9 @@ public final class Serve implements Task {
 
 			.map(line -> {
 
-				final int colon=line.indexOf(':');
+				final int tab=line.indexOf('\t');
 
-				return new AbstractMap.SimpleImmutableEntry<>(line.substring(0, colon), line.substring(colon+1));
+				return new AbstractMap.SimpleImmutableEntry<>(line.substring(0, tab), line.substring(tab+1));
 			})
 
 			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -200,7 +200,7 @@ public final class Serve implements Task {
 
 		exchange.getResponseHeaders().set("Content-Type", mime);
 		exchange.getResponseHeaders().set("Last-Modified", instant.atOffset(UTC).format(RFC_1123_DATE_TIME));
-		exchange.getResponseHeaders().set("ETag", String.format("\"%s\"", instant.toEpochMilli()));
+		exchange.getResponseHeaders().set("ETag", format("\"%s\"", instant.toEpochMilli()));
 
 		exchange.sendResponseHeaders(OK, head ? -1 : data.length);
 
