@@ -32,7 +32,7 @@ final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final Pattern URLPattern=Pattern.compile("((?:^|/)index|((?:^|/)[^/#]*))\\.md(#[^/]*)?$");
+	private static final Pattern URLPattern=Pattern.compile("(?<=^|/)(index|([^/#]*))\\.md(#[^/#]*)?$");
 
 
 	static String plain(final String url) {

@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -41,7 +42,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
-import static java.util.regex.Matcher.quoteReplacement;
 import static java.util.stream.Collectors.toList;
 
 
@@ -56,7 +56,7 @@ public final class Mark implements Opts {
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
-	private static final Pattern AnchorPattern=Pattern.compile("(?:#.*)?$");
+	private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,9 +114,24 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path");
 		}
 
-		return Stream.of("", ".html", "index.html", "/index.html").map(suffix ->
-				AnchorPattern.matcher(path).replaceFirst(format("%s$0", quoteReplacement(suffix)))
-		);
+		final Matcher matcher=URLPattern.matcher(path);
+
+		if ( matcher.matches() ) {
+
+			final String head=Optional.ofNullable(matcher.group(1)).orElse("");
+			final String file=Optional.ofNullable(matcher.group(2)).orElse("");
+			final String hash=Optional.ofNullable(matcher.group(3)).orElse("");
+
+			return file.isEmpty() || file.equals(".") ? Stream.of(head+"index.html"+hash)
+					: file.endsWith(".html") ? Stream.of(head+file+hash)
+					: Stream.of(head+file+hash, head+file+".html"+hash);
+
+		} else {
+
+			return Stream.of(path);
+
+		}
+
 	}
 
 

@@ -31,6 +31,8 @@ final class LinkRewriterExtensionTest {
 		assertThat(plain("path/index.md")).isEqualTo("path/index.html");
 		assertThat(plain("path/index.md#hash")).isEqualTo("path/index.html#hash");
 
+		assertThat(plain("reindex.md")).isEqualTo("reindex.html");
+
 	}
 
 	@Test void testSmartRewriting() {
@@ -40,8 +42,10 @@ final class LinkRewriterExtensionTest {
 		assertThat(smart("path/link.md#hash")).isEqualTo("path/link#hash");
 
 		assertThat(smart("index.md")).isEqualTo(".");
-		assertThat(smart("path/index.md")).isEqualTo("path");
-		assertThat(smart("path/index.md#hash")).isEqualTo("path#hash");
+		assertThat(smart("path/index.md")).isEqualTo("path/");
+		assertThat(smart("path/index.md#hash")).isEqualTo("path/#hash");
+
+		assertThat(smart("reindex.md")).isEqualTo("reindex");
 
 	}
 
