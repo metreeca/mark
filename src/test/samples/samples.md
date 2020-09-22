@@ -55,7 +55,7 @@ final class ${page.title} {
 
 ## Links
 
-- [self](index.md)
+- [home](index.md)
 
 ## Lists
 

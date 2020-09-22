@@ -14,16 +14,17 @@
 package com.metreeca.mark.mojos;
 
 import com.metreeca.mark.Mark;
-import com.metreeca.mark.tasks.Build;
+import com.metreeca.mark.tasks.*;
 
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-
-@Mojo(name="build", defaultPhase=LifecyclePhase.PRE_SITE) public class BuildMojo extends MarkMojo {
+@Mojo(name="serve") public final class ServeMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts()).exec(new Build());
+		new Mark(opts())
+				.exec(new Build())
+				.exec(new Serve())
+				.exec(new Watch());
 	}
 
 }

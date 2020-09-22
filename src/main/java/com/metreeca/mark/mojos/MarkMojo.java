@@ -1,5 +1,14 @@
 /*
- * Copyright © 2019-2020 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 
 package com.metreeca.mark.mojos;
@@ -14,6 +23,7 @@ import org.apache.maven.project.MavenProject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
@@ -34,8 +44,12 @@ public abstract class MarkMojo extends AbstractMojo {
 	@Parameter(defaultValue="@", property="mark.assets")
 	private String assets;
 
-	@Parameter(defaultValue="layouts/default.jade", property="mark.layout")
+	@Parameter(defaultValue="layouts/default.pug", property="mark.layout")
 	private String layout;
+
+
+	@Parameter
+	private Map<String, String> options;
 
 
 	/**
@@ -56,9 +70,9 @@ public abstract class MarkMojo extends AbstractMojo {
 
 
 		private MojoOpts(final MarkMojo mojo) {
-
 			this.mojo=mojo;
 		}
+
 
 		@Override public Path source() { return Paths.get(mojo.source); }
 
@@ -74,6 +88,11 @@ public abstract class MarkMojo extends AbstractMojo {
 		}
 
 		@Override public Log logger() { return mojo.getLog(); }
+
+
+		@Override public <V> V get(final String option, final Function<String, V> mapper) {
+			return mapper.apply(mojo.options == null ? null : mojo.options.get(option));
+		}
 
 	}
 

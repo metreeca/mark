@@ -149,14 +149,14 @@ mvn mark:build # by default in the pre-site phase
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-**Markdown**  / `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file.
+**markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file.
 
 | option                    | default | behaviour                                             |
 | ------------------------- | ------- | ----------------------------------------------------- |
 | `markdown-smart-links`    | `false` | removes `.html` and `/index.html` suffixes from links |
 | `markdown-external-links` | `false` | opens extenal links in a `_blank` target              |
 
-**Less/CSS** /  `.less` and `.css` files under the source folder are converted to minified `.css` files at the same relative path under the target.
+**less/css** › `.css` / `.less` and `.css` files under the source folder are converted to minified `.css` files at the same relative path under the target.
 
 ## Check links
 

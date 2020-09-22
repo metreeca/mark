@@ -1,5 +1,14 @@
 /*
- * Copyright © 2019-2020 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 @import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
 
@@ -157,23 +166,6 @@ html {
 
 				}
 
-				> label {
-
-					@size: 1.25em;
-
-					display: block;
-					width: @size;
-					height: @size;
-					margin-left: 0.25em;
-
-					background-color: #CCC;
-
-					::before {
-						content: ""
-					}
-
-				}
-
 			}
 
 			> section {
@@ -192,7 +184,7 @@ html {
 				> a:first-child {
 					margin-bottom: 1em;
 					white-space: normal;
-					font-size: 110%;
+					font-size: 125%;
 					color: #999;
 				}
 
@@ -274,6 +266,71 @@ html {
 }
 
 
+/**** Toggle **********************************************************************************************************/
+
+label:empty {
+
+	@size: 0.66em;
+	@color: #000;
+	@weight: 0.11em;
+
+	display: block;
+	position: relative;
+	width: @size;
+	height: @size;
+	margin-left: 0.25em;
+
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: @weight;
+		background-color: @color;
+		box-sizing: content-box;
+	}
+
+	body > input:not(:checked) ~ * & {
+
+		background-color: @color;
+
+		&::before,
+		&::after {
+			height: calc(1.05 * @weight);
+			background-color: #FFF;
+		}
+
+		&::before {
+			top: calc(@size / 5);
+		}
+
+		&::after {
+			bottom: calc(@size / 5);
+		}
+	}
+
+	body > :checked ~ * & {
+
+		&::before,
+		&::after {
+			top: calc(@size / 2 - @weight / 2);
+		}
+
+		&::before {
+			transform: rotate(45deg);
+		}
+
+		&::after {
+			transform: rotate(-45deg);
+		}
+
+	}
+
+}
+
+
 /**** Admonitions *****************************************************************************************************/
 
 .adm-hidden {
@@ -288,7 +345,6 @@ html {
 
 	border-style: dotted;
 	border-left: solid 3px;
-	margin-top: 1.5em;
 	font-size: 90%;
 	background-color: #EEE;
 
@@ -300,6 +356,10 @@ html {
 			color: @color;
 		}
 
+	}
+
+	& + :not(&) {
+		margin-top: 1.5em;
 	}
 
 	& + & {
@@ -373,12 +433,14 @@ h3 {
 h1 {
 	padding-bottom: 0.2em;
 	border-bottom-style: solid;
+	scroll-margin-top: 0.25em;
 	font-size: 175%;
 }
 
 h2 {
 	padding-bottom: 0.2em;
 	border-bottom-style: dotted;
+	scroll-margin-top: 0.5em;
 	font-size: 125%;
 }
 
@@ -483,7 +545,13 @@ div + div > pre {
 }
 
 p {
+
 	margin-bottom: 0.75em;
+
+	li > &:only-child {
+		margin: 0;
+	}
+
 }
 
 blockquote {
@@ -538,17 +606,10 @@ a:hover, button:active {
 	cursor: pointer;
 }
 
-a[target=_blank]:after {
-	content: "\f08e"; /* external link */
-	font-family: FontAwesome;
-	font-size: 66%;
-	margin-left: 0.5em;
-}
-
-a.more:after {
-	content: "›››";
-	display: inline-block;
-	margin-left: 0.25em;
+a[target=_blank]:after { // external link
+	content: "⌝";
+	margin-left: 0.1em;
+	font-size: 90%;
 }
 
 button {
@@ -639,7 +700,7 @@ select {
 
 			> nav {
 
-				width: 15rem;
+				width: 17.5rem;
 				border-right-style: solid;
 
 				> * {
@@ -652,7 +713,7 @@ select {
 					border-bottom: none;
 					box-shadow: none;
 
-					> label {
+					> label:empty {
 						display: none;
 					}
 

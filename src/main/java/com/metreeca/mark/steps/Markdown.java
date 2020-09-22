@@ -1,5 +1,14 @@
 /*
- * Copyright © 2019-2020 Metreeca srl. All rights reserved.
+ * Copyright © 2019-2020 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ *  file except in compliance with the License. You may obtain a copy of the License at
+ *
+ *          http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
  */
 
 package com.metreeca.mark.steps;
@@ -7,7 +16,6 @@ package com.metreeca.mark.steps;
 import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.ast.Heading;
-import com.vladsch.flexmark.ast.Link;
 import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
@@ -18,8 +26,8 @@ import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.*;
+import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.sequence.BasedSequence;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,6 +41,12 @@ import static java.util.stream.Collectors.toMap;
 
 
 public final class Markdown {
+
+	public static final DataKey<Boolean> SmartLinks=new DataKey<>("markdown-smart-links", false);
+	public static final DataKey<Boolean> ExternalLinks=new DataKey<>("markdown-external-links", false);
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private final Parser.Builder parsers;
 	private final HtmlRenderer.Builder renderers;
@@ -52,13 +66,17 @@ public final class Markdown {
 						TablesExtension.create(),
 						DefinitionExtension.create(),
 						AdmonitionExtension.create(),
-						AutolinkExtension.create()
+						AutolinkExtension.create(),
+						LinkRewriterExtension.create()
 				))
 
 				.set(HtmlRenderer.RENDER_HEADER_ID, true)
 				.set(HtmlRenderer.GENERATE_HEADER_ID, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
-				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true);
+				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
+
+				.set(SmartLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean))
+				.set(ExternalLinks, mark.get(ExternalLinks.getName(), Boolean::parseBoolean));
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);
@@ -78,27 +96,12 @@ public final class Markdown {
 
 			final Node document=parsers.build().parseReader(reader);
 
-			// !!! as post-processing extension (https://github
-			// .com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples
-			// /SyntheticLinkSample.java)
-
-			new NodeVisitor(new VisitHandler<>(Link.class, link -> {
-
-				final BasedSequence url=link.getUrl();
-
-				if ( url.endsWith(".md") ) {
-					link.setUrl(url.removeProperSuffix(".md").append(".html"));
-				}
-
-			})).visit(document);
-
 			final Map<String, Object> model=metadata(document);
 
 			model.put("headings", headings(document));
-			model.put("content", content(document));
+			model.put("body", body(document));
 
 			return model;
-
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
@@ -114,23 +117,13 @@ public final class Markdown {
 
 		visitor.visit(document);
 
-		final Map<String, List<String>> metadata=visitor.getData().entrySet().stream().collect(toMap(
-				e -> e.getKey().trim(), e -> e.getValue().stream().map(String::trim).collect(toList())
+		return visitor.getData().entrySet().stream().collect(toMap(
+
+				field -> field.getKey().trim(),
+
+				field -> new JoiningList(field.getValue().stream().map(String::trim).collect(toList()))
+
 		));
-
-		final Map<String, Object> model=new HashMap<>();
-
-		metadata.forEach((name, values) -> model.put(name, new AbstractList<String>() {
-
-			@Override public int size() { return values.size(); }
-
-			@Override public String get(final int index) { return values.get(index); }
-
-			@Override public String toString() { return String.join(", ", this); }
-
-		}));
-
-		return model;
 	}
 
 	private List<Heading> headings(final Node document) {
@@ -142,8 +135,26 @@ public final class Markdown {
 		return headings;
 	}
 
-	private String content(final Node document) {
+	private String body(final Node document) {
 		return renderers.build().render(document);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final class JoiningList extends AbstractList<String> {
+
+		private final List<String> values;
+
+		private JoiningList(final List<String> values) { this.values=values; }
+
+
+		@Override public int size() { return values.size(); }
+
+		@Override public String get(final int index) { return values.get(index); }
+
+		@Override public String toString() { return String.join(", ", values); }
+
 	}
 
 }

@@ -3,12 +3,12 @@ doctype html
 - var home = project ? project.organization.url : ""
 - var owner = project ? project.organization.name.toLowerCase() : ""
 
-- var module = project ? project.artifactId.replace(owner+"-", "") : ""
+- var module = project ? project.artifactId.replace("metreeca-", "") : ""
 - var version = project ?  project.version.replace("-SNAPSHOT", "") : ""
 
 - var title = empty(page.title) ? project.name : page.title
 
-- var prism = "//cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
+- var prism = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0" //- select from https://cdnjs.com/libraries/prism
 
 
 html(lang="en")
@@ -20,7 +20,7 @@ html(lang="en")
         meta(name="viewport" content="width=device-width,initial-scale=1")
         meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 
-        link(rel="shortcut icon" href="!{page.base}/index.svg")
+        link(rel="shortcut icon" href="!{page.root}/index.svg")
 
         //- prism.js code highlighting
 
@@ -31,7 +31,7 @@ html(lang="en")
 
         //- default stylesheet (at last to override prism.js)
 
-        link(rel="stylesheet" type="text/css" href="!{page.base}/index.css")
+        link(rel="stylesheet" type="text/css" href="!{page.root}/index.css")
 
     body
 
@@ -44,8 +44,8 @@ html(lang="en")
             header
 
                 span
-                    a(href="#{home}") #{owner}
-                    a(href="#{page.base}/index.html") #{module}
+                    a(href="#{home}") #{empty(owner) ? project.groupId : owner}
+                    a(href="#{page.root}/index.html") #{module}
                         span v#{version}
 
                 //- icon dynamically managed by default.css
@@ -65,12 +65,13 @@ html(lang="en")
 
             header #{title}
 
-            section !{page.content}
+            section !{page.body}
 
             footer
 
-                | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
-                = ' '
-                | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
+                if project.groupId == "com.metreeca"
+                    | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+                    = ' '
+                    | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
-        script(type="text/javascript" src="!{page.base}/index.js")
+        script(type="text/javascript" src="!{page.root}/index.js")
