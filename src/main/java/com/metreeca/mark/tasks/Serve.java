@@ -34,6 +34,7 @@ import static com.metreeca.mark.Mark.variants;
 import static com.sun.net.httpserver.HttpServer.create;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.readAllBytes;
 import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
 import static java.util.stream.Collectors.toMap;
@@ -53,8 +54,10 @@ public final class Serve implements Task {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final int OK=200;
-	private static final int NotFound=400;
+	private static final int NotFound=404;
 	private static final int NotAllowed=405;
+
+	private static final Path Root=Paths.get("/");
 
 	private static final Pattern BodyPattern=Pattern.compile("</body>");
 	private static final String LiveJS="<script type='text/javascript' src='https://livejs.com/live.js'></script>$0";
@@ -142,17 +145,17 @@ public final class Serve implements Task {
 
 			final String method=exchange.getRequestMethod();
 
-			final URI uri=exchange.getRequestURI(); // dot components already normalized
-
-			final String path=Paths.get("/")
-					.relativize(Paths.get(uri.getPath()))
-					.normalize()
-					.toString();
-
 			if ( method.equals("HEAD") || method.equals("GET") ) {
 
-				final Path file=variants(path)
+				final boolean head=exchange.getRequestMethod().equals("HEAD");
 
+				final URI uri=exchange.getRequestURI(); // dot components already normalized
+
+				final Path file=variants(uri.getPath())
+
+						.map(Paths::get)
+						.map(Root::relativize)
+						.map(Path::normalize)
 						.map(target::resolve)
 
 						.filter(Files::exists)
@@ -164,11 +167,32 @@ public final class Serve implements Task {
 
 				if ( file != null ) {
 
-					get(exchange, file);
+					final String mime=types.getOrDefault(extension(file), "application/octet-stream");
+
+					final byte[] data=readAllBytes(file);
+
+					final byte[] body=mime.equals("text/html")
+							? BodyPattern.matcher(new String(data, UTF_8)).replaceAll(LiveJS).getBytes(UTF_8)
+							: data;
+
+					final Instant instant=Files
+							.getLastModifiedTime(file)
+							.toInstant();
+
+					exchange.getResponseHeaders().set("Content-Type", mime);
+					exchange.getResponseHeaders().set("Last-Modified",
+							instant.atOffset(UTC).format(RFC_1123_DATE_TIME));
+					exchange.getResponseHeaders().set("ETag", format("\"%s\"", instant.toEpochMilli()));
+
+					exchange.sendResponseHeaders(OK, head ? -1 : body.length);
+
+					if ( !head ) {
+						try ( final OutputStream output=exchange.getResponseBody() ) { output.write(body); }
+					}
 
 				} else {
 
-					exchange.sendResponseHeaders(NotFound, 0L);
+					exchange.sendResponseHeaders(NotFound, head ? -1 : 0L);
 
 				}
 
@@ -182,32 +206,6 @@ public final class Serve implements Task {
 
 			exchange.close();
 
-		}
-	}
-
-	private void get(final HttpExchange exchange, final Path file) throws IOException {
-
-		final String mime=types.getOrDefault(extension(file), "application/octet-stream");
-
-		final boolean head=exchange.getRequestMethod().equals("HEAD");
-		final boolean html=mime.equals("text/html");
-
-		final byte[] data=html
-				? BodyPattern.matcher(new String(Files.readAllBytes(file), UTF_8)).replaceAll(LiveJS).getBytes(UTF_8)
-				: Files.readAllBytes(file);
-
-		final Instant instant=Files
-				.getLastModifiedTime(file)
-				.toInstant();
-
-		exchange.getResponseHeaders().set("Content-Type", mime);
-		exchange.getResponseHeaders().set("Last-Modified", instant.atOffset(UTC).format(RFC_1123_DATE_TIME));
-		exchange.getResponseHeaders().set("ETag", format("\"%s\"", instant.toEpochMilli()));
-
-		exchange.sendResponseHeaders(OK, head ? -1 : data.length);
-
-		if ( !head ) {
-			try ( final OutputStream output=exchange.getResponseBody() ) { output.write(data); }
 		}
 	}
 
