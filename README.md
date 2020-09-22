@@ -57,7 +57,7 @@ The following optional configuration parameters are available:
 | --------- | ------------- | ------------------------------------------------------ |
 | `source`  | `src/docs`    | the source folder for the site                         |
 | `target`  | `target/docs` | the target folder for the generated site               |
-| `assets` | a virtual empty folder | the path of an additional asset folder |
+| `assets` | a virtual empty folder | a supplemental asset folder |
 | `layout`  | `layouts/default.pug`| the path of default page template relative to `source` or `assets` |
 
 The plugin binds by default the `build` goal to the `site` maven phase.
@@ -154,10 +154,10 @@ mvn mark:build # by default in the pre-site phase
 
 **Markdown**  / `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file.
 
-| option                    | default | behaviour                                             |
-| ------------------------- | ------- | ----------------------------------------------------- |
-| `markdown-smart-links`    | `false` | removes `.html` and `/index.html` suffixes from links |
-| `markdown-external-links` | `false` | opens extenal links in a `_blank` target              |
+| option                    | default | behaviour                                            |
+| ------------------------- | ------- | ---------------------------------------------------- |
+| `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
+| `markdown-external-links` | `false` | opens extenal links in a `_blank` target             |
 
 **Less/CSS** /  `.less` and `.css` files under the source folder are converted to minified `.css` files at the same relative path under the target.
 
