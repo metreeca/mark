@@ -23,8 +23,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.*;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -34,6 +33,8 @@ import static com.metreeca.mark.Mark.extension;
 import static com.sun.net.httpserver.HttpServer.create;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.ZoneOffset.UTC;
+import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -193,13 +194,13 @@ public final class Serve implements Task {
 				? BodyPattern.matcher(new String(Files.readAllBytes(file), UTF_8)).replaceAll(LiveJS).getBytes(UTF_8)
 				: Files.readAllBytes(file);
 
-		exchange.getResponseHeaders().set("Content-Type", mime);
-		exchange.getResponseHeaders().set("Last-Modified", Files
+		final Instant instant=Files
 				.getLastModifiedTime(file)
-				.toInstant()
-				.atOffset(ZoneOffset.UTC)
-				.format(DateTimeFormatter.RFC_1123_DATE_TIME)
-		);
+				.toInstant();
+
+		exchange.getResponseHeaders().set("Content-Type", mime);
+		exchange.getResponseHeaders().set("Last-Modified", instant.atOffset(UTC).format(RFC_1123_DATE_TIME));
+		exchange.getResponseHeaders().set("ETag", String.format("\"%s\"", instant.toEpochMilli()));
 
 		exchange.sendResponseHeaders(OK, head ? -1 : data.length);
 
