@@ -13,7 +13,7 @@
 
 package com.metreeca.mark;
 
-import com.metreeca.mark.tasks.Build;
+import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -31,7 +31,10 @@ public final class MarkTest {
 
 	public static void main(final String... args) {
 		new Mark(new TestOpts())
-				.exec(new Build());
+				.exec(new Build())
+				.exec(new Serve())
+				.exec(new Watch())
+		;
 	}
 
 

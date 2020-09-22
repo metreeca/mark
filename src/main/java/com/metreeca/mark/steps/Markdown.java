@@ -125,23 +125,13 @@ public final class Markdown {
 
 		visitor.visit(document);
 
-		final Map<String, List<String>> metadata=visitor.getData().entrySet().stream().collect(toMap(
-				e -> e.getKey().trim(), e -> e.getValue().stream().map(String::trim).collect(toList())
+		return visitor.getData().entrySet().stream().collect(toMap(
+
+				field -> field.getKey().trim(),
+
+				field -> new JoiningList(field.getValue().stream().map(String::trim).collect(toList()))
+
 		));
-
-		final Map<String, Object> model=new HashMap<>();
-
-		metadata.forEach((name, values) -> model.put(name, new AbstractList<String>() {
-
-			@Override public int size() { return values.size(); }
-
-			@Override public String get(final int index) { return values.get(index); }
-
-			@Override public String toString() { return String.join(", ", this); }
-
-		}));
-
-		return model;
 	}
 
 	private List<Heading> headings(final Node document) {
@@ -155,6 +145,24 @@ public final class Markdown {
 
 	private String body(final Node document) {
 		return renderers.build().render(document);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final class JoiningList extends AbstractList<String> {
+
+		private final List<String> values;
+
+		private JoiningList(final List<String> values) { this.values=values; }
+
+
+		@Override public int size() { return values.size(); }
+
+		@Override public String get(final int index) { return values.get(index); }
+
+		@Override public String toString() { return String.join(", ", values); }
+
 	}
 
 }
