@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.metreeca.mark.Mark.extension;
+import static com.metreeca.mark.Mark.variants;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
@@ -101,8 +102,8 @@ public final class Check implements Task {
 
 			final long broken=links.stream()
 
-					.filter(link -> !internal.contains(link.getValue()))
-					.filter(link -> !external.contains(link.getValue()))
+					.filter(link -> variants(link.getValue()).noneMatch(internal::contains))
+					.filter(link -> Stream.of(link.getValue()).noneMatch(external::contains))
 
 					.peek(link -> logger.warn(format("%s ~› %s", link.getKey(), link.getValue())))
 

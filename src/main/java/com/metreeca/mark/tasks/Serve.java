@@ -47,6 +47,7 @@ public final class Serve implements Task {
 
 	private static final int port=2020;
 
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final int OK=200;
@@ -141,16 +142,24 @@ public final class Serve implements Task {
 
 			final URI uri=exchange.getRequestURI(); // dot components already normalized
 
-			final Path path=Paths.get(uri.getPath()).normalize();
-			final Path file=target.resolve(Paths.get("/").relativize(path));
+			final String path=Paths.get("/")
+					.relativize(Paths.get(uri.getPath()))
+					.normalize()
+					.toString();
 
 			if ( method.equals("HEAD") || method.equals("GET") ) {
 
-				if ( Files.isDirectory(file) ) {
+				final Path file=Mark.variants(path)
+						.map(target::resolve)
 
-					get(exchange, file.resolve("index.html"));
+						.filter(Files::exists)
+						.filter(Files::isRegularFile)
 
-				} else if ( Files.isRegularFile(file) ) {
+						.findFirst()
+
+						.orElse(null);
+
+				if ( file != null ) {
 
 					get(exchange, file);
 

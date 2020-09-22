@@ -41,6 +41,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
+import static java.util.regex.Matcher.quoteReplacement;
 import static java.util.stream.Collectors.toList;
 
 
@@ -55,6 +56,7 @@ public final class Mark implements Opts {
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
+	private static final Pattern AnchorPattern=Pattern.compile("(?:#.*)?$");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +105,18 @@ public final class Mark implements Opts {
 		final int dot=name.lastIndexOf('.');
 
 		return dot >= 0 ? name.substring(dot).toLowerCase(ROOT) : "";
+	}
+
+
+	public static Stream<String> variants(final String path) {
+
+		if ( path == null ) {
+			throw new NullPointerException("null path");
+		}
+
+		return Stream.of("", ".html", "index.html", "/index.html").map(suffix ->
+				AnchorPattern.matcher(path).replaceFirst(format("%s$0", quoteReplacement(suffix)))
+		);
 	}
 
 
