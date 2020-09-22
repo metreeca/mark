@@ -13,6 +13,7 @@
 
 package com.metreeca.mark;
 
+import com.metreeca.mark.steps.Markdown;
 import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugin.logging.Log;
@@ -22,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toMap;
@@ -82,6 +84,16 @@ public final class MarkTest {
 		}
 
 		@Override public Log logger() { return new SystemStreamLog(); }
+
+		@Override public <V> V get(final String option, final Function<String, V> mapper) {
+			return mapper.apply(
+
+					option.equals(Markdown.SmartLinks.getName()) ? "false"
+							: option.equals(Markdown.ExternalLinks.getName()) ? "true"
+							: null
+
+			);
+		}
 
 	}
 

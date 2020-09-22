@@ -17,7 +17,6 @@ import com.vladsch.flexmark.html.*;
 import com.vladsch.flexmark.html.renderer.LinkResolverBasicContext;
 import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 
 import java.util.Optional;
@@ -25,11 +24,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension {
-
-	private static final String Base=LinkRewriterExtension.class.getSimpleName();
-
-	public static final DataKey<Boolean> SmartLinks=new DataKey<>(Base+"#SmartLinks", false);
-	public static final DataKey<Boolean> ExternalLinks=new DataKey<>(Base+"#ExternalLinks", false);
 
 
 	public static LinkRewriterExtension create() {
@@ -83,8 +77,8 @@ final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension 
 
 
 		private LinkRewriter(final LinkResolverBasicContext context) {
-			smart=SmartLinks.get(context.getOptions());
-			external=ExternalLinks.get(context.getOptions());
+			smart=Markdown.SmartLinks.get(context.getOptions());
+			external=Markdown.ExternalLinks.get(context.getOptions());
 		}
 
 

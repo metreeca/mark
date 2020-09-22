@@ -126,6 +126,8 @@ public final class Mark implements Opts {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private final Opts opts;
+
 	private final Path source;
 	private final Path target;
 
@@ -158,6 +160,8 @@ public final class Mark implements Opts {
 		if ( opts == null ) {
 			throw new NullPointerException("null opts");
 		}
+
+		this.opts=opts;
 
 		this.source=absolute(requireNonNull(opts.source(), "null opts source path"));
 		this.target=absolute(requireNonNull(opts.target(), "null opts target path"));
@@ -316,6 +320,11 @@ public final class Mark implements Opts {
 
 	@Override public Log logger() {
 		return logger;
+	}
+
+
+	@Override public <V> V get(final String option, final Function<String, V> mapper) {
+		return opts.get(option, mapper);
 	}
 
 

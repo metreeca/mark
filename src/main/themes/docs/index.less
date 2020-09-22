@@ -545,7 +545,13 @@ div + div > pre {
 }
 
 p {
+
 	margin-bottom: 0.75em;
+
+	li > &:only-child {
+		margin: 0;
+	}
+
 }
 
 blockquote {

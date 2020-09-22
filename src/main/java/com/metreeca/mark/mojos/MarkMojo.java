@@ -23,6 +23,7 @@ import org.apache.maven.project.MavenProject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.function.Function;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
@@ -47,6 +48,10 @@ public abstract class MarkMojo extends AbstractMojo {
 	private String layout;
 
 
+	@Parameter
+	private Map<String, String> options;
+
+
 	/**
 	 * Retrieves site generation options.
 	 *
@@ -65,9 +70,9 @@ public abstract class MarkMojo extends AbstractMojo {
 
 
 		private MojoOpts(final MarkMojo mojo) {
-
 			this.mojo=mojo;
 		}
+
 
 		@Override public Path source() { return Paths.get(mojo.source); }
 
@@ -83,6 +88,11 @@ public abstract class MarkMojo extends AbstractMojo {
 		}
 
 		@Override public Log logger() { return mojo.getLog(); }
+
+
+		@Override public <V> V get(final String option, final Function<String, V> mapper) {
+			return mapper.apply(mojo.options == null ? null : mojo.options.get(option));
+		}
 
 	}
 

@@ -17,6 +17,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Site generation options.
@@ -53,5 +54,20 @@ public interface Opts {
 	 * @return the system logger
 	 */
 	public Log logger();
+
+
+	/**
+	 * Retrieves a pipeline option.
+	 *
+	 * @param option the name of the option to be retrieved
+	 * @param mapper a function mapping from a possibly null string value to an option value of the expected type
+	 * @param <V>    the expected type of the option value
+	 *
+	 * @return the value produced by applying {@code mapper} to a possibly null string value retrieved from a
+	 * system-specific source
+	 *
+	 * @throws NullPointerException if {@code mapper} is null
+	 */
+	public <V> V get(final String option, final Function<String, V> mapper);
 
 }

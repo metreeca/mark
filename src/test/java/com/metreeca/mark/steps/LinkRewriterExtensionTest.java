@@ -21,7 +21,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.steps.LinkRewriterExtension.*;
+import static com.metreeca.mark.steps.LinkRewriterExtension.plain;
+import static com.metreeca.mark.steps.LinkRewriterExtension.smart;
 import static org.assertj.core.api.Assertions.assertThat;
 
 final class LinkRewriterExtensionTest {
@@ -35,8 +36,8 @@ final class LinkRewriterExtensionTest {
 						LinkRewriterExtension.create()
 				))
 
-				.set(SmartLinks, true)
-				.set(ExternalLinks, true);
+				.set(Markdown.SmartLinks, true)
+				.set(Markdown.ExternalLinks, true);
 
 		Stream
 
