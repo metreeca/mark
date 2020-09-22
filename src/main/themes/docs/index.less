@@ -600,17 +600,11 @@ a:hover, button:active {
 	cursor: pointer;
 }
 
-a[target=_blank]:after {
-	content: "\f08e"; /* external link */
-	font-family: FontAwesome;
-	font-size: 66%;
-	margin-left: 0.5em;
-}
-
-a.more:after {
-	content: "›››";
+a[target=_blank]:after { // external link
 	display: inline-block;
-	margin-left: 0.25em;
+	content: "⇱";
+	font-size: 90%;
+	transform: scaleX(-1) translate(-0.15em, -0.15em);
 }
 
 button {

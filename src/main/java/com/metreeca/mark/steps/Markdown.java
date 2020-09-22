@@ -16,7 +16,6 @@ package com.metreeca.mark.steps;
 import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.ast.Heading;
-import com.vladsch.flexmark.ast.Link;
 import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
@@ -28,7 +27,6 @@ import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.*;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.sequence.BasedSequence;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -61,13 +59,19 @@ public final class Markdown {
 						TablesExtension.create(),
 						DefinitionExtension.create(),
 						AdmonitionExtension.create(),
-						AutolinkExtension.create()
+						AutolinkExtension.create(),
+						LinkRewriterExtension.create()
 				))
 
 				.set(HtmlRenderer.RENDER_HEADER_ID, true)
 				.set(HtmlRenderer.GENERATE_HEADER_ID, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
-				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true);
+				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
+
+				//.set(LinkRewriterExtension.SmartLinks, true)
+				//.set(LinkRewriterExtension.ExternalLinks, true)
+
+				;
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);
@@ -87,29 +91,12 @@ public final class Markdown {
 
 			final Node document=parsers.build().parseReader(reader);
 
-			// !!! as post-processing extension (https://github
-			// .com/vsch/flexmark-java/blob/master/flexmark-java-samples/src/com/vladsch/flexmark/java/samples
-			// /SyntheticLinkSample.java)
-
-			new NodeVisitor(new VisitHandler<>(Link.class, link -> {
-
-				final BasedSequence url=link.getUrl();
-
-				if ( url.endsWith(".md") ) {
-					link.setUrl(url.removeProperSuffix(".md").append(".html"));
-				} else {
-					link.setUrl(url.replace(".md#", ".html#"));
-				}
-
-			})).visit(document);
-
 			final Map<String, Object> model=metadata(document);
 
 			model.put("headings", headings(document));
 			model.put("body", body(document));
 
 			return model;
-
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);
