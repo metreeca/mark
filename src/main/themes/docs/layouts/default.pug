@@ -3,7 +3,7 @@ doctype html
 - var home = project ? project.organization.url : ""
 - var owner = project ? project.organization.name.toLowerCase() : ""
 
-- var module = project ? project.artifactId.replace(owner+"-", "") : ""
+- var module = project ? project.artifactId.replace("metreeca-", "") : ""
 - var version = project ?  project.version.replace("-SNAPSHOT", "") : ""
 
 - var title = empty(page.title) ? project.name : page.title
@@ -44,7 +44,7 @@ html(lang="en")
             header
 
                 span
-                    a(href="#{home}") #{owner}
+                    a(href="#{home}") #{empty(owner) ? project.groupId : owner}
                     a(href="#{page.root}/index.html") #{module}
                         span v#{version}
 
@@ -69,8 +69,9 @@ html(lang="en")
 
             footer
 
-                | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
-                = ' '
-                | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
+                if project.groupId == "com.metreeca"
+                    | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+                    = ' '
+                    | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
         script(type="text/javascript" src="!{page.root}/index.js")

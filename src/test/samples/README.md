@@ -58,8 +58,7 @@ The plugin binds by default the `build` goal to the `site` maven phase.
 
 ## Define a template
 
-> ℹ️
-> If you feel lazy, use the default bundled docs theme including  `<assets>@/docs</assets>` in the configuration
+> :info: If you feel lazy, use the bundled docs theme including  `<assets>@/docs</assets>` in the configuration
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
