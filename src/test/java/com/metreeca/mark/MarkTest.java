@@ -42,15 +42,6 @@ public final class MarkTest {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@SafeVarargs private static <K, V> Map<K, V> map(final Map.Entry<K, V>... entries) {
-		return Stream.of(entries).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	private static <K, V> Map.Entry<K, V> entry(final K key, final V value) {
-		return new AbstractMap.SimpleImmutableEntry<>(key, value);
-	}
-
-
 	private static final class TestOpts implements Opts {
 
 		@Override public Path source() { return Paths.get("src/test/samples"); }
@@ -95,6 +86,17 @@ public final class MarkTest {
 			);
 		}
 
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@SafeVarargs private static <K, V> Map<K, V> map(final Map.Entry<K, V>... entries) {
+		return Stream.of(entries).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	private static <K, V> Map.Entry<K, V> entry(final K key, final V value) {
+		return new AbstractMap.SimpleImmutableEntry<>(key, value);
 	}
 
 }

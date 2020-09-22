@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.metreeca.mark.Mark.extension;
+import static com.metreeca.mark.Mark.variants;
 import static com.sun.net.httpserver.HttpServer.create;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -71,7 +72,7 @@ public final class Serve implements Task {
 			.map(Serve.class::getResource)
 
 			.map(url -> {
-				try { return url.toURI();} catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
+				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
 			})
 
 			.map(Paths::get)
@@ -150,7 +151,8 @@ public final class Serve implements Task {
 
 			if ( method.equals("HEAD") || method.equals("GET") ) {
 
-				final Path file=Mark.variants(path)
+				final Path file=variants(path)
+
 						.map(target::resolve)
 
 						.filter(Files::exists)
