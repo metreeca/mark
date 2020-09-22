@@ -65,7 +65,8 @@ The plugin binds by default the `build` goal to the `site` maven phase.
 ## Define a template
 
 > ℹ️
-> If you feel lazy, use the default bundled docs theme including  `<assets>@/docs</assets>` in the configuration
+>
+> **If you feel lazy,  insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme**
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
@@ -105,8 +106,9 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
-> :warning: 
-> **Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
+> :warning:
+>
+>  **Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
 ## Create site content
 
@@ -126,8 +128,9 @@ All the properties available to templates (with the obvious exception of `page.b
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
 
-> :warning: 
-> **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
+> :warning:
+>
+>  **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
 # Goals
 
@@ -184,15 +187,16 @@ mvn mark:serve
 - the site is generated and watched as described above
 - the generated site is served on a development grade HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
-- pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com)
+- pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com))
 
 > :warning:
+>
 > **Live page reloading assumes `UTF-8`.**
 
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- open a topic on [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
+- post to [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
 
 # License
 
