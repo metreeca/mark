@@ -8,4 +8,4 @@ Metreeca/Mark is an minimalist static site generator, optimized for project/app 
 
 - [redirect](redirect.md)
 - [broken](broken.md)
-- [external](http://example.com/)
+- [external](http://example.com/) link
