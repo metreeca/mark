@@ -5,16 +5,16 @@
 package com.metreeca.mark.mojos;
 
 import com.metreeca.mark.Mark;
-import com.metreeca.mark.tasks.Crawl;
+import com.metreeca.mark.tasks.Check;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
 
-@Mojo(name="crawl", defaultPhase=LifecyclePhase.POST_SITE) public class CrawlMojo extends MarkMojo {
+@Mojo(name="check", defaultPhase=LifecyclePhase.POST_SITE) public class CheckMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts()).exec(new Crawl());
+		new Mark(opts()).exec(new Check());
 	}
 
 }

@@ -143,16 +143,13 @@ mvn mark:build # by default in the pre-site phase
 | `.md`               | `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file |
 | `.less`<br />`.css` | `.less` and ``.css` files under the `source` folder are converted to minified `.css` files at the same relative path under the `target` |
 
-## Verify links
+## Check links
 
 ```shell
-mvn mark:crawl # by default in the post-site phase
+mvn mark:check # by default in the post-site phase
 ```
 
 - HTML files under the `target` folder are scanned and dangling links reported
-
-> :warning: 
-> **Crawling doesn't automaticaly generate the site, in order to support incremental operations while watching site sources.**
 
 ## Watch site sources
 

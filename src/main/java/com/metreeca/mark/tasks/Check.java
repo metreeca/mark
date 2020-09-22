@@ -36,11 +36,11 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
- * Site crawling task.
+ * Site link checking task.
  *
- * <p>Crawls HTML files in the {@linkplain Opts#target() target} site folder nd reports dangling links.</p>
+ * <p>Scans HTML files in the {@linkplain Opts#target() target} site folder and reports dangling links.</p>
  */
-public final class Crawl implements Task {
+public final class Check implements Task {
 
 	private static final Pattern URLPattern=Pattern.compile("^\\w+:.*$");
 
@@ -68,6 +68,9 @@ public final class Crawl implements Task {
 			final Set<String> external=links.stream() // verified external link targets
 					.map(Map.Entry::getValue)
 					.filter(URLPattern.asPredicate())
+
+					// !!! external links
+
 					//.distinct()
 					//.filter(url -> {
 					//	try {
@@ -84,6 +87,7 @@ public final class Crawl implements Task {
 					//
 					//	}
 					//})
+
 					.collect(toSet());
 
 			final long broken=links.stream()
