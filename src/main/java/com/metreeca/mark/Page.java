@@ -15,6 +15,8 @@ package com.metreeca.mark;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -22,17 +24,18 @@ import static java.util.Collections.unmodifiableMap;
 /**
  * Site page.
  */
-public abstract class Page {
+public final class Page {
 
 	private final Path path;
 	private final Map<String, Object> model;
+	private final BiConsumer<Path, Map<String, Object>> render;
 
 
-	protected Page(final Path path) {
-		this(path, emptyMap());
+	public Page(final Path path, final Consumer<Path> render) {
+		this(path, emptyMap(), (target, model) -> render.accept(target));
 	}
 
-	protected Page(final Path path, final Map<String, Object> model) {
+	public Page(final Path path, final Map<String, Object> model, final BiConsumer<Path, Map<String, Object>> render) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -42,8 +45,13 @@ public abstract class Page {
 			throw new NullPointerException("null model");
 		}
 
+		if ( render == null ) {
+			throw new NullPointerException("null render");
+		}
+
 		this.path=path;
 		this.model=model;
+		this.render=render;
 	}
 
 
@@ -55,7 +63,8 @@ public abstract class Page {
 		return unmodifiableMap(model);
 	}
 
-
-	public abstract void render(final Path target, final Map<String, Object> model);
+	public BiConsumer<Path, Map<String, Object>> render() {
+		return render;
+	}
 
 }

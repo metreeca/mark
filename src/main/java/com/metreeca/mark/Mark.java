@@ -25,6 +25,7 @@ import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -40,6 +41,7 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -137,11 +139,11 @@ public final class Mark implements Opts {
 
 	private final String template; // template layout extension
 
-	private final Collection<Function<Mark, Pipe>> factories=asList( // pipe factories
+	private final Collection<Function<Mark, Pipe>> pipes=asList(
 			Md::new, Less::new, Wild::new
 	);
 
-	private final Map<Path, Page> resources=new LinkedHashMap<>();
+	private final Map<Path, Map<String, Object>> pages=new ConcurrentSkipListMap<>(comparing(Path::toString));
 
 
 	/**
@@ -413,72 +415,30 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path stream");
 		}
 
-		// locate, compile and collect resources
+		return paths
 
-		final long count=paths
-				.sorted(comparing(Path::toString)) // !!!compare only common path
+				// 1st pass: locate, compile and register pages
+
 				.map(this::source)
 				.map(this::compile)
+
 				.filter(Optional::isPresent)
+				.map(Optional::get)
+
+				.map(this::register)
+
+				.peek(page -> logger.info(page.path().toString()))
+
+				// collect all page models before rendering
+
+				.collect(toList())
+				.stream()
+
+				// 2nd pass >> render pages
+
+				.peek(this::render)
+
 				.count();
-
-
-		// generate and collect extended resource data models
-
-		final List<Page> resources=new ArrayList<>();
-		final List<Map<String, Object>> models=new ArrayList<>();
-
-		for (final Page resource : this.resources.values()) {
-
-			final Path path=common(resource.path()).normalize();
-			final Map<String, Object> meta=new HashMap<>(resource.model());
-
-			// extend raw resource data models
-
-			meta.put("root", Optional
-					.ofNullable(path.getParent())
-					.map(parent -> root.resolve(parent).relativize(root)) // ;( must be both absolute
-					.map(Path::toString)
-					.orElse(".")
-			);
-
-			meta.put("base", Optional
-					.ofNullable(path.getParent())
-					.map(Path::toString)
-					.orElse(".")
-			);
-
-			meta.put("path", path.toString());
-
-			meta.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
-
-
-			// collect extended models
-
-			models.add(meta);
-
-
-			// create the root data model
-
-			final Map<String, Object> model=new HashMap<>(shared());
-
-			model.put("page", meta);
-			model.put("pages", models); //; collected extended models
-
-
-			// collect extended pages rendering from the root model
-
-			resources.add(new Page(path, model) {
-				@Override public void render(final Path target, final Map<String, Object> model) {
-					resource.render(target, model);
-				}
-			});
-
-		}
-
-		resources.forEach(this::render);
-
-		return count;
 	}
 
 
@@ -487,7 +447,7 @@ public final class Mark implements Opts {
 	private Optional<Page> compile(final Path source) {
 		try {
 
-			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : factories
+			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes
 
 					.stream()
 					.map(factory -> factory.apply(this))
@@ -512,8 +472,6 @@ public final class Mark implements Opts {
 					.filter(Optional::isPresent)
 					.map(Optional::get)
 
-					.peek(page -> resources.put(source, page))
-
 					.findFirst();
 
 		} catch ( final IOException e ) {
@@ -523,10 +481,45 @@ public final class Mark implements Opts {
 		}
 	}
 
-	private Mark render(final Page page) {
+	private Page register(final Page page) {
+
+		final Path path=common(page.path()).normalize();
+		final Map<String, Object> model=new HashMap<>(page.model());
+
+		model.put("root", Optional
+				.ofNullable(path.getParent())
+				.map(parent -> root.resolve(parent).relativize(root)) // ;( must be both absolute
+				.map(Path::toString)
+				.orElse(".")
+		);
+
+		model.put("base", Optional
+				.ofNullable(path.getParent())
+				.map(Path::toString)
+				.orElse(".")
+		);
+
+		model.put("path", path.toString());
+
+		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
+
+		if ( path.toString().endsWith(".html") ) {
+			pages.put(path, model);
+		}
+
+		return new Page(path, model, page.render());
+	}
+
+	private void render(final Page page) {
 		try {
 
-			logger.info(page.path().toString());
+			// create the root data model
+
+			final Map<String, Object> model=new HashMap<>(shared());
+
+			model.put("page", page.model());
+			model.put("pages", pages.values());
+
 
 			// make sure the output folder exists, then render page
 
@@ -534,9 +527,8 @@ public final class Mark implements Opts {
 
 			Files.createDirectories(target.getParent());
 
-			page.render(target, page.model());
+			page.render().accept(target, model);
 
-			return this;
 
 		} catch ( final IOException e ) {
 

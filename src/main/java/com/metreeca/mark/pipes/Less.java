@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.inet.lib.less.Less.compile;
@@ -41,23 +40,18 @@ public final class Less implements Pipe {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
-		return target(source, ".css", ".less", ".css").map(target -> new Page(target) {
+		return target(source, ".css", ".less", ".css").map(target -> new Page(target, path -> {
+			try {
 
-			@Override public void render(final Path target, final Map<String, Object> model) {
-				try {
+				final String less=new String(Files.readAllBytes(source), UTF_8);
+				final String css=compile(path.toUri().toURL(), less, true);
 
-					final String less=new String(Files.readAllBytes(source), UTF_8);
-					final String css=compile(target.toUri().toURL(), less, true);
+				Files.write(path, css.getBytes(UTF_8));
 
-					Files.write(target, css.getBytes(UTF_8));
-
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
 			}
-
-		});
+		}));
 	}
 
 }

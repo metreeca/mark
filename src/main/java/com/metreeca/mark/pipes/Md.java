@@ -18,7 +18,6 @@ import com.metreeca.mark.steps.Markdown;
 import com.metreeca.mark.steps.Pug;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.metreeca.mark.Mark.target;
@@ -47,11 +46,9 @@ public final class Md implements Pipe {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
-		return target(source, ".html", ".md").map(target -> new Page(target, markdown.read(source)) {
-			@Override public void render(final Path target, final Map<String, Object> model) {
-				pug.write(target, model);
-			}
-		});
+		return target(source, ".html", ".md").map(target ->
+				new Page(target, markdown.read(source), pug::write)
+		);
 	}
 
 }

@@ -54,7 +54,7 @@ The following optional configuration parameters are available:
 
 The plugin binds by default the `build` goal to the `site` maven phase.
 
-## Define a default template
+## Define a template
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
@@ -91,13 +91,13 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.path`     | the path of the page relative to the site root               |
 | `page.headings` | a list of page [headings](https://javadoc.io/doc/com.vladsch.flexmark/flexmark/undefined/com/vladsch/flexmark/ast/Heading.html); use `heading.anchorRefId`, `heading.level` and `heading.text` to generate TOCs |
 | `page.body`  | page content rendered as HTML                     |
-| `pages[]` | a list containing  `page` objects for all site files |
+| `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
 > :warning: 
 > **Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
 
-## Define site content
+## Create site content
 
 Define site pages as `.md` files under the `source` folder, for instance as:
 

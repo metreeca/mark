@@ -19,11 +19,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.util.Collections.emptyMap;
 
 
 public final class Wild implements Pipe {
@@ -40,17 +38,15 @@ public final class Wild implements Pipe {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
-		return Optional.of(new Page(source, emptyMap()) {
-			@Override public void render(final Path target, final Map<String, Object> model) {
-				try {
+		return Optional.of(new Page(source, target -> {
+			try {
 
-					Files.copy(source, target, REPLACE_EXISTING);
+				Files.copy(source, target, REPLACE_EXISTING);
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
 			}
-		});
+		}));
 	}
 
 }
