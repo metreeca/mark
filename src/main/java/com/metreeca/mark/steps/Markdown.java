@@ -76,7 +76,7 @@ public final class Markdown {
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
 
 				.set(SmartLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean))
-				.set(ExternalLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean));
+				.set(ExternalLinks, mark.get(ExternalLinks.getName(), Boolean::parseBoolean));
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);
