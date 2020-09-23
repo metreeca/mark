@@ -103,13 +103,21 @@ public final class Serve implements Task {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public void exec(final Mark mark) {
+		serve(mark);
+		watch(mark);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private void serve(final Opts opts) {
 
 		final Thread daemon=new Thread(() -> {
 
 			try {
 
-				final Path target=mark.target();
-				final Log logger=mark.logger();
+				final Path target=opts.target();
+				final Log logger=opts.logger();
 
 				final HttpServer server=create(new InetSocketAddress("localhost", port), 0);
 
@@ -134,7 +142,22 @@ public final class Serve implements Task {
 
 		daemon.setDaemon(true);
 		daemon.start();
+	}
 
+	private void watch(final Mark mark) {
+
+		final Thread daemon=new Thread(() -> {
+
+			mark.watch(mark.target(), (kind, path) -> {
+
+				mark.logger().error(path.toString());
+
+			});
+
+		});
+
+		daemon.setDaemon(true);
+		daemon.start();
 	}
 
 

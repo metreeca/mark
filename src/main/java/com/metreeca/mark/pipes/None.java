@@ -20,6 +20,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
+
+import static com.metreeca.mark.Mark.basename;
 
 
 public final class None implements Pipe {
@@ -39,9 +42,19 @@ public final class None implements Pipe {
 		return Optional.of(source)
 				.filter(path -> !Files.exists(path))
 				.map(path -> new Page(path, target -> {
-					try {
+					try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
 
-						Files.deleteIfExists(target);
+						files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {
+							try {
+
+								Files.delete(file);
+
+							} catch ( final IOException e ) {
+
+								throw new UncheckedIOException(e);
+
+							}
+						});
 
 					} catch ( final IOException e ) {
 

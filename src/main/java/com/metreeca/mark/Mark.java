@@ -460,19 +460,19 @@ public final class Mark implements Opts {
 						final WatchEvent.Kind<?> kind=event.kind();
 						final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-						if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
+						if ( kind.equals(OVERFLOW) ) {
+
+							logger.error("sync lost ;-(");
+
+						} else if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
 
 							logger.info(root.relativize(path).toString());
 
 							register.accept(path);
 
-						} else if ( Files.isRegularFile(path) ) {
+						} else if ( kind.equals(ENTRY_DELETE) || Files.isRegularFile(path) ) {
 
 							action.accept(kind, path);
-
-						} else if ( kind.equals(OVERFLOW) ) {
-
-							logger.error("sync lost ;-(");
 
 						}
 					}
