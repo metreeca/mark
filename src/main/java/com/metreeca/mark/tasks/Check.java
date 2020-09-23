@@ -38,8 +38,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.metreeca.mark.Mark.extension;
-import static com.metreeca.mark.Mark.variants;
+import static com.metreeca.rest.handlers.Publisher.extension;
+import static com.metreeca.rest.handlers.Publisher.variants;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;

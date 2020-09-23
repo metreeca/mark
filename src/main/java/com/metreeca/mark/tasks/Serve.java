@@ -13,28 +13,32 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.jse.Server;
 import com.metreeca.mark.*;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
-import org.apache.maven.plugin.logging.Log;
+import com.metreeca.rest.Response;
+import com.metreeca.rest.handlers.Publisher;
 
 import java.awt.*;
 import java.io.*;
 import java.net.*;
-import java.nio.file.*;
-import java.time.Instant;
-import java.util.*;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.*;
-import static com.sun.net.httpserver.HttpServer.create;
+import static com.metreeca.mark.Mark.Root;
+import static com.metreeca.rest.Response.OK;
+import static com.metreeca.rest.Wrapper.postprocessor;
+import static com.metreeca.rest.formats.OutputFormat.output;
+import static com.metreeca.rest.formats.TextFormat.text;
+import static com.metreeca.rest.handlers.Router.router;
+import static com.metreeca.rest.wrappers.Gateway.gateway;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.readAllBytes;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * Site serving task.
@@ -45,79 +49,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class Serve implements Task {
 
-	private static final int port=2020;
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static final int OK=200;
-	private static final int NotFound=404;
-	private static final int NotAllowed=405;
-
-	private static final String Live=Optional
-
-			.of(Serve.class.getSimpleName()+".js")
-
-			.map(Serve.class::getResource)
-
-			.map(url -> {
-				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
-			})
-
-			.map(Paths::get)
-
-			.map(path -> {
-				try {
-					return new String(readAllBytes(path), UTF_8);
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			})
-
-			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))
-
-			.orElse("");
-
-
-	/**
-	 * File extension to MIME types.
-	 *
-	 * @see "https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types"
-	 */
-	private static final Map<String, String> MIMEs=Stream
-
-			.of(Serve.class.getSimpleName()+".tsv")
-
-			.map(Serve.class::getResource)
-
-			.map(url -> {
-				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
-			})
-
-			.map(Paths::get)
-
-			.flatMap(path -> {
-				try {
-					return Files.readAllLines(path, UTF_8).stream();
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			})
-
-			.filter(line -> !line.isEmpty())
-
-			.map(line -> {
-
-				final int tab=line.indexOf('\t');
-
-				return new AbstractMap.SimpleImmutableEntry<>(line.substring(0, tab), line.substring(tab+1));
-
-			})
-
-			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private final InetSocketAddress address=new InetSocketAddress("localhost", 2020);
 
 	private final BlockingDeque<String> updates=new LinkedBlockingDeque<>();
 
@@ -135,25 +67,42 @@ public final class Serve implements Task {
 	private void serve(final Opts opts) {
 
 		final Thread daemon=new Thread(() -> {
-
 			try {
 
-				final Path target=opts.target();
-				final Log logger=opts.logger();
+				new Server()
 
-				final HttpServer server=create(new InetSocketAddress("localhost", port), 16);
+						.address(address)
 
-				server.createContext("/", exchange -> new Thread(() -> handle(exchange, target)).start());
+						.handler(context -> gateway().wrap(router()
 
-				server.start();
+								.path("/~", router().get(request -> request.reply(response -> {
+									try {
 
-				final String home=format("http://%s:%d/",
-						server.getAddress().getHostString(), server.getAddress().getPort()
-				);
+										return response.status(OK).body(text(), updates.take());
 
-				logger.info(format("server listening at <%s>", home));
+									} catch ( final InterruptedException e ) {
 
-				open(home);
+										return response.status(OK);
+
+									}
+								})))
+
+								.path("/*", router().get(Publisher.publisher(opts.target())
+										.with(postprocessor(output(), this::rewrite))
+								))
+
+						))
+
+						.start();
+
+				final String home=format("http://%s:%d/", address.getHostString(), address.getPort());
+
+				opts.logger().info(format("server listening at <%s>", home));
+
+				if ( Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) ) {
+					Desktop.getDesktop().browse(URI.create(home));
+				}
+
 
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
@@ -184,99 +133,57 @@ public final class Serve implements Task {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void handle(final HttpExchange exchange, final Path target) {
-		try {
+	private static final String Live=Optional
 
-			final String method=exchange.getRequestMethod();
+			.of(Serve.class.getSimpleName()+".js")
 
-			if ( method.equals("GET") && exchange.getRequestURI().getPath().equals("/~") ) {
+			.map(Serve.class::getResource)
 
+			.map(url -> {
+				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
+			})
+
+			.map(Paths::get)
+
+			.map(path -> {
 				try {
-
-					final byte[] data=updates.take().getBytes(UTF_8);
-
-					exchange.sendResponseHeaders(OK, data.length);
-
-					try ( final OutputStream body=exchange.getResponseBody() ) { body.write(data); }
-
-				} catch ( final InterruptedException e ) {
-
-					exchange.sendResponseHeaders(OK, 0);
-
+					return new String(readAllBytes(path), UTF_8);
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
 				}
+			})
 
-			} else if ( method.equals("HEAD") || method.equals("GET") ) {
+			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))
 
-				final boolean head=exchange.getRequestMethod().equals("HEAD");
+			.orElse("");
 
-				final URI uri=exchange.getRequestURI(); // dot components already normalized
 
-				final Path file=variants(uri.getPath())
+	private Consumer<OutputStream> rewrite(final Response response, final Consumer<OutputStream> target) {
+		if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
 
-						.map(Paths::get)
-						.map(Root::relativize)
-						.map(Path::normalize)
-						.map(target::resolve)
+			final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
 
-						.filter(Files::exists)
-						.filter(Files::isRegularFile)
+			target.accept(buffer);
 
-						.findFirst()
+			final byte[] data=buffer.toByteArray();
+			final Charset charset=Charset.forName(response.charset());
 
-						.orElse(null);
+			final byte[] body=new String(data, charset)
+					.replace("</body>", Live+"</body>")
+					.getBytes(charset);
 
-				if ( file != null ) {
-
-					final String mime=MIMEs.getOrDefault(extension(file), "application/octet-stream");
-
-					final byte[] data=readAllBytes(file);
-
-					final byte[] body=mime.equals("text/html")
-							? new String(data, UTF_8).replace("</body>", Live+"</body>").getBytes(UTF_8)
-							: data;
-
-					final Instant instant=Files
-							.getLastModifiedTime(file)
-							.toInstant();
-
-					exchange.getResponseHeaders().set("Content-Type", mime);
-					exchange.getResponseHeaders().set("ETag", format("\"%s\"", instant.toEpochMilli()));
-
-					exchange.sendResponseHeaders(OK, head ? -1 : body.length);
-
-					if ( !head ) {
-						try ( final OutputStream output=exchange.getResponseBody() ) { output.write(body); }
-					}
-
-				} else {
-
-					exchange.sendResponseHeaders(NotFound, head ? -1 : 0L);
-
+			return output -> {
+				try {
+					output.write(body);
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
 				}
+			};
 
-			} else {
+		} else {
 
-				exchange.sendResponseHeaders(NotAllowed, 0L);
+			return target;
 
-			}
-
-		} catch ( final IOException e ) {
-
-			throw new UncheckedIOException(e);
-
-		} finally {
-
-			exchange.close();
-
-		}
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private void open(final String home) throws IOException {
-		if ( Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) ) {
-			Desktop.getDesktop().browse(URI.create(home));
 		}
 	}
 

@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.basename;
+import static com.metreeca.rest.handlers.Publisher.basename;
 
 
 public final class None implements Pipe {
