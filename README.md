@@ -189,10 +189,6 @@ mvn mark:serve
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates
 
-> :warning:
->
-> **Live page reloading assumes `UTF-8`.**
-
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
@@ -200,4 +196,4 @@ mvn mark:serve
 
 # License
 
-This project is licensed under the MIT License – see [LICENSE](LICENSE) file for details
+This project is licensed under the Apache 2.0 License – see [LICENSE](LICENSE) file for details.
