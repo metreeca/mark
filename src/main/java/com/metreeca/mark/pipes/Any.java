@@ -14,38 +14,39 @@
 package com.metreeca.mark.pipes;
 
 import com.metreeca.mark.*;
-import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.steps.Pug;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.metreeca.mark.Mark.target;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
-public final class Md implements Pipe {
+public final class Any implements Pipe {
 
-	private final Markdown markdown;
-	private final Pug pug;
-
-
-	public Md(final Mark mark) {
+	public Any(final Mark mark) {
 
 		if ( mark == null ) {
 			throw new NullPointerException("null mark");
 		}
 
-		this.markdown=new Markdown(mark);
-		this.pug=new Pug(mark);
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
-		return target(source, ".html", ".md").map(target ->
-				new Page(target, markdown.read(source), pug::write)
-		);
+		return Optional.of(new Page(source, target -> {
+			try {
+
+				Files.copy(source, target, REPLACE_EXISTING);
+
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
+		}));
 	}
 
 }

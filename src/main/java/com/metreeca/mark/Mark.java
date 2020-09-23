@@ -15,6 +15,7 @@ package com.metreeca.mark;
 
 import com.metreeca.mark.pipes.*;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -35,6 +36,7 @@ import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.isHidden;
+import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -171,7 +173,7 @@ public final class Mark implements Opts {
 	private final String template; // template layout extension
 
 	private final Collection<Function<Mark, Pipe>> pipes=asList(
-			Md::new, Less::new, Wild::new
+			None::new, Md::new, Less::new, Any::new
 	);
 
 	private final Map<Path, Map<String, Object>> pages=new ConcurrentSkipListMap<>(comparing(Path::toString));
@@ -411,6 +413,91 @@ public final class Mark implements Opts {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * Watches site folders.
+	 *
+	 * @param root   the root of the site folder to be monitored for changes
+	 * @param action an action to be performed on change events; takes as argument the kind of change event and the
+	 *               path of the changed file
+	 *
+	 * @return this engine
+	 *
+	 * @throws NullPointerException if either {@code root} or {@code action} is null
+	 */
+	public Mark watch(final Path root, final BiConsumer<WatchEvent.Kind<?>, Path> action) {
+
+		if ( root == null ) {
+			throw new NullPointerException("null root");
+		}
+
+		if ( action == null ) {
+			throw new NullPointerException("null action");
+		}
+
+		final Thread thread=new Thread(() -> {
+
+			try ( final WatchService service=root.getFileSystem().newWatchService() ) {
+
+				final Consumer<Path> register=path -> {
+					try {
+
+						path.register(service,
+								new WatchEvent.Kind<?>[]{ ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE },
+								SensitivityWatchEventModifier.HIGH
+						);
+
+					} catch ( final IOException e ) {
+						throw new UncheckedIOException(e);
+					}
+				};
+
+				try ( final Stream<Path> sources=Files.walk(root) ) {
+					sources.filter(Files::isDirectory).forEach(register); // register existing folders
+				}
+
+				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
+					for (final WatchEvent<?> event : key.pollEvents()) {
+
+						final WatchEvent.Kind<?> kind=event.kind();
+						final Path path=((Path)key.watchable()).resolve((Path)event.context());
+
+						if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
+
+							logger.info(root.relativize(path).toString());
+
+							register.accept(path);
+
+						} else if ( Files.isRegularFile(path) ) {
+
+							action.accept(kind, path);
+
+						} else if ( kind.equals(OVERFLOW) ) {
+
+							logger.error("sync lost ;-(");
+
+						}
+					}
+				}
+
+			} catch ( final IOException e ) {
+
+				throw new UncheckedIOException(e);
+
+			} catch ( final InterruptedException ignored ) {
+
+				logger.error("interrupted…");
+
+			}
+
+		});
+
+		thread.setDaemon(true);
+		thread.start();
+
+		return this;
+	}
+
+
+	/**
 	 * Executes a site generation task.
 	 *
 	 * @param task the site generation task to be executed
@@ -588,10 +675,6 @@ public final class Mark implements Opts {
 
 				.findFirst()
 				.orElse(path);
-
-		if ( !Files.exists(absolute) ) {
-			throw new IllegalArgumentException("unknown resource { "+relative(path)+" }");
-		}
 
 		if ( Stream.of(source, assets).noneMatch(folder -> contains(folder, absolute)) ) {
 			throw new IllegalArgumentException("resource outside input folders { "+relative(path)+" }");
