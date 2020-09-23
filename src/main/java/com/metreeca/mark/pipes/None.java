@@ -20,13 +20,14 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static com.metreeca.mark.Mark.basename;
 
 
-public final class Wild implements Pipe {
+public final class None implements Pipe {
 
-	public Wild(final Mark mark) {
+	public None(final Mark mark) {
 
 		if ( mark == null ) {
 			throw new NullPointerException("null mark");
@@ -38,15 +39,29 @@ public final class Wild implements Pipe {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
-		return Optional.of(new Page(source, target -> {
-			try {
+		return Optional.of(source)
+				.filter(path -> !Files.exists(path))
+				.map(path -> new Page(path, target -> {
+					try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
 
-				Files.copy(source, target, REPLACE_EXISTING);
+						files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {
+							try {
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		}));
+								Files.delete(file);
+
+							} catch ( final IOException e ) {
+
+								throw new UncheckedIOException(e);
+
+							}
+						});
+
+					} catch ( final IOException e ) {
+
+						throw new UncheckedIOException(e);
+
+					}
+				}));
 	}
 
 }

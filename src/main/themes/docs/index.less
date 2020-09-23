@@ -89,7 +89,7 @@ html {
 
 		}
 
-		> * {
+		> nav, > main {
 
 			display: flex;
 			align-items: stretch;
@@ -549,6 +549,7 @@ p {
 	margin-bottom: 0.75em;
 
 	li > &:only-child {
+		display: inline;
 		margin: 0;
 	}
 
@@ -608,7 +609,7 @@ a:hover, button:active {
 
 a[target=_blank]:after { // external link
 	content: "⌝";
-	margin-left: 0.1em;
+	vertical-align: 5%;
 	font-size: 90%;
 }
 

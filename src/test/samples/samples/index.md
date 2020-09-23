@@ -8,6 +8,9 @@ Shared theme for Metreeca docs sites.
 |--------|-----|
 |project.artifactId|${project.artifactId}|
 |project.version|${project.version}|
+|page.root| ${page.root}          |
+| page.base          | ${page.base}          |
+| page.path          |${page.path}|
 
 # Headings
 
@@ -55,7 +58,7 @@ final class ${page.title} {
 
 ## Links
 
-- [home](index.md)
+- [home](../index.md)
 
 ## Lists
 

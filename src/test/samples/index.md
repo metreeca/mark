@@ -3,8 +3,8 @@ Metreeca/Mark is an minimalist static site generator, optimized for project/app 
 
 
 - [README](README.md)
-- [samples](samples.md)
-- [headings](samples.md#headings)
+- [samples](samples/index.md)
+- [headings](samples/index.md#headings)
 
 - [redirect](redirect.md)
 - [broken](broken.md)

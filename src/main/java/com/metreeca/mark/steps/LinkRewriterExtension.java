@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension {
 
-
 	public static LinkRewriterExtension create() {
 		return new LinkRewriterExtension();
 	}
@@ -33,14 +32,14 @@ final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final Pattern URLPattern=Pattern.compile("((?:^|/)index|((?:^|/)[^/#]*))\\.md(#[^/]*)?$");
+	private static final Pattern URLPattern=Pattern.compile("(?<=^|/)(index|([^/#]*))\\.md(#[^/#]*)?$");
 
 
-	public static String plain(final String url) {
+	static String plain(final String url) {
 		return url == null ? null : URLPattern.matcher(url).replaceAll("$1.html$3");
 	}
 
-	public static String smart(final String url) {
+	static String smart(final String url) {
 		return url == null ? null : Optional.of(URLPattern.matcher(url).replaceAll("$2$3"))
 				.filter(smart -> !smart.isEmpty())
 				.orElse(".");
@@ -55,6 +54,8 @@ final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension 
 		htmlRendererBuilder.linkResolverFactory(new LinkRewriterFactory());
 	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final class LinkRewriterFactory implements LinkResolverFactory {
 

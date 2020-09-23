@@ -15,6 +15,7 @@ package com.metreeca.mark;
 
 import com.metreeca.mark.pipes.*;
 
+import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
@@ -26,7 +27,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.Function;
+import java.util.function.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -34,6 +36,7 @@ import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.isHidden;
+import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
@@ -41,7 +44,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
-import static java.util.regex.Matcher.quoteReplacement;
 import static java.util.stream.Collectors.toList;
 
 
@@ -50,13 +52,13 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Mark implements Opts {
 
-	private static final Path root=Paths.get("/");
-	private static final Path base=Paths.get("").toAbsolutePath();
+	public static final Path Root=Paths.get("/");
+	public static final Path Base=Paths.get("").toAbsolutePath();
 
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
-	private static final Pattern AnchorPattern=Pattern.compile("(?:#.*)?$");
+	private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,9 +116,24 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path");
 		}
 
-		return Stream.of("", ".html", "index.html", "/index.html").map(suffix ->
-				AnchorPattern.matcher(path).replaceFirst(format("%s$0", quoteReplacement(suffix)))
-		);
+		final Matcher matcher=URLPattern.matcher(path);
+
+		if ( matcher.matches() ) {
+
+			final String head=Optional.ofNullable(matcher.group(1)).orElse("");
+			final String file=Optional.ofNullable(matcher.group(2)).orElse("");
+			final String hash=Optional.ofNullable(matcher.group(3)).orElse("");
+
+			return file.isEmpty() || file.equals(".") ? Stream.of(head+"index.html"+hash)
+					: file.endsWith(".html") ? Stream.of(head+file+hash)
+					: Stream.of(head+file+hash, head+file+".html"+hash);
+
+		} else {
+
+			return Stream.of(path);
+
+		}
+
 	}
 
 
@@ -134,7 +151,7 @@ public final class Mark implements Opts {
 	}
 
 	private static Path relative(final Path path) {
-		return compatible(base, path) ? base.relativize(path.toAbsolutePath()) : path;
+		return compatible(Base, path) ? Base.relativize(path.toAbsolutePath()) : path;
 	}
 
 
@@ -156,7 +173,7 @@ public final class Mark implements Opts {
 	private final String template; // template layout extension
 
 	private final Collection<Function<Mark, Pipe>> pipes=asList(
-			Md::new, Less::new, Wild::new
+			None::new, Md::new, Less::new, Any::new
 	);
 
 	private final Map<Path, Map<String, Object>> pages=new ConcurrentSkipListMap<>(comparing(Path::toString));
@@ -237,7 +254,7 @@ public final class Mark implements Opts {
 
 
 	private Path layout(final Path path) {
-		return root.resolve(path).normalize(); // root-relative layout path
+		return Root.resolve(path).normalize(); // root-relative layout path
 	}
 
 	private Path assets(final Path path) {
@@ -380,7 +397,7 @@ public final class Mark implements Opts {
 
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-		final Path layout=source(root.relativize(
+		final Path layout=source(Root.relativize(
 				name.isEmpty() || name.equals(template) ? this.layout
 						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
 		));
@@ -416,6 +433,93 @@ public final class Mark implements Opts {
 		));
 
 		task.exec(this);
+
+		return this;
+	}
+
+
+	/**
+	 * Watches site folders.
+	 *
+	 * @param root   the root of the site folder to be monitored for changes
+	 * @param action an action to be performed on change events; takes as argument the kind of change event and the
+	 *               path of the changed file
+	 *
+	 * @return this engine
+	 *
+	 * @throws NullPointerException if either {@code root} or {@code action} is null
+	 */
+	public Mark watch(final Path root, final BiConsumer<WatchEvent.Kind<?>, Path> action) {
+
+		if ( root == null ) {
+			throw new NullPointerException("null root");
+		}
+
+		if ( action == null ) {
+			throw new NullPointerException("null action");
+		}
+
+		final Thread thread=new Thread(() -> {
+
+			try ( final WatchService service=root.getFileSystem().newWatchService() ) {
+
+				final Consumer<Path> register=path -> {
+					try {
+
+						path.register(service,
+								new WatchEvent.Kind<?>[]{ ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE },
+								SensitivityWatchEventModifier.HIGH
+						);
+
+					} catch ( final IOException e ) {
+						throw new UncheckedIOException(e);
+					}
+				};
+
+				try ( final Stream<Path> sources=Files.walk(root) ) {
+					sources.filter(Files::isDirectory).forEach(register); // register existing folders
+				}
+
+				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
+					for (final WatchEvent<?> event : key.pollEvents()) {
+
+						final WatchEvent.Kind<?> kind=event.kind();
+						final Path path=((Path)key.watchable()).resolve((Path)event.context());
+
+						if ( kind.equals(OVERFLOW) ) {
+
+							logger.error("sync lost ;-(");
+
+						} else if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
+
+							logger.info(root.relativize(path).toString());
+
+							register.accept(path);
+
+						} else if ( kind.equals(ENTRY_DELETE) || Files.isRegularFile(path) ) {
+
+							action.accept(kind, path);
+
+						}
+					}
+				}
+
+			} catch ( final UnsupportedOperationException ignored ) {
+
+			} catch ( final InterruptedException e ) {
+
+				logger.error("interrupted…");
+
+			} catch ( final IOException e ) {
+
+				throw new UncheckedIOException(e);
+
+			}
+
+		});
+
+		thread.setDaemon(true);
+		thread.start();
 
 		return this;
 	}
@@ -511,7 +615,7 @@ public final class Mark implements Opts {
 
 		model.put("root", Optional
 				.ofNullable(path.getParent())
-				.map(parent -> root.resolve(parent).relativize(root)) // ;( must be both absolute
+				.map(parent -> Root.resolve(parent).relativize(Root)) // ;( must be both absolute
 				.map(Path::toString)
 				.orElse(".")
 		);
@@ -573,10 +677,6 @@ public final class Mark implements Opts {
 
 				.findFirst()
 				.orElse(path);
-
-		if ( !Files.exists(absolute) ) {
-			throw new IllegalArgumentException("unknown resource { "+relative(path)+" }");
-		}
 
 		if ( Stream.of(source, assets).noneMatch(folder -> contains(folder, absolute)) ) {
 			throw new IllegalArgumentException("resource outside input folders { "+relative(path)+" }");

@@ -24,17 +24,16 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.*;
 import java.time.Instant;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.extension;
+import static com.metreeca.mark.Mark.*;
 import static com.sun.net.httpserver.HttpServer.create;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.time.ZoneOffset.UTC;
-import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
+import static java.nio.file.Files.readAllBytes;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -52,11 +51,32 @@ public final class Serve implements Task {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private static final int OK=200;
-	private static final int NotFound=400;
+	private static final int NotFound=404;
 	private static final int NotAllowed=405;
 
-	private static final Pattern BodyPattern=Pattern.compile("</body>");
-	private static final String LiveJS="<script type='text/javascript' src='https://livejs.com/live.js'></script>$0";
+	private static final String Live=Optional
+
+			.of(Serve.class.getSimpleName()+".js")
+
+			.map(Serve.class::getResource)
+
+			.map(url -> {
+				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
+			})
+
+			.map(Paths::get)
+
+			.map(path -> {
+				try {
+					return new String(readAllBytes(path), UTF_8);
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			})
+
+			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))
+
+			.orElse("");
 
 
 	/**
@@ -64,14 +84,14 @@ public final class Serve implements Task {
 	 *
 	 * @see "https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types"
 	 */
-	private static final Map<String, String> types=Stream
+	private static final Map<String, String> MIMEs=Stream
 
-			.of(Serve.class.getSimpleName())
+			.of(Serve.class.getSimpleName()+".tsv")
 
 			.map(Serve.class::getResource)
 
 			.map(url -> {
-				try { return url.toURI();} catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
+				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
 			})
 
 			.map(Paths::get)
@@ -88,9 +108,10 @@ public final class Serve implements Task {
 
 			.map(line -> {
 
-				final int colon=line.indexOf(':');
+				final int tab=line.indexOf('\t');
 
-				return new AbstractMap.SimpleImmutableEntry<>(line.substring(0, colon), line.substring(colon+1));
+				return new AbstractMap.SimpleImmutableEntry<>(line.substring(0, tab), line.substring(tab+1));
+
 			})
 
 			.collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -98,21 +119,33 @@ public final class Serve implements Task {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	private final BlockingDeque<String> updates=new LinkedBlockingDeque<>();
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	@Override public void exec(final Mark mark) {
+		serve(mark);
+		watch(mark);
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private void serve(final Opts opts) {
 
 		final Thread daemon=new Thread(() -> {
 
 			try {
 
-				final Path target=mark.target();
-				final Log logger=mark.logger();
+				final Path target=opts.target();
+				final Log logger=opts.logger();
 
-				final HttpServer server=create(new InetSocketAddress("localhost", port), 0);
+				final HttpServer server=create(new InetSocketAddress("localhost", port), 16);
 
-				server.createContext("/", exchange -> handle(exchange, target));
+				server.createContext("/", exchange -> new Thread(() -> handle(exchange, target)).start());
 
 				server.start();
-
 
 				final String home=format("http://%s:%d/",
 						server.getAddress().getHostString(), server.getAddress().getPort()
@@ -130,27 +163,59 @@ public final class Serve implements Task {
 
 		daemon.setDaemon(true);
 		daemon.start();
+	}
 
+	private void watch(final Mark mark) {
+
+		final Thread daemon=new Thread(() -> mark.watch(mark.target(), (kind, target) -> {
+
+			final String path=Root.resolve(mark.target().relativize(target)).toString();
+
+			Stream.of("", ".html", "index.html").forEach(suffix -> {
+				if ( path.endsWith(suffix) ) { updates.offer(path.substring(0, path.length()-suffix.length())); }
+			});
+
+		}));
+
+		daemon.setDaemon(true);
+		daemon.start();
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void handle(final HttpExchange exchange, final Path target) throws IOException {
+	private void handle(final HttpExchange exchange, final Path target) {
 		try {
 
 			final String method=exchange.getRequestMethod();
 
-			final URI uri=exchange.getRequestURI(); // dot components already normalized
+			if ( method.equals("GET") && exchange.getRequestURI().getPath().equals("/~") ) {
 
-			final String path=Paths.get("/")
-					.relativize(Paths.get(uri.getPath()))
-					.normalize()
-					.toString();
+				try {
 
-			if ( method.equals("HEAD") || method.equals("GET") ) {
+					final byte[] data=updates.take().getBytes(UTF_8);
 
-				final Path file=Mark.variants(path)
+					exchange.sendResponseHeaders(OK, data.length);
+
+					try ( final OutputStream body=exchange.getResponseBody() ) { body.write(data); }
+
+				} catch ( final InterruptedException e ) {
+
+					exchange.sendResponseHeaders(OK, 0);
+
+				}
+
+			} else if ( method.equals("HEAD") || method.equals("GET") ) {
+
+				final boolean head=exchange.getRequestMethod().equals("HEAD");
+
+				final URI uri=exchange.getRequestURI(); // dot components already normalized
+
+				final Path file=variants(uri.getPath())
+
+						.map(Paths::get)
+						.map(Root::relativize)
+						.map(Path::normalize)
 						.map(target::resolve)
 
 						.filter(Files::exists)
@@ -162,11 +227,30 @@ public final class Serve implements Task {
 
 				if ( file != null ) {
 
-					get(exchange, file);
+					final String mime=MIMEs.getOrDefault(extension(file), "application/octet-stream");
+
+					final byte[] data=readAllBytes(file);
+
+					final byte[] body=mime.equals("text/html")
+							? new String(data, UTF_8).replace("</body>", Live+"</body>").getBytes(UTF_8)
+							: data;
+
+					final Instant instant=Files
+							.getLastModifiedTime(file)
+							.toInstant();
+
+					exchange.getResponseHeaders().set("Content-Type", mime);
+					exchange.getResponseHeaders().set("ETag", format("\"%s\"", instant.toEpochMilli()));
+
+					exchange.sendResponseHeaders(OK, head ? -1 : body.length);
+
+					if ( !head ) {
+						try ( final OutputStream output=exchange.getResponseBody() ) { output.write(body); }
+					}
 
 				} else {
 
-					exchange.sendResponseHeaders(NotFound, 0L);
+					exchange.sendResponseHeaders(NotFound, head ? -1 : 0L);
 
 				}
 
@@ -176,36 +260,14 @@ public final class Serve implements Task {
 
 			}
 
+		} catch ( final IOException e ) {
+
+			throw new UncheckedIOException(e);
+
 		} finally {
 
 			exchange.close();
 
-		}
-	}
-
-	private void get(final HttpExchange exchange, final Path file) throws IOException {
-
-		final String mime=types.getOrDefault(extension(file), "application/octet-stream");
-
-		final boolean head=exchange.getRequestMethod().equals("HEAD");
-		final boolean html=mime.equals("text/html");
-
-		final byte[] data=html
-				? BodyPattern.matcher(new String(Files.readAllBytes(file), UTF_8)).replaceAll(LiveJS).getBytes(UTF_8)
-				: Files.readAllBytes(file);
-
-		final Instant instant=Files
-				.getLastModifiedTime(file)
-				.toInstant();
-
-		exchange.getResponseHeaders().set("Content-Type", mime);
-		exchange.getResponseHeaders().set("Last-Modified", instant.atOffset(UTC).format(RFC_1123_DATE_TIME));
-		exchange.getResponseHeaders().set("ETag", String.format("\"%s\"", instant.toEpochMilli()));
-
-		exchange.sendResponseHeaders(OK, head ? -1 : data.length);
-
-		if ( !head ) {
-			try ( final OutputStream output=exchange.getResponseBody() ) { output.write(data); }
 		}
 	}
 

@@ -13,48 +13,13 @@
 
 package com.metreeca.mark.steps;
 
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.stream.Stream;
 
 import static com.metreeca.mark.steps.LinkRewriterExtension.plain;
 import static com.metreeca.mark.steps.LinkRewriterExtension.smart;
 import static org.assertj.core.api.Assertions.assertThat;
 
 final class LinkRewriterExtensionTest {
-
-
-	public static void main(final String[] args) {
-
-		final MutableDataSet options=new MutableDataSet()
-
-				.set(Parser.EXTENSIONS, Collections.singletonList(
-						LinkRewriterExtension.create()
-				))
-
-				.set(Markdown.SmartLinks, true)
-				.set(Markdown.ExternalLinks, true);
-
-		Stream
-
-				.of(
-
-						"[file](internal.md)",
-						"[file](http://exampe.org)"
-
-				)
-
-				.map(Parser.builder(options).build()::parse)
-				.map(HtmlRenderer.builder(options).build()::render)
-
-				.forEach(System.out::println);
-
-	}
-
 
 	@Test void testPlainRewriting() {
 
@@ -66,6 +31,8 @@ final class LinkRewriterExtensionTest {
 		assertThat(plain("path/index.md")).isEqualTo("path/index.html");
 		assertThat(plain("path/index.md#hash")).isEqualTo("path/index.html#hash");
 
+		assertThat(plain("reindex.md")).isEqualTo("reindex.html");
+
 	}
 
 	@Test void testSmartRewriting() {
@@ -75,8 +42,10 @@ final class LinkRewriterExtensionTest {
 		assertThat(smart("path/link.md#hash")).isEqualTo("path/link#hash");
 
 		assertThat(smart("index.md")).isEqualTo(".");
-		assertThat(smart("path/index.md")).isEqualTo("path");
-		assertThat(smart("path/index.md#hash")).isEqualTo("path#hash");
+		assertThat(smart("path/index.md")).isEqualTo("path/");
+		assertThat(smart("path/index.md#hash")).isEqualTo("path/#hash");
+
+		assertThat(smart("reindex.md")).isEqualTo("reindex");
 
 	}
 
