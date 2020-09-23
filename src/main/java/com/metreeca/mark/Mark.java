@@ -413,6 +413,32 @@ public final class Mark implements Opts {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/**
+	 * Executes a site generation task.
+	 *
+	 * @param task the site generation task to be executed
+	 *
+	 * @return this engine
+	 *
+	 * @throws NullPointerException if {@code resource} is null
+	 */
+	public Mark exec(final Task task) {
+
+		if ( task == null ) {
+			throw new NullPointerException("null task");
+		}
+
+		logger.info(format("%s %s + %s ›› %s",
+				task.getClass().getSimpleName().toLowerCase(ROOT),
+				relative(source), relative(assets), relative(target)
+		));
+
+		task.exec(this);
+
+		return this;
+	}
+
+
+	/**
 	 * Watches site folders.
 	 *
 	 * @param root   the root of the site folder to be monitored for changes
@@ -478,13 +504,15 @@ public final class Mark implements Opts {
 					}
 				}
 
+			} catch ( final UnsupportedOperationException ignored ) {
+
+			} catch ( final InterruptedException e ) {
+
+				logger.error("interrupted…");
+
 			} catch ( final IOException e ) {
 
 				throw new UncheckedIOException(e);
-
-			} catch ( final InterruptedException ignored ) {
-
-				logger.error("interrupted…");
 
 			}
 
@@ -492,32 +520,6 @@ public final class Mark implements Opts {
 
 		thread.setDaemon(true);
 		thread.start();
-
-		return this;
-	}
-
-
-	/**
-	 * Executes a site generation task.
-	 *
-	 * @param task the site generation task to be executed
-	 *
-	 * @return this engine
-	 *
-	 * @throws NullPointerException if {@code resource} is null
-	 */
-	public Mark exec(final Task task) {
-
-		if ( task == null ) {
-			throw new NullPointerException("null task");
-		}
-
-		logger.info(format("%s %s + %s ›› %s",
-				task.getClass().getSimpleName().toLowerCase(ROOT),
-				relative(source), relative(assets), relative(target)
-		));
-
-		task.exec(this);
 
 		return this;
 	}
