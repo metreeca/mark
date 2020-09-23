@@ -187,7 +187,7 @@ mvn mark:serve
 - the site is generated and watched as described above
 - the generated site is served on a development grade HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
-- pages are automatically reloaded on updates (courtesy of [Live.js](https://livejs.com))
+- pages are automatically reloaded on updates
 
 > :warning:
 >

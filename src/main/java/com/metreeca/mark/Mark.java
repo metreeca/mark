@@ -52,8 +52,8 @@ import static java.util.stream.Collectors.toList;
  */
 public final class Mark implements Opts {
 
-	private static final Path root=Paths.get("/");
-	private static final Path base=Paths.get("").toAbsolutePath();
+	public static final Path Root=Paths.get("/");
+	public static final Path Base=Paths.get("").toAbsolutePath();
 
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
 
@@ -151,7 +151,7 @@ public final class Mark implements Opts {
 	}
 
 	private static Path relative(final Path path) {
-		return compatible(base, path) ? base.relativize(path.toAbsolutePath()) : path;
+		return compatible(Base, path) ? Base.relativize(path.toAbsolutePath()) : path;
 	}
 
 
@@ -254,7 +254,7 @@ public final class Mark implements Opts {
 
 
 	private Path layout(final Path path) {
-		return root.resolve(path).normalize(); // root-relative layout path
+		return Root.resolve(path).normalize(); // root-relative layout path
 	}
 
 	private Path assets(final Path path) {
@@ -397,7 +397,7 @@ public final class Mark implements Opts {
 
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
-		final Path layout=source(root.relativize(
+		final Path layout=source(Root.relativize(
 				name.isEmpty() || name.equals(template) ? this.layout
 						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
 		));
@@ -613,7 +613,7 @@ public final class Mark implements Opts {
 
 		model.put("root", Optional
 				.ofNullable(path.getParent())
-				.map(parent -> root.resolve(parent).relativize(root)) // ;( must be both absolute
+				.map(parent -> Root.resolve(parent).relativize(Root)) // ;( must be both absolute
 				.map(Path::toString)
 				.orElse(".")
 		);
