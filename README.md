@@ -2,7 +2,7 @@
 
 # metreeca/mark
 
-Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions it's tightly integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
+Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
 
 # Usage
 
@@ -37,9 +37,9 @@ Add the plugin to your build configuration as:
                 <execution> <!-- example -->
                     
                     <goals>
-                        <goal>clean</goal>
-                        <goal>build</goal>
-                        <goal>check</goal>
+                        <goal>clean</goal> <!-- by default in the pre-clean phase-->
+                        <goal>build</goal> <!-- by default in the pre-site phase-->
+                        <goal>check</goal> <!-- by default in the post-site phase-->
                     </goals>
                     
                 </execution>
@@ -60,13 +60,11 @@ The following optional configuration parameters are available:
 | `assets` | a virtual empty folder | a supplemental asset folder |
 | `layout`  | `layouts/default.pug`| the path of default page template relative to `source` or `assets` |
 
-The plugin binds by default the `build` goal to the `site` maven phase.
-
 ## Define a template
 
 > ℹ️
 >
-> **If you feel lazy,  insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme**
+> **If you feel lazy,  insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme ;-)**
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
 
@@ -97,7 +95,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 | property        | value                                                        |
 | --------------- | ------------------------------------------------------------ |
 | `page.*`        | page front matter properties                                 |
-| `page.date`     | the page date in ISO format; defaults to the current date, unless specified in the front matter |
+| `page.date`     | the page date in ISO format (`yyyy-mm-dd`); defaults to the current date, unless specified in the front matter |
 | `page.root`     | the path of the site root relative to the page               |
 | `page.base` | the path of the page folder relative to the site root |
 | `page.path`     | the path of the page relative to the site root               |
