@@ -16,7 +16,9 @@ package com.metreeca.mark.tasks;
 import com.metreeca.jse.Server;
 import com.metreeca.mark.*;
 import com.metreeca.rest.Response;
-import com.metreeca.rest.handlers.Publisher;
+import com.metreeca.rest.assets.Logger;
+
+import org.apache.maven.plugin.logging.Log;
 
 import java.awt.*;
 import java.io.*;
@@ -26,14 +28,16 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.function.Consumer;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static com.metreeca.mark.Mark.Root;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
+import static com.metreeca.rest.assets.Logger.logger;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
+import static com.metreeca.rest.handlers.Publisher.publisher;
 import static com.metreeca.rest.handlers.Router.router;
 import static com.metreeca.rest.wrappers.Gateway.gateway;
 import static java.lang.String.format;
@@ -73,34 +77,41 @@ public final class Serve implements Task {
 
 						.address(address)
 
-						.handler(context -> gateway().wrap(router()
+						.handler(context -> context
 
-								.path("/~", router().get(request -> request.reply(response -> {
-									try {
+								.set(logger(), () -> new MavenLogger(opts.logger()))
 
-										return response.status(OK).body(text(), updates.take());
+								.get(() -> gateway().wrap(router()
 
-									} catch ( final InterruptedException e ) {
+										.path("/~", router()
+												.get(request -> request.reply(response -> {
+													try {
 
-										return response.status(OK);
+														return response.status(OK).body(text(), updates.take());
 
-									}
-								})))
+													} catch ( final InterruptedException e ) {
 
-								.path("/*", router().get(Publisher.publisher(opts.target())
-										.with(postprocessor(output(), this::rewrite))
+														return response.status(OK);
+
+													}
+												}))
+										)
+
+										.path("/*", router()
+												.get(publisher(opts.target())
+														.with(postprocessor(this::rewrite))
+												)
+										)
+
 								))
-
-						))
+						)
 
 						.start();
 
-				final String home=format("http://%s:%d/", address.getHostString(), address.getPort());
-
-				opts.logger().info(format("server listening at <%s>", home));
-
 				if ( Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) ) {
-					Desktop.getDesktop().browse(URI.create(home));
+					Desktop.getDesktop().browse(URI.create(format(
+							"http://%s:%d/", address.getHostString(), address.getPort()
+					)));
 				}
 
 
@@ -158,32 +169,81 @@ public final class Serve implements Task {
 			.orElse("");
 
 
-	private Consumer<OutputStream> rewrite(final Response response, final Consumer<OutputStream> target) {
+	private Response rewrite(final Response response) {
 		if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
 
-			final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
+			return response.body(output()).fold(e -> response, target -> {
 
-			target.accept(buffer);
+				final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
 
-			final byte[] data=buffer.toByteArray();
-			final Charset charset=Charset.forName(response.charset());
+				target.accept(buffer);
 
-			final byte[] body=new String(data, charset)
-					.replace("</body>", Live+"</body>")
-					.getBytes(charset);
+				final byte[] data=buffer.toByteArray();
+				final Charset charset=Charset.forName(response.charset());
 
-			return output -> {
-				try {
-					output.write(body);
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
-			};
+				final byte[] body=new String(data, charset)
+						.replace("</body>", Live+"</body>")
+						.getBytes(charset);
+
+				return response
+						.header("Content-Length", String.valueOf(body.length))
+						.body(output(), output -> {
+							try {
+								output.write(body);
+							} catch ( final IOException e ) {
+								throw new UncheckedIOException(e);
+							}
+						});
+
+			});
 
 		} else {
 
-			return target;
+			return response;
 
+		}
+	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final class MavenLogger extends Logger {
+
+		private final Log logger;
+
+
+		private MavenLogger(final Log logger) {
+			this.logger=logger;
+		}
+
+
+		@Override public Logger entry(
+				final Level level, final Object source,
+				final Supplier<String> message, final Throwable cause
+		) {
+
+			if ( cause == null ) {
+
+				final Consumer<String> sink=(level == Level.Error) ? logger::error
+						: (level == Level.Warning) ? logger::warn
+						: (level == Level.Info) ? logger::info
+						: logger::debug;
+
+				sink.accept(message.get());
+
+
+			} else {
+
+				final BiConsumer<String, Throwable> sink=(level == Level.Error) ? logger::error
+						: (level == Level.Warning) ? logger::warn
+						: (level == Level.Info) ? logger::info
+						: logger::debug;
+
+				sink.accept(message.get(), cause);
+
+			}
+
+			return this;
 		}
 	}
 

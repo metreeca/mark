@@ -31,10 +31,19 @@
 	}
 
 	function poll() {
-		fetch("/~")
-			.then(response => response.text())
-			.then(update => resource(update) && location.reload())
-			.then(poll);
+		fetch("/~").then(response => response.text()).then(update => {
+
+			if (resource(update)) {
+
+				location.reload();
+
+			} else {
+
+				poll();
+
+			}
+
+		});
 	}
 
 
