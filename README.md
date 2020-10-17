@@ -1,8 +1,8 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
-# metreeca/mark
+# Metreeca/Mark
 
-Metreeca/Mark is an minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
+Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
 
 # Usage
 
@@ -130,7 +130,7 @@ The template to be used for rendering the page may be explicitly selected by set
 >
 >  **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
 
-# Goals
+# Maven Goals
 
 ## Clean site
 
@@ -190,7 +190,8 @@ mvn mark:serve
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- post to [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to ask how-to or open-ended questions
+- post to [Stack Overflow](https://stackoverflow.com/questions/ask?tags=metreeca) using the `metreeca` tag to ask how-to questions
+- post to [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to start open-ended discussions
 
 # License
 
