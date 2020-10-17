@@ -1,14 +1,17 @@
 /*
  * Copyright © 2019-2020 Metreeca srl
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
- *  file except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.metreeca.mark;
@@ -28,10 +31,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static com.metreeca.rest.handlers.Publisher.basename;
+import static com.metreeca.rest.handlers.Publisher.extension;
 import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isDirectory;
@@ -58,7 +62,6 @@ public final class Mark implements Opts {
 	private static final Map<URI, FileSystem> bundles=new ConcurrentHashMap<>();
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
-	private static final Pattern URLPattern=Pattern.compile("(.*/)?(\\.|[^/#]*)?(#[^/#]*)?$");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,58 +85,6 @@ public final class Mark implements Opts {
 		return Arrays.stream(from).anyMatch(extension::equalsIgnoreCase)
 				? Optional.of(source.resolveSibling(basename(source)+to))
 				: Optional.empty();
-	}
-
-
-	public static String basename(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final String name=path.getFileName().toString();
-		final int dot=name.lastIndexOf('.');
-
-		return dot >= 0 ? name.substring(0, dot) : name;
-	}
-
-	public static String extension(final Path path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final String name=path.getFileName().toString();
-		final int dot=name.lastIndexOf('.');
-
-		return dot >= 0 ? name.substring(dot).toLowerCase(ROOT) : "";
-	}
-
-
-	public static Stream<String> variants(final String path) {
-
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
-
-		final Matcher matcher=URLPattern.matcher(path);
-
-		if ( matcher.matches() ) {
-
-			final String head=Optional.ofNullable(matcher.group(1)).orElse("");
-			final String file=Optional.ofNullable(matcher.group(2)).orElse("");
-			final String hash=Optional.ofNullable(matcher.group(3)).orElse("");
-
-			return file.isEmpty() || file.equals(".") ? Stream.of(head+"index.html"+hash)
-					: file.endsWith(".html") ? Stream.of(head+file+hash)
-					: Stream.of(head+file+hash, head+file+".html"+hash);
-
-		} else {
-
-			return Stream.of(path);
-
-		}
-
 	}
 
 

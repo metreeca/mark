@@ -1,21 +1,24 @@
 /*
  * Copyright © 2019-2020 Metreeca srl
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
- *  file except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.metreeca.mark.steps;
 
 import com.metreeca.mark.Mark;
 
-import com.vladsch.flexmark.util.sequence.SubSequence;
+import com.vladsch.flexmark.util.sequence.BasedSequence;
 import de.neuland.pug4j.PugConfiguration;
 import de.neuland.pug4j.exceptions.ExpressionException;
 import de.neuland.pug4j.expression.ExpressionHandler;
@@ -103,7 +106,7 @@ public final class Pug {
 
 	//// !!! refactor //////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Object layout(final Map<String, Object> model) {
+	@SuppressWarnings("unchecked") private Object layout(final Map<String, Object> model) {
 
 		final Object page=model.get("page");
 
@@ -118,7 +121,7 @@ public final class Pug {
 		}
 	}
 
-	private Map<String, Object> set(final Map<String, Object> model) {
+	@SuppressWarnings("unchecked") private Map<String, Object> set(final Map<String, Object> model) {
 
 		final Map<String, Object> _model=new HashMap<>(model);
 
@@ -174,7 +177,7 @@ public final class Pug {
 
 					bindings.putAll(model);
 
-					builder.append(SubSequence.of(handler.evaluateStringExpression(
+					builder.append(BasedSequence.of(handler.evaluateStringExpression(
 							matcher.group(1), bindings // expression value
 					)));
 
