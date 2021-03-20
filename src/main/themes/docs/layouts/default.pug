@@ -13,65 +13,65 @@ doctype html
 
 html(lang="en")
 
-    head
+	head
 
-        title #{title} #{title && project.name ? " | " : ""} #{project.name}
+		title #{title} #{title && project.name ? " | " : ""} #{project.name}
 
-        meta(name="viewport" content="width=device-width,initial-scale=1")
-        meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+		meta(name="viewport" content="width=device-width,initial-scale=1")
+		meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 
-        link(rel="shortcut icon" href="!{page.root}/index.svg")
+		link(rel="shortcut icon" href="!{page.root}/index.svg")
 
-        //- prism.js code highlighting
+		//- prism.js code highlighting
 
-        link(rel="stylesheet" href="!{prism}/themes/prism.min.css")
+		link(rel="stylesheet" href="!{prism}/themes/prism.min.css")
 
-        script(type="text/javascript" src="!{prism}/components/prism-core.min.js")
-        script(type="text/javascript" src="!{prism}/plugins/autoloader/prism-autoloader.min.js")
+		script(type="text/javascript" src="!{prism}/components/prism-core.min.js")
+		script(type="text/javascript" src="!{prism}/plugins/autoloader/prism-autoloader.min.js")
 
-        //- default stylesheet (at last to override prism.js)
+		//- default stylesheet (at last to override prism.js)
 
-        link(rel="stylesheet" type="text/css" href="!{page.root}/index.css")
+		link(rel="stylesheet" type="text/css" href="!{page.root}/index.css")
 
-    body
+	body
 
-        //- hidden menu toggle for mobile view
+		//- hidden menu toggle for mobile view
 
-        input(id="toggle" type="checkbox")
+		input(id="toggle" type="checkbox")
 
-        nav
+		nav
 
-            header
+			header
 
-                span
-                    a(href="#{home}") #{empty(owner) ? project.groupId : owner}
-                    a(href="#{page.root}/index.html") #{module}
-                        span v#{version}
+				span
+					a(href="#{home}") #{empty(owner) ? project.groupId : owner}
+					a(href="#{page.root}/index.html") #{module}
+						span v#{version}
 
-                //- icon dynamically managed by default.css
+				//- icon dynamically managed by default.css
 
-                label(for="toggle")
+				label(for="toggle")
 
-            section
+			section
 
-                if title && !empty(page.headings)
-                    a(class="title" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
+				if title && !empty(page.headings)
+					a(class="title" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
 
-                for heading in page.headings
-                    #{"h"+heading.level}
-                        a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
+				for heading in page.headings
+					#{"h"+heading.level}
+						a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
 
-        main
+		main
 
-            header #{title}
+			header #{title}
 
-            section !{page.body}
+			section !{page.body}
 
-            footer
+			footer
 
-                if project.groupId == "com.metreeca"
-                    | © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
-                    = ' '
-                    | #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
+				if project.groupId === "com.metreeca"
+					| © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
+					= ' '
+					| #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
-        script(type="text/javascript" src="!{page.root}/index.js")
+		script(type="text/javascript" src="!{page.root}/index.js")
