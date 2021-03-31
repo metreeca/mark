@@ -2,7 +2,9 @@
 
 # Metreeca/Mark
 
-Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
+Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is
+tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups:
+just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
 
 # Usage
 
@@ -11,43 +13,44 @@ Metreeca/Mark is a minimalist static site generator, optimized for project/app d
 Add the plugin to your build configuration as:
 
 ```xml
- <build>
-   <plugins>
 
-        <plugin>
+<build>
+	<plugins>
 
-            <groupId>com.metreeca</groupId>
-            <artifactId>mark-maven-plugin</artifactId>
-            <version>${mark.version}</version>
+		<plugin>
 
-            <configuration> <!-- optional -->
-                
-                <source>src/docs</source>
-                <target>target/docs</target>
-                <assets>@/docs</assets>
-                <layout>layouts/default.pug</layout>
-                
-                <options> <!-- pipeline specific options --> 
-                    <pipeline-option>value</pipeline-option>
-                </options>
-                
-            </configuration>
-            
-            <executions>
-                <execution> <!-- example -->
-                    
-                    <goals>
-                        <goal>clean</goal> <!-- by default in the pre-clean phase-->
-                        <goal>build</goal> <!-- by default in the pre-site phase-->
-                        <goal>check</goal> <!-- by default in the post-site phase-->
-                    </goals>
-                    
-                </execution>
-            </executions>
+			<groupId>com.metreeca</groupId>
+			<artifactId>mark-maven-plugin</artifactId>
+			<version>${mark.version}</version>
 
-        </plugin>
+			<configuration> <!-- optional -->
 
-    </plugins>
+				<source>src/docs</source>
+				<target>target/docs</target>
+				<assets>@/docs</assets>
+				<layout>layouts/default.pug</layout>
+
+				<options> <!-- pipeline specific options -->
+					<pipeline-option>value</pipeline-option>
+				</options>
+
+			</configuration>
+
+			<executions>
+				<execution> <!-- example -->
+
+					<goals>
+						<goal>clean</goal> <!-- by default in the pre-clean phase-->
+						<goal>build</goal> <!-- by default in the pre-site phase-->
+						<goal>check</goal> <!-- by default in the post-site phase-->
+					</goals>
+
+				</execution>
+			</executions>
+
+		</plugin>
+
+	</plugins>
 </build>
 ```
 
@@ -64,9 +67,10 @@ The following optional configuration parameters are available:
 
 > ℹ️
 >
-> **If you feel lazy,  insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme ;-)**
+> **If you feel lazy, insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme ;-)**
 
-Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for instance:
+Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
+instance:
 
 ```pug
 doctype html
@@ -114,17 +118,17 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 
 ```markdown
 ---
-title: Lorem Ipsum
-date: 2019-11-05 # optional
-layout: post.pug # optional
+title: Lorem Ipsum date: 2019-11-05 # optional layout: post.pug # optional
 ---
 
 Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
 ```
 
-All the properties available to templates (with the obvious exception of `page.body`) are also available for interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim). 
+All the properties available to templates (with the obvious exception of `page.body`) are also available for
+interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim).
 
-The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property to the path of the required template, relative to the plugin `layout` parameter.
+The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property
+to the path of the required template, relative to the plugin `layout` parameter.
 
 > :warning:
 >
@@ -146,18 +150,22 @@ mvn mark:clean # by default in the pre-clean phase
 mvn mark:build # by default in the pre-site phase
 ```
 
-- files matching one of the following files extensions in  the `source` folder are processed by the corresponding pipeline
-- templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are ignored
+- files matching one of the following files extensions in the `source` folder are processed by the corresponding pipeline
+- templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
+  ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-**Markdown**  / `.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to other `.md` files are converted to the corresponding `.html` file.
+**Markdown**  / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
+the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
+property; links to other `.md` files are converted to the corresponding `.html` file.
 
 | option                    | default | behaviour                                            |
 | ------------------------- | ------- | ---------------------------------------------------- |
 | `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
 | `markdown-external-links` | `false` | opens extenal links in a `_blank` target             |
 
-**Less/CSS** /  `.less` and `.css` files under the source folder are converted to minified `.css` files at the same relative path under the target.
+**Less/CSS** /  `.less` and `.css` files under the source folder are converted to minified `.css` files at the same
+relative path under the target.
 
 ## Check links
 
@@ -174,7 +182,8 @@ mvn mark:watch
 ```
 
 - the site is generated as described above
-- on file updates and additions under the `source` folder, the corresponding files under the `target` folder are regenerated as required; if a template is modified, the whole site is regenerated
+- on file updates and additions under the `source` folder, the corresponding files under the `target` folder are
+  regenerated as required; if a template is modified, the whole site is regenerated
 
 ## Serve generated site
 
@@ -190,8 +199,8 @@ mvn mark:serve
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- post to [Stack Overflow](https://stackoverflow.com/questions/ask?tags=metreeca) using the `metreeca` tag to ask how-to questions
-- post to [groups.google.com/d/forum/metreeca](https://groups.google.com/d/forum/metreeca) to start open-ended discussions
+- start a [conversation](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an open-ended
+  idea
 
 # License
 
