@@ -98,19 +98,19 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-project</artifactId>
-			<version>2.0.3</version>
+			<version>2.2.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>3.6.3</version>
+			<version>3.8.1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.6.0</version>
+			<version>3.6.2</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -118,7 +118,7 @@
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-jse</artifactId>
-			<version>0.54.1</version>
+			<version>1.0.1</version>
 		</dependency>
 
 		<dependency>
@@ -130,7 +130,7 @@
 		<dependency> <!-- https://github.com/neuland/pug4j -->
 			<groupId>de.neuland-bfi</groupId>
 			<artifactId>pug4j</artifactId>
-			<version>2.0.0-alpha-2</version>
+			<version>2.0.4</version>
 		</dependency>
 
 		<dependency> <!-- https://github.com/i-net-software/jlessc -->
@@ -149,14 +149,14 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.7.0</version>
+			<version>5.8.2</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency> <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.17.2</version>
+			<version>3.21.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -380,7 +380,7 @@
 
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.2.0</version>
+						<version>3.2.1</version>
 
 						<executions>
 							<execution>
