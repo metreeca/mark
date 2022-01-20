@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.handlers.Publisher.basename;
-
+import static com.metreeca.mark.Mark.basename;
 
 public final class None implements Pipe {
 
@@ -38,8 +37,6 @@ public final class None implements Pipe {
 
 	}
 
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public Optional<Page> process(final Path source) {
 		return Optional.of(source)

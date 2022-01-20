@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.metreeca.mark.tasks;
 
-import com.metreeca.jse.Server;
+import com.metreeca.jse.JSEServer;
 import com.metreeca.mark.*;
 import com.metreeca.rest.Response;
-import com.metreeca.rest.assets.Logger;
+import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -27,6 +27,7 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
@@ -37,15 +38,14 @@ import java.util.stream.Stream;
 import static com.metreeca.mark.Mark.Root;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
-import static com.metreeca.rest.assets.Logger.logger;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
 import static com.metreeca.rest.handlers.Publisher.publisher;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.wrappers.Gateway.gateway;
+import static com.metreeca.rest.services.Logger.logger;
+import static com.metreeca.rest.wrappers.Server.server;
+
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.readAllBytes;
 
 /**
  * Site serving task.
@@ -76,15 +76,15 @@ public final class Serve implements Task {
 		final Thread daemon=new Thread(() -> {
 			try {
 
-				new Server()
+				new JSEServer()
 
 						.address(address)
 
-						.handler(context -> context
+						.delegate(context -> context
 
 								.set(logger(), () -> new MavenLogger(opts.logger()))
 
-								.get(() -> gateway().wrap(router()
+								.get(() -> server().wrap(router()
 
 										.path("/~", router()
 												.get(request -> request.reply(response -> {
@@ -161,7 +161,7 @@ public final class Serve implements Task {
 
 			.map(path -> {
 				try {
-					return new String(readAllBytes(path), UTF_8);
+					return Files.readString(path);
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
@@ -181,10 +181,9 @@ public final class Serve implements Task {
 
 				target.accept(buffer);
 
-				final byte[] data=buffer.toByteArray();
 				final Charset charset=Charset.forName(response.charset());
 
-				final byte[] body=new String(data, charset)
+				final byte[] body=buffer.toString(charset)
 						.replace("</body>", Live+"</body>")
 						.getBytes(charset);
 
@@ -227,9 +226,9 @@ public final class Serve implements Task {
 
 			if ( cause == null ) {
 
-				final Consumer<String> sink=(level == Level.Error) ? logger::error
-						: (level == Level.Warning) ? logger::warn
-						: (level == Level.Info) ? logger::info
+				final Consumer<String> sink=(level == Level.error) ? logger::error
+						: (level == Level.warning) ? logger::warn
+						: (level == Level.info) ? logger::info
 						: logger::debug;
 
 				sink.accept(message.get());
@@ -237,9 +236,9 @@ public final class Serve implements Task {
 
 			} else {
 
-				final BiConsumer<String, Throwable> sink=(level == Level.Error) ? logger::error
-						: (level == Level.Warning) ? logger::warn
-						: (level == Level.Info) ? logger::info
+				final BiConsumer<String, Throwable> sink=(level == Level.error) ? logger::error
+						: (level == Level.warning) ? logger::warn
+						: (level == Level.info) ? logger::info
 						: logger::debug;
 
 				sink.accept(message.get(), cause);

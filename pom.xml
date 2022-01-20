@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Copyright © 2019-2021 Metreeca srl
+  Copyright © 2019-2022 Metreeca srl
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.metreeca</groupId>
+	<parent>
+		<groupId>com.metreeca</groupId>
+		<artifactId>metreeca-root</artifactId>
+		<version>0.1.0</version>
+	</parent>
+
 	<artifactId>mark-maven-plugin</artifactId>
 	<version>0.6.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
@@ -30,28 +35,6 @@
 	<description>A minimalist static site generator.</description>
 	<url>https://github.com/metreeca/mark</url>
 	<inceptionYear>2019</inceptionYear>
-
-	<organization>
-		<name>Metreeca</name>
-		<url>https://www.metreeca.com/</url>
-	</organization>
-
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<name>Metreeca</name>
-			<email>info@metreeca.com</email>
-			<organization>Metreeca</organization>
-			<organizationUrl>https://www.metreeca.com/</organizationUrl>
-		</developer>
-	</developers>
 
 	<scm>
 		<connection>scm:git:git@github.com:metreeca/mark.git</connection>
@@ -64,35 +47,6 @@
 		<url>https://github.com/metreeca/mark/issues</url>
 	</issueManagement>
 
-	<distributionManagement>
-
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/releases</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-
-	</distributionManagement>
-
-	<properties>
-
-		<java.version>1.8</java.version>
-		<maven.version>3.6</maven.version>
-
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<maven.deploy.skip>true</maven.deploy.skip> <!-- ossrh public artifact deployment -->
-
-	</properties>
-
-	<prerequisites>
-		<maven>3.3</maven>
-	</prerequisites>
-
 	<dependencies>
 
 		<dependency>
@@ -101,16 +55,16 @@
 			<version>2.2.1</version>
 		</dependency>
 
-		<dependency>
+		<dependency> <!-- https://maven.apache.org/ref/3.8.4/maven-plugin-api/ -->
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
 			<version>3.8.1</version>
 		</dependency>
 
-		<dependency>
+		<dependency> <!-- https://maven.apache.org/plugin-tools/maven-plugin-annotations/ -->
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.6.2</version>
+			<version>3.6.4</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -118,10 +72,10 @@
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-jse</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 		</dependency>
 
-		<dependency>
+		<dependency> <!-- https://github.com/vsch/flexmark-java -->
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-all</artifactId>
 			<version>0.62.2</version>
@@ -145,60 +99,17 @@
 			<version>1.2.1</version>
 		</dependency>
 
-
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.8.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency> <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.21.0</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 
 	<build>
 
 		<plugins>
 
-			<plugin> <!-- https://maven.apache.org/enforcer/maven-enforcer-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M2</version>
-
-				<executions>
-					<execution>
-
-						<id>enforce-maven</id>
-
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-
-						<configuration>
-							<rules>
-								<requireMavenVersion>
-									<version>${maven.version}</version>
-								</requireMavenVersion>
-							</rules>
-						</configuration>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
 			<plugin> <!-- https://maven.apache.org/plugin-tools/maven-plugin-plugin/ -->
 
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.6.0</version>
+				<version>3.6.4</version>
 
 				<configuration>
 					<goalPrefix>mark</goalPrefix>
@@ -232,240 +143,8 @@
 
 			</plugin>
 
-			<plugin> <!-- https://maven.apache.org/plugins/maven-resources-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.2.0</version>
-
-				<executions>
-					<execution>
-
-						<id>copy-std-themes</id>
-						<phase>generate-resources</phase>
-
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-
-						<configuration>
-
-							<outputDirectory>${project.build.outputDirectory}/@/</outputDirectory>
-							<overwrite>true</overwrite>
-
-							<resources>
-								<resource>
-									<directory>${basedir}/src/main/themes/</directory>
-									<filtering>false</filtering>
-								</resource>
-							</resources>
-
-						</configuration>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-compiler-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-
-				<configuration>
-
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-
-				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-jar-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.2.0</version>
-
-				<configuration>
-
-					<archive>
-
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-
-						<manifestEntries>
-							<Built-By>${project.organization.name}</Built-By>
-							<Built-On>${maven.build.timestamp}</Built-On>
-							<Implementation-Version>${project.version}</Implementation-Version>
-						</manifestEntries>
-
-					</archive>
-
-				</configuration>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.0</version>
-
-			</plugin>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-site-plugin -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.9.1</version>
-
-				<configuration>
-
-					<skipDeploy>true</skipDeploy> <!-- github deployment -->
-
-					<stagingDirectory>${project.build.directory}/docs/reports</stagingDirectory>
-
-				</configuration>
-
-			</plugin>
-
 		</plugins>
 
 	</build>
-
-	<reporting>
-		<plugins>
-
-			<plugin> <!-- https://maven.apache.org/plugins/maven-project-info-reports-plugin/ -->
-
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.1.1</version>
-
-				<reportSets>
-
-					<reportSet>
-
-						<reports>
-							<report>index</report>
-							<report>dependencies</report>
-						</reports>
-
-						<configuration>
-							<dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-						</configuration>
-
-					</reportSet>
-
-				</reportSets>
-
-			</plugin>
-
-		</plugins>
-	</reporting>
-
-	<profiles>
-		<profile>
-
-			<id>release</id>
-
-			<build>
-				<plugins>
-
-					<plugin> <!-- https://maven.apache.org/plugins/maven-source-plugin -->
-
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>3.2.1</version>
-
-						<executions>
-							<execution>
-
-								<id>attach-sources</id>
-								<phase>package</phase>
-
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-
-							</execution>
-						</executions>
-
-					</plugin>
-
-					<plugin> <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
-
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.2.0</version>
-
-						<executions>
-
-							<execution>
-
-								<id>attach-javadocs</id>
-								<phase>package</phase>
-
-								<goals>
-									<goal>jar</goal>
-								</goals>
-
-							</execution>
-
-						</executions>
-
-					</plugin>
-
-					<plugin> <!-- http://maven.apache.org/plugins/maven-gpg-plugin/ -->
-
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-
-						<configuration>
-							<executable>gpg</executable>
-							<passphraseServerId>gpg.metreeca</passphraseServerId>
-						</configuration>
-
-						<executions>
-							<execution>
-
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-
-								<goals>
-									<goal>sign</goal>
-								</goals>
-
-							</execution>
-						</executions>
-
-					</plugin>
-
-					<plugin> <!-- https://github.com/sonatype/nexus-maven-plugins/tree/master/staging/maven-plugin -->
-
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
-
-						<extensions>true</extensions>
-
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-
-					</plugin>
-
-				</plugins>
-			</build>
-
-		</profile>
-	</profiles>
 
 </project>

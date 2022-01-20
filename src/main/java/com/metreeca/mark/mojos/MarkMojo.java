@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
-
-import static java.util.Collections.singletonMap;
-import static java.util.Collections.unmodifiableMap;
 
 
 public abstract class MarkMojo extends AbstractMojo {
@@ -87,7 +84,7 @@ public abstract class MarkMojo extends AbstractMojo {
 
 
 		@Override public Map<String, Object> shared() {
-			return unmodifiableMap(singletonMap("project", mojo.project));
+			return Map.of("project", mojo.project);
 		}
 
 		@Override public Log logger() { return mojo.getLog(); }

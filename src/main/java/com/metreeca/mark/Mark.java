@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,6 @@ import java.util.function.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.handlers.Publisher.basename;
-import static com.metreeca.rest.handlers.Publisher.extension;
 import static java.lang.String.format;
 import static java.nio.file.FileSystems.newFileSystem;
 import static java.nio.file.Files.isDirectory;
@@ -88,6 +86,28 @@ public final class Mark implements Opts {
 	}
 
 
+	public static String extension(final Path path) {
+
+		final String filename=filename(path);
+		final int dot=filename.lastIndexOf('.');
+
+		return dot < 0 ? "" : filename.substring(dot);
+	}
+
+	public static String basename(final Path path) {
+
+		final String filename=filename(path);
+		final int dot=filename.lastIndexOf('.');
+
+		return dot < 0 ? filename : filename.substring(0, dot);
+	}
+
+
+	private static String filename(final Path path) {
+		return Optional.ofNullable(path.getFileName()).map(Path::toString).orElse("");
+	}
+
+
 	private static boolean contains(final Path path, final Path child) {
 		return compatible(path, child) && child.startsWith(path);
 	}
@@ -127,7 +147,7 @@ public final class Mark implements Opts {
 			None::new, Md::new, Less::new, Any::new
 	);
 
-	private final Map<Path, Map<String, Object>> pages=new ConcurrentSkipListMap<>(comparing(Path::toString));
+	private final Map<Path, Map<String, Object>> models=new ConcurrentSkipListMap<>(comparing(Path::toString));
 
 
 	/**
@@ -393,8 +413,8 @@ public final class Mark implements Opts {
 	 * Watches site folders.
 	 *
 	 * @param root   the root of the site folder to be monitored for changes
-	 * @param action an action to be performed on change events; takes as argument the kind of change event and the
-	 *               path of the changed file
+	 * @param action an action to be performed on change events; takes as argument the kind of change event and the path
+	 *               of the changed file
 	 *
 	 * @return this engine
 	 *
@@ -493,30 +513,29 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null path stream");
 		}
 
-		return paths
+		// 1st pass › locate, compile and extend
 
-				// 1st pass: locate, compile and register pages
+		final List<Page> pages=paths
+
+				.filter(Objects::nonNull)
 
 				.map(this::source)
-				.map(this::compile)
+				.map(this::compile).flatMap(Optional::stream)
+				.map(this::extend)
 
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.collect(toList());
 
-				.map(this::register)
+		// 2nd pass › collect models
 
-				.peek(page -> logger.info(page.path().toString()))
+		pages.stream()
+				.filter(page -> page.path().toString().endsWith(".html"))
+				.forEach(page -> models.put(page.path(), page.model()));
 
-				// collect all page models before rendering
+		// 3rd pass › render
 
-				.collect(toList())
-				.stream()
+		pages.forEach(this::render);
 
-				// 2nd pass >> render pages
-
-				.peek(this::render)
-
-				.count();
+		return pages.size();
 	}
 
 
@@ -547,8 +566,7 @@ public final class Mark implements Opts {
 						}
 					})
 
-					.filter(Optional::isPresent)
-					.map(Optional::get)
+					.flatMap(Optional::stream)
 
 					.findFirst();
 
@@ -559,7 +577,7 @@ public final class Mark implements Opts {
 		}
 	}
 
-	private Page register(final Page page) {
+	private Page extend(final Page page) {
 
 		final Path path=common(page.path()).normalize();
 		final Map<String, Object> model=new HashMap<>(page.model());
@@ -581,22 +599,20 @@ public final class Mark implements Opts {
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-		if ( path.toString().endsWith(".html") ) {
-			pages.put(path, model);
-		}
-
 		return new Page(path, model, page.render());
 	}
 
 	private void render(final Page page) {
 		try {
 
+			logger.info(page.path().toString());
+
 			// create the root data model
 
 			final Map<String, Object> model=new HashMap<>(shared());
 
 			model.put("page", page.model());
-			model.put("pages", pages.values());
+			model.put("pages", models.values());
 
 
 			// make sure the output folder exists, then render page
@@ -606,7 +622,6 @@ public final class Mark implements Opts {
 			Files.createDirectories(target.getParent());
 
 			page.render().accept(target, model);
-
 
 		} catch ( final IOException e ) {
 

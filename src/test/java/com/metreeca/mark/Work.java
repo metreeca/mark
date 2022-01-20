@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.tasks.*;
+import com.metreeca.mark.tasks.Build;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -37,8 +37,8 @@ public final class Work {
 	public static void main(final String... args) {
 		new Mark(new TestOpts())
 				.exec(new Build())
-				.exec(new Serve())
-				.exec(new Watch())
+		//.exec(new Serve())
+		//.exec(new Watch())
 		;
 	}
 
@@ -47,7 +47,7 @@ public final class Work {
 
 	private static final class TestOpts implements Opts {
 
-		@Override public Path source() { return Paths.get("src/test/samples"); }
+		@Override public Path source() { return Paths.get("docs"); }
 
 		@Override public Path target() { return Paths.get("target/docs"); }
 

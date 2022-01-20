@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.inet.lib.less.Less.compile;
 import static com.metreeca.mark.Mark.target;
+
+import static com.inet.lib.less.Less.compile;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
@@ -46,7 +48,7 @@ public final class Less implements Pipe {
 		return target(source, ".css", ".less", ".css").map(target -> new Page(target, path -> {
 			try {
 
-				final String less=new String(Files.readAllBytes(source), UTF_8);
+				final String less=Files.readString(source);
 				final String css=compile(path.toUri().toURL(), less, true);
 
 				Files.write(path, css.getBytes(UTF_8));

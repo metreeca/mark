@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,6 @@ import org.ccil.cowan.tagsoup.Parser;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.xpath.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -41,8 +34,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static com.metreeca.rest.handlers.Publisher.extension;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.xpath.*;
+
+import static com.metreeca.mark.Mark.extension;
 import static com.metreeca.rest.handlers.Publisher.variants;
+
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.stream.Collectors.toList;
@@ -312,7 +314,7 @@ public final class Check implements Task {
 		private int next;
 
 
-		private NodeIterator(final NodeList nodes) {this.nodes=nodes;}
+		private NodeIterator(final NodeList nodes) { this.nodes=nodes; }
 
 
 		@Override public boolean hasNext() {

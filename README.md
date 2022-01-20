@@ -13,44 +13,43 @@ just throw in a couple of Markdown pages and a Pug/Less template and let the gen
 Add the plugin to your build configuration as:
 
 ```xml
-
 <build>
-	<plugins>
+  <plugins>
 
-		<plugin>
+    <plugin>
 
-			<groupId>com.metreeca</groupId>
-			<artifactId>mark-maven-plugin</artifactId>
-			<version>${mark.version}</version>
+      <groupId>com.metreeca</groupId>
+      <artifactId>mark-maven-plugin</artifactId>
+      <version>${mark.version}</version>
 
-			<configuration> <!-- optional -->
+      <configuration> <!-- optional -->
 
-				<source>src/docs</source>
-				<target>target/docs</target>
-				<assets>@/docs</assets>
-				<layout>layouts/default.pug</layout>
+        <source>src/docs</source>
+        <target>target/docs</target>
+        <assets>@/docs</assets>
+        <layout>layouts/default.pug</layout>
 
-				<options> <!-- pipeline specific options -->
-					<pipeline-option>value</pipeline-option>
-				</options>
+        <options> <!-- pipeline specific options -->
+          <pipeline-option>value</pipeline-option>
+        </options>
 
-			</configuration>
+      </configuration>
 
-			<executions>
-				<execution> <!-- example -->
+      <executions>
+        <execution> <!-- example -->
 
-					<goals>
-						<goal>clean</goal> <!-- by default in the pre-clean phase-->
-						<goal>build</goal> <!-- by default in the pre-site phase-->
-						<goal>check</goal> <!-- by default in the post-site phase-->
-					</goals>
+          <goals>
+            <goal>clean</goal> <!-- by default in the pre-clean phase-->
+            <goal>build</goal> <!-- by default in the pre-site phase-->
+            <goal>check</goal> <!-- by default in the post-site phase-->
+          </goals>
 
-				</execution>
-			</executions>
+        </execution>
+      </executions>
 
-		</plugin>
+    </plugin>
 
-	</plugins>
+  </plugins>
 </build>
 ```
 
@@ -199,7 +198,7 @@ mvn mark:serve
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- start a [conversation](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an open-ended
+- start a [discussion](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an open-ended
   idea
 
 # License
