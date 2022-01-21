@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public final class Clean implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		final Path target=mark.target();
+		final Path target=opts.target();
 
 		if ( Files.exists(target) ) { // clean target folder
 

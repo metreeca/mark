@@ -28,13 +28,14 @@ import java.util.stream.Stream;
 
 public final class None implements Pipe {
 
-	public static String basename(final Path path) {
+	private static String basename(final Path path) { // !!!
 
 		final String filename=path.toString();
 		final int dot=filename.lastIndexOf('.');
 
 		return dot < 0 ? filename : filename.substring(0, dot);
 	}
+
 
 	public None(final Mark mark) {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ package com.metreeca.mark;
 	 * Executes this task.
 	 *
 	 * @param mark the site generation engine
+	 *
+	 * @throws NullPointerException if {@code mark}
 	 */
 	public void exec(final Mark mark);
 

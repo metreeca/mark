@@ -45,9 +45,9 @@ public final class Work {
 
 	private static final class TestOpts implements Opts {
 
-		@Override public Path source() { return Paths.get("docs"); }
+		@Override public Path source() { return Paths.get("docs").toAbsolutePath().normalize(); }
 
-		@Override public Path target() { return Paths.get("docs"); }
+		@Override public Path target() { return source(); }
 
 		@Override public Path layout() { return Paths.get(""); }
 

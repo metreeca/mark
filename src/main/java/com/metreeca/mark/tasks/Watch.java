@@ -43,7 +43,7 @@ public final class Watch implements Task {
 
 		} catch ( final InterruptedException e ) {
 
-			mark.logger().error("interrupted…");
+			opts.logger().error("interrupted…");
 
 		}
 

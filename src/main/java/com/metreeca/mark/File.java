@@ -34,10 +34,11 @@ public final class File {
 
 	/**
 	 * @param path
-	 * @param model  may be extended
-	 * @param render
+	 * @param model     may be extended
+	 * @param processor
 	 */
-	public File(final Path path, final Map<String, Object> model, final BiConsumer<Path, Map<String, Object>> render) {
+	public File(final Path path, final Map<String, Object> model,
+			final BiConsumer<Path, Map<String, Object>> processor) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -47,13 +48,13 @@ public final class File {
 			throw new NullPointerException("null model");
 		}
 
-		if ( render == null ) {
-			throw new NullPointerException("null render");
+		if ( processor == null ) {
+			throw new NullPointerException("null processor");
 		}
 
 		this.path=path;
 		this.model=unmodifiableMap(model);
-		this.render=render;
+		this.render=processor;
 	}
 
 
@@ -65,7 +66,7 @@ public final class File {
 		return model;
 	}
 
-	public BiConsumer<Path, Map<String, Object>> render() {
+	public BiConsumer<Path, Map<String, Object>> process() {
 		return render;
 	}
 

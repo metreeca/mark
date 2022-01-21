@@ -19,7 +19,6 @@ package com.metreeca.mark;
 import com.metreeca.mark.pipes.*;
 
 import com.sun.nio.file.SensitivityWatchEventModifier;
-import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,7 +36,6 @@ import static java.nio.file.Files.isHidden;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableMap;
 import static java.util.Comparator.comparing;
 import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
@@ -47,15 +45,13 @@ import static java.util.stream.Collectors.toList;
 /**
  * Site generation engine.
  */
-public final class Mark implements Opts {
+public final class Mark {
 
 	public static final Path Root=Paths.get("/");
 	private static final Path Base=Paths.get("").toAbsolutePath();
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static Optional<Path> target(final Path source, final String to, final String... from) {
 
@@ -95,34 +91,12 @@ public final class Mark implements Opts {
 	}
 
 
-	private static boolean contains(final Path path, final Path child) {
-		return child.startsWith(path);
-	}
-
-
-	private static Path absolute(final Path path) {
-		return path.toAbsolutePath().normalize();
-	}
-
-	private static Path relative(final Path path) {
-		return Base.relativize(path.toAbsolutePath()).normalize();
-	}
-
-
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private final Opts opts;
 
-	private final Path source;
-	private final Path target;
-	private final Path layout;
-
-	private final Map<String, Object> shared;
-
-	private final Log logger;
-
-
 	private final String template; // template layout extension
+
 
 	private final Collection<Function<Mark, Pipe>> pipes=asList(
 			None::new, Md::new, Less::new, Any::new
@@ -144,79 +118,62 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null opts");
 		}
 
-		this.opts=opts;
 
-		this.source=absolute(requireNonNull(opts.source(), "null opts source path"));
-		this.target=absolute(requireNonNull(opts.target(), "null opts target path"));
-		this.layout=layout(requireNonNull(opts.layout(), "null opts layout path"));
+		final Path source=requireNonNull(opts.source(), "null source path");
+		final Path target=requireNonNull(opts.source(), "null target path");
+		final Path layout=requireNonNull(opts.source(), "null layout path");
 
+		if ( !source.isAbsolute() ) {
+			throw new IllegalArgumentException(format("relative source path ‹%s›", source));
+		}
+
+		if ( !source.equals(source.normalize()) ) {
+			throw new IllegalArgumentException(format("denormalized source path ‹%s›", source));
+		}
 
 		if ( !Files.exists(source) ) {
-			throw new IllegalArgumentException("missing source folder { "+relative(source)+" }");
+			throw new IllegalArgumentException(format("missing source folder ‹%s›", relative(source)));
 		}
 
 		if ( !isDirectory(source) ) {
-			throw new IllegalArgumentException("source is not a folder { "+relative(source)+" }");
+			throw new IllegalArgumentException(format("source path ‹%s› is not a folder", relative(source)));
+		}
+
+
+		if ( !target.isAbsolute() ) {
+			throw new IllegalArgumentException(format("relative target path ‹%s›", target));
+		}
+
+		if ( !target.equals(target.normalize()) ) {
+			throw new IllegalArgumentException(format("denormalized target path ‹%s›", target));
 		}
 
 		if ( Files.exists(target) && !isDirectory(target) ) {
-			throw new IllegalArgumentException("target is not a folder { "+relative(target)+" }");
+			throw new IllegalArgumentException(format("target path ‹%s› is not a folder", relative(target)));
 		}
 
-		if ( contains(source, target) || contains(target, source) ) {
+		if ( !target.equals(source) && (target.startsWith(source) || source.startsWith(target)) ) {
 			throw new IllegalArgumentException(
-					"overlapping source/target folders { "+relative(source)+" <-> "+relative(target)+" }"
+					format("overlapping source/target folders ‹%s›/‹%s›", relative(source), relative(target))
 			);
 		}
-
-
-		this.shared=requireNonNull(opts.global(), "null opts shared variables");
-		this.logger=requireNonNull(opts.logger(), "null opts system logger");
 
 
 		final String path=layout.toString();
 		final int dot=path.lastIndexOf('.');
 
 		if ( dot < 0 ) {
-			throw new IllegalArgumentException("extension-less layout { "+layout+" }");
+			throw new IllegalArgumentException(format("layout ‹%s› has no extension", layout));
 		}
 
+
+		this.opts=opts;
 		this.template=path.substring(dot);
 	}
 
 
-	private Path layout(final Path path) {
-		return Root.resolve(path).normalize(); // root-relative layout path
-	}
-
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Path source() {
-		return source;
-	}
-
-	@Override public Path target() {
-		return target;
-	}
-
-	@Override public Path layout() {
-		return layout;
-	}
-
-
-	@Override public Log logger() {
-		return logger;
-	}
-
-
-	@Override public Map<String, Object> global() {
-		return unmodifiableMap(shared);
-	}
-
-	@Override public <V> V get(final String option, final Function<String, V> mapper) {
-		return opts.get(option, mapper);
+	public Opts opts() {
+		return opts;
 	}
 
 
@@ -227,7 +184,7 @@ public final class Mark implements Opts {
 	 *
 	 * @param path the path to be checked
 	 *
-	 * @return {@code true} if {@code path} has the same file extension as the default {@linkplain #layout() layout}
+	 * @return {@code true} if {@code path} has the same file extension as the default {@linkplain Opts#layout() layout}
 	 *
 	 * @throws NullPointerException if {@code path} is {@code null}
 	 */
@@ -259,8 +216,8 @@ public final class Mark implements Opts {
 		// identify the absolute path of the layout ;(handling extension-only paths…)
 
 		final Path layout=source(Root.relativize(
-				name.isEmpty() || name.equals(template) ? this.layout
-						: this.layout.resolveSibling(name.contains(".") ? name : name+template).normalize()
+				name.isEmpty() || name.equals(template) ? opts.layout()
+						: opts.layout().resolveSibling(name.contains(".") ? name : name+template).normalize()
 		));
 
 		if ( !Files.isRegularFile(layout) ) {
@@ -288,8 +245,8 @@ public final class Mark implements Opts {
 			throw new NullPointerException("null task");
 		}
 
-		logger.info(format("%s %s  ›› %s",
-				task.getClass().getSimpleName().toLowerCase(ROOT), relative(source), relative(target)
+		opts.logger().info(format("%s %s  ›› %s",
+				task.getClass().getSimpleName().toLowerCase(ROOT), relative(opts.source()), relative(opts.target())
 		));
 
 		task.exec(this);
@@ -316,7 +273,7 @@ public final class Mark implements Opts {
 
 		final Thread thread=new Thread(() -> {
 
-			try ( final WatchService service=source.getFileSystem().newWatchService() ) {
+			try ( final WatchService service=opts.source().getFileSystem().newWatchService() ) {
 
 				final Consumer<Path> register=path -> {
 					try {
@@ -331,7 +288,7 @@ public final class Mark implements Opts {
 					}
 				};
 
-				try ( final Stream<Path> sources=Files.walk(source) ) {
+				try ( final Stream<Path> sources=Files.walk(opts.source()) ) {
 					sources.filter(Files::isDirectory).forEach(register); // register existing folders
 				}
 
@@ -343,11 +300,11 @@ public final class Mark implements Opts {
 
 						if ( kind.equals(OVERFLOW) ) {
 
-							logger.error("sync lost ;-(");
+							opts.logger().error("sync lost ;-(");
 
 						} else if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
 
-							logger.info(source.relativize(path).toString());
+							opts.logger().info(opts.source().relativize(path).toString());
 
 							register.accept(path);
 
@@ -363,7 +320,7 @@ public final class Mark implements Opts {
 
 			} catch ( final InterruptedException e ) {
 
-				logger.error("interrupted…");
+				opts.logger().error("interrupted…");
 
 			} catch ( final IOException e ) {
 
@@ -417,7 +374,7 @@ public final class Mark implements Opts {
 
 		// 3rd pass › render
 
-		files.forEach(this::render);
+		files.forEach(this::process);
 
 		return files.size();
 	}
@@ -440,7 +397,7 @@ public final class Mark implements Opts {
 
 						} catch ( final RuntimeException e ) {
 
-							logger.error(format("%s › %s",
+							opts.logger().error(format("%s › %s",
 									pipe.getClass().getSimpleName().toLowerCase(ROOT),
 									MessagePattern.matcher(e.getMessage()).replaceAll("; ")
 							));
@@ -463,8 +420,8 @@ public final class Mark implements Opts {
 
 	private File extend(final File file) {
 
-		final Path path=Paths.get((source.relativize(file.path())).toString()).normalize(); // use strings to handle
-		// incompatible filesystems
+		final Path path=opts.source().relativize(file.path()).normalize();
+
 		final Map<String, Object> model=new HashMap<>(file.model());
 
 		model.put("root", Optional
@@ -484,29 +441,29 @@ public final class Mark implements Opts {
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-		return new File(path, model, file.render());
+		return new File(path, model, file.process());
 	}
 
-	private void render(final File file) {
+	private void process(final File file) {
 		try {
 
-			logger.info(file.path().toString());
+			opts.logger().info(file.path().toString());
 
 			// create the root data model
 
-			final Map<String, Object> model=new HashMap<>(global());
+			final Map<String, Object> model=new HashMap<>(opts.global());
 
 			model.put("page", file.model());
 			model.put("pages", models.values());
 
 
-			// make sure the output folder exists, then render page
+			// make sure the output folder exists, then render file
 
 			final Path target=target(file.path());
 
 			Files.createDirectories(target.getParent());
 
-			file.render().accept(target, model);
+			file.process().accept(target, model);
 
 		} catch ( final IOException e ) {
 
@@ -522,12 +479,12 @@ public final class Mark implements Opts {
 
 		// !!! Files::exists
 
-		final Path absolute=source
+		final Path absolute=opts.source()
 				.resolve(path.toString()) // use strings to handle incompatible filesystems
 				.toAbsolutePath()
 				.normalize();
 
-		if ( contains(source, absolute) ) {
+		if ( absolute.startsWith(opts.source()) ) {
 			throw new IllegalArgumentException("resource outside input folders { "+relative(path)+" }");
 		}
 
@@ -535,10 +492,15 @@ public final class Mark implements Opts {
 	}
 
 	private Path target(final Path path) {
-		return target
+		return opts.target()
 				.resolve(path.toString()) // use strings to handle incompatible filesystems
 				.toAbsolutePath()
 				.normalize();
+	}
+
+
+	private Path relative(final Path path) {
+		return Base.relativize(path.toAbsolutePath()).normalize();
 	}
 
 }

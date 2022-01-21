@@ -59,12 +59,10 @@ public final class Check implements Task {
 	private static final Pattern URLPattern=Pattern.compile("^\\w+:.*$");
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override public void exec(final Mark mark) {
 
-		final Path target=mark.target();
-		final Log logger=mark.logger();
+		final Path target=opts.target();
+		final Log logger=opts.logger();
 
 		try ( final Stream<Path> walk=Files.walk(target) ) {
 

@@ -64,14 +64,14 @@ public final class Serve implements Task {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public void exec(final Mark mark) {
-		serve(mark);
-		watch(mark);
+		serve(mark, opts);
+		watch(mark, opts);
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void serve(final Opts opts) {
+	private void serve(final Mark mark, final Opts opts) {
 
 		final Thread daemon=new Thread(() -> {
 			try {
@@ -128,11 +128,11 @@ public final class Serve implements Task {
 		daemon.start();
 	}
 
-	private void watch(final Mark mark) {
+	private void watch(final Mark mark, final Opts opts) {
 
 		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> {
 
-			final String path=Root.resolve(mark.target().relativize(target)).toString();
+			final String path=Root.resolve(opts.target().relativize(target)).toString();
 
 			Stream.of("", ".html", "index.html").forEach(suffix -> {
 				if ( path.endsWith(suffix) ) { updates.offer(path.substring(0, path.length()-suffix.length())); }
