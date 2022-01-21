@@ -69,7 +69,7 @@ public final class Serve implements Task {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void serve(final Mark mark) {
+	private void serve(final Opts mark) {
 
 		final Thread daemon=new Thread(() -> {
 			try {

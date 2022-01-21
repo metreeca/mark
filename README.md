@@ -4,7 +4,7 @@
 
 Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. It is tightly integrated as a Maven
 in the build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown
-pages and a Pug/Less template and let the generator take care of the details…
+pages and maybe a Pug/Less template and let the generator take care of the details…
 
 # Usage
 
@@ -27,7 +27,6 @@ Add the plugin to your build configuration as:
 
         <source>src/docs</source>
         <target>target/docs</target>
-        <assets>@/docs</assets>
         <layout>layouts/default.pug</layout>
 
         <options> <!-- pipeline specific options -->
@@ -58,16 +57,15 @@ The following optional configuration parameters are available:
 
 | parameter | default       | value                                                  |
 | --------- | ------------- | ------------------------------------------------------ |
-| `source`  | `src/docs`    | the source folder for the site                         |
-| `target`  | `target/docs` | the target folder for the generated site               |
-| `assets` | a virtual empty folder | a supplemental asset folder |
-| `layout`  | `layouts/default.pug`| the path of default page template relative to `source` or `assets` |
+| `source`  | `./docs`    | the source folder for the site                         |
+| `target`  | `\${source}` (in-place generation)| the target folder for the generated site               |
+| `layout`  | default bundled layout | the path of default page template relative to `\${source}` |
 
 ## Define a template
 
 > ℹ️
 >
-> **If you feel lazy, insert  `<assets>@/docs</assets>` in the configuration to use the default bundled docs theme ;-)**
+> If you feel lazy, just omit the `layout` parameters to use the default bundled docs theme ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -110,7 +108,9 @@ The following properties are available for inclusion using the `#/!{expression}`
 
 > :warning:
 >
->  **Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/) rather than Javascript.**
+>  Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL]
+> (http://commons.apache.org/proper/commons-jexl/) rather than Javascript. Expression interpolation in HTML attributes
+> is supported as ```\${expression}```
 
 ## Create site content
 
@@ -118,11 +118,12 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 
 ```markdown
 ---
-title: Lorem Ipsum date: 2019-11-05 # optional layout:
-post.pug # optional
+title: Lorem Ipsum
+date: 2019-11-05 # optional
+layout: post.pug # optional
 ---
 
-Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
+Lorem ipsum `\${project.version}` dolor sit amet, consectetur adipiscing elit…
 ```
 
 All the properties available to templates (with the obvious exception of `page.body`) are also available for
@@ -133,7 +134,7 @@ to the path of the required template, relative to the plugin `layout` parameter.
 
 > :warning:
 >
->  **Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).**
+>  Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
 # Maven Goals
 
@@ -156,17 +157,23 @@ mvn mark:build # by default in the pre-site phase
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-**Markdown**  / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
+**Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
 the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
 property; links to other `.md` files are converted to the corresponding `.html` file.
 
 | option                    | default | behaviour                                            |
 | ------------------------- | ------- | ---------------------------------------------------- |
 | `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
-| `markdown-external-links` | `false` | opens extenal links in a `_blank` target             |
+| `markdown-external-links` | `false` | opens external links in a `_blank` target             |
 
-**Less/CSS** /  `.less` and `.css` files under the source folder are converted to minified `.css` files at the same
+**CSS/Less** /  `.css` and `.less` files under the source folder are converted to minified `.css` files at the same
 relative path under the target.
+
+
+> :warning:
+>
+>  When generating sites in-place, files converted without altering the file extension (for instance, `.css` › `.css`)
+> are silently ignored.
 
 ## Check links
 
@@ -193,7 +200,7 @@ mvn mark:serve
 ```
 
 - the site is generated and watched as described above
-- the generated site is served on a development grade HTTP server for testing purposes
+- the generated site is served on an embedded HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates
 

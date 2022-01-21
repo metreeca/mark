@@ -1,4 +1,4 @@
 ---
 title:      "Elsewhere"
-canonical:  "http://example.org/"
+canonical:  "https://example.org/"
 ---

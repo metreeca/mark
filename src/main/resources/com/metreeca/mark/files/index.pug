@@ -10,82 +10,80 @@ doctype html
 
 - var prism = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.26.0" //- select from https://cdnjs.com/libraries/prism
 
+
+if page.canonical
+
 	html(lang="en")
 
-		if page.canonical
+		head
 
-			head
+			title Redirecting… (#{project.name ? " | " : ""}) #{project.name}
 
-				title Redirecting… (#{project.name ? " | " : ""}) #{project.name}
+			meta(name="viewport" content="width=device-width,initial-scale=1")
+			meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+			meta(http-equiv="Refresh" content=`0; url=${page.canonical}`)
 
-				meta(name="viewport" content="width=device-width,initial-scale=1")
-				meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
-				meta(http-equiv="Refresh" content="0; url=#{page.canonical}")
+			link(rel="canonical" href=page.canonical)
 
-				link(rel="shortcut icon" href="#{page.root}/index.svg")
-				link(rel="canonical" href="#{page.canonical}")
+			link(rel="shortcut icon" href=`${page.root}/index.svg`)
 
-		else
+else
 
-			head
+	html(lang="en")
 
-				title #{title} #{title && project.name ? " | " : ""} #{project.name}
+		head
 
-				meta(name="viewport" content="width=device-width,initial-scale=1")
-				meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
+			title #{title} #{title && project.name ? " | " : ""} #{project.name}
 
-				link(rel="shortcut icon" href="#{page.root}/index.svg")
+			meta(name="viewport" content="width=device-width,initial-scale=1")
+			meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 
-				//- prism.js code highlighting
+			link(rel="shortcut icon" href=`${page.root}/index.svg`)
 
-				link(rel="stylesheet" href="#{prism}/themes/prism.min.css")
+			link(rel="stylesheet" href=`${prism}/themes/prism.min.css`)
+			link(rel="stylesheet" type="text/css" href=`${page.root}/index.css`)
 
-				script(type="text/javascript" src="#{prism}/components/prism-core.min.js")
-				script(type="text/javascript" src="#{prism}/plugins/autoloader/prism-autoloader.min.js")
+			script(type="text/javascript" src=`${prism}/components/prism-core.min.js`)
+			script(type="text/javascript" src=`${prism}/plugins/autoloader/prism-autoloader.min.js`)
+			script(type="text/javascript" src=`${page.root}/index.js`)
 
-				//- default stylesheet (at end to override prism.js)
-
-				link(rel="stylesheet" type="text/css" href="#{page.root}/index.css")
-	
 		body
-	
+
 			//- hidden menu toggle for mobile view
-	
+
 			input(id="toggle" type="checkbox")
-	
+
 			nav
-	
+
 				header
-	
+
 					span
-						a(href="#{home}") #{empty(owner) ? project.groupId : owner}
-						a(href="#{page.root}/index.html") #{module}
+						a(href=`${home}`) #{empty(owner) ? project.groupId : owner}
+						a(href=`${page.root}/index.html`) #{module}
 							span v#{version}
-	
+
 					//- icon dynamically managed by default.css
-	
+
 					label(for="toggle")
-	
+
 				section
-	
+
 					if title && !empty(page.headings)
 						a(class="title" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
-	
+
 					for heading in page.headings
 						#{"h"+heading.level}
-							a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
-	
+							a(href="#"+heading.anchorRefId) #{heading.anchorRefText}
+
 			main
-	
+
 				header #{title}
-	
+
 				section !{page.body}
-	
+
 				footer
-	
+
 					if project.groupId == "com.metreeca"
 						| © #{page.date.substring(0, 4)} Metreeca srl. This work is licensed under the
 						= ' '
 						| #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
-	
-			script(type="text/javascript" src="#{page.root}/index.js")

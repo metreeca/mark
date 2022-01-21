@@ -145,6 +145,26 @@
 
 			</plugin>
 
+			<plugin>
+
+				<groupId>com.metreeca</groupId>
+				<artifactId>mark-maven-plugin</artifactId>
+				<version>${project.version}</version>
+
+				<executions>
+					<execution>
+
+						<goals>
+							<goal>clean</goal>
+							<goal>build</goal>
+							<goal>check</goal>
+						</goals>
+
+					</execution>
+				</executions>
+
+			</plugin>
+
 		</plugins>
 
 	</build>

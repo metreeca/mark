@@ -295,7 +295,7 @@ public final class Mark implements Opts {
 			});
 		}
 
-		logger.info(format("%s %s  ›› %s",
+		logger.info(format("%s %s ›› %s",
 				task.getClass().getSimpleName().toLowerCase(ROOT), local(source), local(target)
 		));
 
