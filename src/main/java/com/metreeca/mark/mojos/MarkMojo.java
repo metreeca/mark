@@ -49,14 +49,14 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
 
 
 	@Override public Path source() {
-		return Paths.get(source);
+		return Paths.get(source == null ? "" : source);
 	}
 
 	@Override public Path target() {
-		return Paths.get(target);
+		return Paths.get(target == null ? "" : target);
 	}
 
-	@Override public Path layout() { return Paths.get(layout); }
+	@Override public Path layout() { return Paths.get(layout == null ? "" : layout); }
 
 
 	@Override public Map<String, Object> global() {

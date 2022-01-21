@@ -17,7 +17,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.tasks.Clean;
+import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -34,12 +34,14 @@ public final class Work {
 
 	public static void main(final String... args) {
 		new Mark(new TestOpts())
-				//.exec(new Build())
-				.exec(new Clean())
-		//.exec(new Serve())
-		//.exec(new Watch())
+				.exec(new Build())
+				.exec(new Serve())
+				.exec(new Watch())
 		;
 	}
+
+
+	private Work() { }
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +79,8 @@ public final class Work {
 		@Override public <V> V get(final String option, final Function<String, V> mapper) {
 			return mapper.apply(
 
-					option.equals(Markdown.SmartLinks.getName()) ? "true"
+					option.equals("index") ? "README.md"
+							: option.equals(Markdown.SmartLinks.getName()) ? "true"
 							: option.equals(Markdown.ExternalLinks.getName()) ? "true"
 							: null
 

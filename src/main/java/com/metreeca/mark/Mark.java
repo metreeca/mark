@@ -39,7 +39,9 @@ import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
 import static java.util.Locale.ROOT;
+import static java.util.Map.entry;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -56,6 +58,7 @@ public final class Mark implements Opts {
 
 	private static final String Date=ISO_LOCAL_DATE.format(LocalDate.now());
 
+	private static final Pattern IndexPattern=Pattern.compile("^[^.]*");
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 
@@ -209,10 +212,6 @@ public final class Mark implements Opts {
 		return path.toString().endsWith(template);
 	}
 
-	public Map<Path, URL> assets() {
-		return bundled ? Assets : Map.of();
-	}
-
 	/**
 	 * Locates a layout.
 	 *
@@ -233,6 +232,7 @@ public final class Mark implements Opts {
 				: layout.resolveSibling(name.contains(".") ? name : name+template)
 		);
 	}
+
 
 	public Optional<Path> target(final Path source, final String to, final String... from) {
 
@@ -269,6 +269,18 @@ public final class Mark implements Opts {
 				.filter(Objects::nonNull)
 
 				.findFirst();
+	}
+
+
+	public Optional<Map.Entry<Path, Path>> index() {
+		return Optional.ofNullable(get("index", identity())).map(index -> entry(
+				Paths.get(index),
+				target().resolve(Paths.get(IndexPattern.matcher(index).replaceFirst("index")))
+		));
+	}
+
+	public Map<Path, URL> assets() {
+		return bundled ? Assets : Map.of();
 	}
 
 

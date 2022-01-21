@@ -151,6 +151,14 @@
 				<artifactId>mark-maven-plugin</artifactId>
 				<version>${project.version}</version>
 
+				<configuration>
+
+					<options>
+						<index>README.md</index>
+					</options>
+
+				</configuration>
+
 				<executions>
 					<execution>
 

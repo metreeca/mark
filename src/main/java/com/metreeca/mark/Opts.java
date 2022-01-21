@@ -56,7 +56,7 @@ public interface Opts {
 	 * @param <V>    the expected type of the option value
 	 *
 	 * @return the value produced by applying {@code mapper} to a possibly null string value retrieved from a
-	 * system-specific source
+	 * system-specific source or {@code null} the optipn is not defined
 	 *
 	 * @throws NullPointerException if {@code mapper} is null
 	 */

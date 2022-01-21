@@ -2,9 +2,9 @@ Metreeca/Mark is an minimalist static site generator, optimized for project/app 
 integrated in the Maven build process as a plugin and doesn't force on you specific site layouts or complex setups: just
 throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
 
-- [README](README.md)
-- [samples](samples/index.md)
-- [headings](samples/index.md#headings)
+- [README](../index.md)
+- [samples](index.md)
+- [headings](index.md#headings)
 
 - [redirect](redirect.md)
 - [broken](broken.md)

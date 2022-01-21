@@ -39,25 +39,52 @@ public final class Clean implements Task {
 		final Path source=mark.source();
 		final Path target=mark.target();
 
-		if ( source.equals(target) ) { // in-place generation › remove assets and generated files
+		if ( source.equals(target) ) { // in-place generation › remove volatile files
 
 			try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
+				// delete generated files
+
 				mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
+
+				// delete bundled assets
 
 				mark.assets().forEach((path, url) -> {
 
 					final Path asset=target.resolve(path);
 
-					try (
-							final InputStream origin=url.openStream();
-							final InputStream actual=Files.newInputStream(asset)
-					) {
+					if ( Files.exists(asset) ) {
+						try (
+								final InputStream origin=url.openStream();
+								final InputStream actual=Files.newInputStream(asset)
+						) {
 
-						if ( checksum(origin) == checksum(actual) ) { delete(asset); }
+							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
+					}
+
+				});
+
+				// delete index file
+
+				mark.index().ifPresent(entry -> {
+
+					final Path asset=target.resolve(entry.getValue());
+
+					if ( Files.exists(asset) ) {
+						try (
+								final InputStream origin=Files.newInputStream(entry.getKey());
+								final InputStream actual=Files.newInputStream(asset)
+						) {
+
+							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
+
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
 					}
 
 				});
@@ -95,7 +122,7 @@ public final class Clean implements Task {
 	private void delete(final Path path) {
 		try {
 
-			Files.delete(path);
+			if ( Files.exists(path) ) { Files.delete(path); }
 
 		} catch ( final IOException e ) {
 			throw new UncheckedIOException(e);

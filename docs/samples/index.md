@@ -59,7 +59,7 @@ felis tincidunt felis, at convallis lorem orci a lacus.
 
 ## Links
 
-- [home](../index.md)
+- [home](work.md)
 
 ## Lists
 

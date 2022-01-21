@@ -36,6 +36,22 @@ public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
 
+		// copy index file to source folder
+
+		mark.index().ifPresent(entry -> {
+
+			try {
+
+				Files.copy(entry.getKey(), entry.getValue());
+
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
+
+		});
+
+		// copy bundled assets to source folder
+
 		mark.assets().forEach((path, url) -> {
 
 			final Path source=mark.source().resolve(path);
@@ -51,6 +67,8 @@ public final class Build implements Task {
 			}
 
 		});
+
+		// process resources
 
 		try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
