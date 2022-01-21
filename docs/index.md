@@ -63,9 +63,7 @@ The following optional configuration parameters are available:
 
 ## Define a template
 
-> ℹ️
->
-> If you feel lazy, just omit the `layout` parameters to use the default bundled docs theme ;-)
+> :information_source: If you feel lazy, just omit the `layout` parameters to use the default bundled docs theme ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -106,9 +104,8 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
-> :warning:
->
->  Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/)
+> :warning: Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
+> [JEXL](http://commons.apache.org/proper/commons-jexl/)
 > rather than Javascript. Expression interpolation in HTML attributes is supported as ``\${expression}``
 
 ## Create site content
@@ -129,9 +126,8 @@ interpolation inside pages using the `${expression}` syntax (escape like `\${exp
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property
 to the path of the required template, relative to the plugin `layout` parameter.
 
-> :warning:
->
->  Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
+> :warning: Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is
+> supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
 # Maven Goals
 
@@ -154,10 +150,8 @@ mvn mark:build # by default in the pre-site phase
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-> :warning:
->
->  When generating sites in-place, files converted without altering the file extension (for instance, `.css` › `.css`)
-> are silently ignored.
+> :warning:  When generating sites in-place, files converted without altering the file extension (for instance, `.
+> css` › `.css`) > are silently ignored.
 
 **Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
 the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter

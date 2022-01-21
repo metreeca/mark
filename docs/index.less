@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2021 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -574,7 +574,7 @@ blockquote > small:last-child {
 	text-align: right;
 }
 
-img:only-child {
+p > img:only-child {
 	width: 100%;
 	height: auto;
 	margin-top: 0.5em;
@@ -584,11 +584,11 @@ img:only-child {
 	box-shadow: 3pt 3pt 9pt #999;
 }
 
-img:not(:only-child) {
-	float: right;
+p > img:not(:only-child) {
+	float: left;
 	max-width: 40%;
 	height: auto;
-	margin-left: 1.5em;
+	margin-right: 1.5em;
 	margin-bottom: 1.5em;
 }
 

@@ -22,6 +22,8 @@ import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ext.admonition.AdmonitionExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
@@ -72,13 +74,16 @@ public final class Markdown {
 						DefinitionExtension.create(),
 						AdmonitionExtension.create(),
 						AutolinkExtension.create(),
-						LinkRewriterExtension.create()
+						LinkRewriterExtension.create(),
+						EmojiExtension.create()
 				))
 
 				.set(HtmlRenderer.RENDER_HEADER_ID, true)
 				.set(HtmlRenderer.GENERATE_HEADER_ID, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
+
+				.set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
 
 				.set(SmartLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean))
 				.set(ExternalLinks, mark.get(ExternalLinks.getName(), Boolean::parseBoolean));
