@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ package com.metreeca.mark.mojos;
 import com.metreeca.mark.Mark;
 import com.metreeca.mark.tasks.Clean;
 
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_CLEAN;
 
-@Mojo(name="clean", defaultPhase=LifecyclePhase.PRE_CLEAN) public class CleanMojo extends MarkMojo {
+
+@Mojo(name="clean", defaultPhase=PRE_CLEAN)
+public class CleanMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts()).exec(new Clean());
+		new Mark(this).exec(new Clean());
 	}
 
 }

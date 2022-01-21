@@ -44,15 +44,15 @@ public interface Opts {
 
 
 	/**
-	 * @return the shared variables
-	 */
-	public Map<String, Object> shared();
-
-	/**
 	 * @return the system logger
 	 */
 	public Log logger();
 
+
+	/**
+	 * @return the global variables
+	 */
+	public Map<String, Object> global();
 
 	/**
 	 * Retrieves a pipeline option.

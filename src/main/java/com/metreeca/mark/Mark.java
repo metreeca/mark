@@ -170,7 +170,7 @@ public final class Mark implements Opts {
 		}
 
 
-		this.shared=requireNonNull(opts.shared(), "null opts shared variables");
+		this.shared=requireNonNull(opts.global(), "null opts shared variables");
 		this.logger=requireNonNull(opts.logger(), "null opts system logger");
 
 
@@ -206,14 +206,14 @@ public final class Mark implements Opts {
 	}
 
 
-	@Override public Map<String, Object> shared() {
-		return unmodifiableMap(shared);
-	}
-
 	@Override public Log logger() {
 		return logger;
 	}
 
+
+	@Override public Map<String, Object> global() {
+		return unmodifiableMap(shared);
+	}
 
 	@Override public <V> V get(final String option, final Function<String, V> mapper) {
 		return opts.get(option, mapper);
@@ -494,7 +494,7 @@ public final class Mark implements Opts {
 
 			// create the root data model
 
-			final Map<String, Object> model=new HashMap<>(shared());
+			final Map<String, Object> model=new HashMap<>(global());
 
 			model.put("page", file.model());
 			model.put("pages", models.values());

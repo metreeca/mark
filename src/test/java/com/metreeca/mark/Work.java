@@ -24,12 +24,10 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.AbstractMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.Map.entry;
 
 
 public final class Work {
@@ -49,24 +47,27 @@ public final class Work {
 
 		@Override public Path source() { return Paths.get("docs"); }
 
-		@Override public Path target() { return Paths.get("target/docs"); }
+		@Override public Path target() { return Paths.get("docs"); }
 
-		@Override public Path layout() { return Paths.get("layouts/default.pug"); }
+		@Override public Path layout() { return Paths.get(""); }
 
 
-		@Override public Map<String, Object> shared() {
-			return map(
-					entry("project", map(
+		@Override public Log logger() { return new SystemStreamLog(); }
+
+
+		@Override public Map<String, Object> global() {
+			return Map.ofEntries(
+					entry("project", Map.ofEntries(
 
 							entry("groupId", "com.metreeca"),
-							entry("artifactId", "metreeca-work"),
-							entry("version", "1.2.3-SNAPSHOT"),
+							entry("artifactId", "metreeca-test"),
+							entry("version", "1.2.3"),
 
-							entry("name", "Metreeca Static Site Generator"),
-							entry("description", "A minimalist static site generator."),
+							entry("name", "Metreeca Test Project"),
+							entry("description", "A dummy test project"),
 							entry("url", "https://github.com/metreeca/mark"),
 
-							entry("organization", map(
+							entry("organization", Map.ofEntries(
 									entry("name", "Metreeca"),
 									entry("url", "https://www.metreeca.com/")
 							))
@@ -74,8 +75,6 @@ public final class Work {
 					))
 			);
 		}
-
-		@Override public Log logger() { return new SystemStreamLog(); }
 
 		@Override public <V> V get(final String option, final Function<String, V> mapper) {
 			return mapper.apply(
@@ -87,17 +86,6 @@ public final class Work {
 			);
 		}
 
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@SafeVarargs private static <K, V> Map<K, V> map(final Map.Entry<K, V>... entries) {
-		return Stream.of(entries).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	private static <K, V> Map.Entry<K, V> entry(final K key, final V value) {
-		return new AbstractMap.SimpleImmutableEntry<>(key, value);
 	}
 
 }
