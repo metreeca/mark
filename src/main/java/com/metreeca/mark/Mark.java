@@ -58,13 +58,14 @@ public final class Mark implements Opts {
 
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
+
 	private static final Path Layout=Paths.get("index.pug");
 
-	private static final Map<String, URL> Assets=Stream.of(
+	private static final Map<Path, URL> Assets=Stream.of(
 
 			"index.js", "index.less", "index.pug", "index.svg"
 
-	).collect(toMap(asset -> asset, asset -> requireNonNull(
+	).collect(toMap(Paths::get, asset -> requireNonNull(
 
 			Mark.class.getResource(format("files/%s", asset)),
 			format("missing asset ‹%s›", asset)
@@ -208,7 +209,7 @@ public final class Mark implements Opts {
 		return path.toString().endsWith(template);
 	}
 
-	public Map<String, URL> assets() {
+	public Map<Path, URL> assets() {
 		return bundled ? Assets : Map.of();
 	}
 
@@ -259,8 +260,6 @@ public final class Mark implements Opts {
 		final String path=source.toString();
 
 		return Arrays.stream(from)
-
-				.filter(not(extension -> inplace && extension.equals(to))) // prevent overwriting
 
 				.map(extension -> path.endsWith(extension)
 						? source.resolveSibling(path.substring(0, path.length()-extension.length())+to)
@@ -381,6 +380,7 @@ public final class Mark implements Opts {
 		return this;
 	}
 
+
 	/**
 	 * Processes site resources.
 	 *
@@ -389,47 +389,60 @@ public final class Mark implements Opts {
 	 * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
 	 *              site folder
 	 *
-	 * @return the number of processed resources
+	 * @return the collection of generated site files
 	 *
 	 * @throws NullPointerException if {@code source} is null
 	 */
-	public long process(final Stream<Path> paths) {
+	public Collection<File> process(final Stream<Path> paths) {
 
 		if ( paths == null ) {
 			throw new NullPointerException("null path stream");
 		}
 
-		// 1st pass › locate, compile and extend
-
-		final List<File> files=paths
-
-				.filter(Objects::nonNull)
-				.filter(Files::isRegularFile)
-
-				.map(this::source)
-				.map(this::compile).flatMap(Optional::stream)
-				.map(this::extend)
-
-				.collect(toList());
-
-		// 2nd pass › collect models
+		final Collection<File> files=scan(paths);
 
 		final List<Map<String, Object>> models=files.stream()
 				.filter(page -> page.path().toString().endsWith(".html"))
 				.map(File::model)
 				.collect(toList());
 
-		// 3rd pass › render
-
 		files.forEach(file -> process(file, models));
 
-		return files.size();
+		return files;
+	}
+
+	/**
+	 * Identifies site resources to be processed.
+	 *
+	 * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
+	 *              site folder
+	 *
+	 * @return the collection of site files to be generated
+	 *
+	 * @throws NullPointerException if {@code source} is null
+	 */
+	public Collection<File> scan(final Stream<Path> paths) {
+
+		if ( paths == null ) {
+			throw new NullPointerException("null paths");
+		}
+
+		return paths
+
+				.filter(Objects::nonNull)
+				.filter(Files::isRegularFile)
+
+				.map(this::source)
+				.map(this::scan).flatMap(Optional::stream)
+				.map(this::extend)
+
+				.collect(toList());
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Optional<File> compile(final Path source) {
+	private Optional<File> scan(final Path source) {
 		try {
 
 			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes.stream()
@@ -439,7 +452,10 @@ public final class Mark implements Opts {
 					.map(pipe -> {
 						try {
 
-							return pipe.process(source);
+							return pipe.process(source).filter(not(file ->
+									inplace && file.path().equals(source) // prevent overwriting
+							));
+
 
 						} catch ( final RuntimeException e ) {
 
@@ -496,6 +512,7 @@ public final class Mark implements Opts {
 			final Path relative=relative(file.path());
 
 			logger.info(relative.toString());
+
 
 			// create the root data model
 

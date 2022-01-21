@@ -18,11 +18,12 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import static java.util.Comparator.reverseOrder;
 
@@ -40,15 +41,20 @@ public final class Clean implements Task {
 
 		if ( source.equals(target) ) { // in-place generation › remove assets and generated files
 
-		} else if ( Files.exists(target) ) { // delete target folder
+			try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
-			try ( final Stream<Path> walk=Files.walk(target) ) {
+				mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
 
-				walk.sorted(reverseOrder()).forEachOrdered(path -> {
+				mark.assets().forEach((path, url) -> {
 
-					try {
+					final Path asset=target.resolve(path);
 
-						Files.delete(path);
+					try (
+							final InputStream origin=url.openStream();
+							final InputStream actual=Files.newInputStream(asset)
+					) {
+
+						if ( checksum(origin) == checksum(actual) ) { delete(asset); }
 
 					} catch ( final IOException e ) {
 						throw new UncheckedIOException(e);
@@ -60,6 +66,39 @@ public final class Clean implements Task {
 				throw new UncheckedIOException(e);
 			}
 
+		} else if ( Files.exists(target) ) { // delete target folder
+
+			try ( final Stream<Path> walk=Files.walk(target) ) {
+
+				walk.sorted(reverseOrder()).forEachOrdered(this::delete);
+
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
+
+		}
+	}
+
+
+	private static long checksum(final InputStream input) throws IOException {
+		try ( final CheckedInputStream checker=new CheckedInputStream(input, new CRC32()) ) {
+
+			final byte[] buffer=new byte[1024];
+
+			while ( checker.read(buffer, 0, buffer.length) >= 0 ) { }
+
+			return checker.getChecksum().getValue();
+		}
+	}
+
+
+	private void delete(final Path path) {
+		try {
+
+			Files.delete(path);
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

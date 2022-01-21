@@ -19,7 +19,8 @@ package com.metreeca.mark.tasks;
 import com.metreeca.mark.*;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -37,7 +38,7 @@ public final class Build implements Task {
 
 		mark.assets().forEach((path, url) -> {
 
-			final Path source=mark.source().resolve(Paths.get(path));
+			final Path source=mark.source().resolve(path);
 
 			if ( !Files.exists(source) ) {
 				try ( final InputStream resource=url.openStream() ) {
@@ -51,12 +52,10 @@ public final class Build implements Task {
 
 		});
 
-		try (
-				final Stream<Path> sources=Files.walk(mark.source())
-		) {
+		try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
 			final long start=currentTimeMillis();
-			final long count=mark.process(sources);
+			final long count=mark.process(sources).size();
 			final long stop=currentTimeMillis();
 
 			if ( count > 0 ) {
