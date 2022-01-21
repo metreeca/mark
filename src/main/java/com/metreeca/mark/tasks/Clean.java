@@ -35,9 +35,12 @@ public final class Clean implements Task {
 
 	@Override public void exec(final Mark mark) {
 
+		final Path source=mark.source();
 		final Path target=mark.target();
 
-		if ( Files.exists(target) ) { // clean target folder
+		if ( source.equals(target) ) { // in-place generation › remove assets and generated files
+
+		} else if ( Files.exists(target) ) { // delete target folder
 
 			try ( final Stream<Path> walk=Files.walk(target) ) {
 

@@ -18,12 +18,11 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.*;
+import java.nio.file.*;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 
 /**
@@ -35,6 +34,23 @@ import static java.lang.System.currentTimeMillis;
 public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
+
+		mark.assets().forEach((path, url) -> {
+
+			final Path source=mark.source().resolve(Paths.get(path));
+
+			if ( !Files.exists(source) ) {
+				try ( final InputStream resource=url.openStream() ) {
+
+					Files.copy(resource, source);
+
+				} catch ( final IOException e ) {
+					throw new UncheckedIOException(e);
+				}
+			}
+
+		});
+
 		try (
 				final Stream<Path> sources=Files.walk(mark.source())
 		) {
@@ -44,7 +60,7 @@ public final class Build implements Task {
 			final long stop=currentTimeMillis();
 
 			if ( count > 0 ) {
-				mark.logger().info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000.0f));
+				mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
 			}
 
 		} catch ( final IOException e ) {

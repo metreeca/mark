@@ -21,7 +21,9 @@ import com.metreeca.mark.pipes.*;
 import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
 import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -40,6 +42,7 @@ import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 
 /**
@@ -56,7 +59,17 @@ public final class Mark implements Opts {
 	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 	private static final Path Layout=Paths.get("index.pug");
-	private static final Set<String> Assets=Set.of("index.js", "index.less", "index.pug", "index.svg");
+
+	private static final Map<String, URL> Assets=Stream.of(
+
+			"index.js", "index.less", "index.pug", "index.svg"
+
+	).collect(toMap(asset -> asset, asset -> requireNonNull(
+
+			Mark.class.getResource(format("files/%s", asset)),
+			format("missing asset ‹%s›", asset)
+
+	)));
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +208,9 @@ public final class Mark implements Opts {
 		return path.toString().endsWith(template);
 	}
 
+	public Map<String, URL> assets() {
+		return bundled ? Assets : Map.of();
+	}
 
 	/**
 	 * Locates a layout.
@@ -272,27 +288,6 @@ public final class Mark implements Opts {
 
 		if ( task == null ) {
 			throw new NullPointerException("null task");
-		}
-
-		if ( bundled ) {
-			Assets.forEach(asset -> {
-
-				final Path path=source.resolve(Paths.get(asset));
-
-				if ( !Files.exists(path) ) {
-					try ( final InputStream resource=requireNonNull(
-							getClass().getResourceAsStream(format("files/%s", asset)),
-							format("missing skin resource ‹%s›", asset)
-					) ) {
-
-						Files.copy(resource, path);
-
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				}
-
-			});
 		}
 
 		logger.info(format("%s %s ›› %s",
