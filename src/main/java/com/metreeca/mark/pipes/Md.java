@@ -23,10 +23,10 @@ import com.metreeca.mark.steps.Pug;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static com.metreeca.mark.Mark.target;
-
 
 public final class Md implements Pipe {
+
+	private final Mark mark;
 
 	private final Markdown markdown;
 	private final Pug pug;
@@ -38,13 +38,15 @@ public final class Md implements Pipe {
 			throw new NullPointerException("null mark");
 		}
 
+		this.mark=mark;
+
 		this.markdown=new Markdown(mark);
 		this.pug=new Pug(mark);
 	}
 
 
 	@Override public Optional<File> process(final Path source) {
-		return target(source, ".html", ".md").map(target ->
+		return mark.target(source, ".html", ".md").map(target ->
 				new File(target, markdown.read(source), pug::write)
 		);
 	}

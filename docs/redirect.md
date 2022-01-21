@@ -1,4 +1,4 @@
 ---
 title:      "Elsewhere"
-layout:     redirect canonical:  "http://example.org/"
+canonical:  "http://example.org/"
 ---

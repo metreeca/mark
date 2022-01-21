@@ -44,12 +44,6 @@ public interface Opts {
 
 
 	/**
-	 * @return the system logger
-	 */
-	public Log logger();
-
-
-	/**
 	 * @return the global variables
 	 */
 	public Map<String, Object> global();
@@ -67,5 +61,11 @@ public interface Opts {
 	 * @throws NullPointerException if {@code mapper} is null
 	 */
 	public <V> V get(final String option, final Function<String, V> mapper);
+
+
+	/**
+	 * @return the system logger
+	 */
+	public Log logger();
 
 }

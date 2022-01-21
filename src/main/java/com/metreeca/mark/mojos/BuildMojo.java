@@ -23,7 +23,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_SITE;
 
-
 @Mojo(name="build", defaultPhase=PRE_SITE)
 public class BuildMojo extends MarkMojo {
 

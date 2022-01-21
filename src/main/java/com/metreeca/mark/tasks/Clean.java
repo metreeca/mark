@@ -35,7 +35,7 @@ public final class Clean implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		final Path target=opts.target();
+		final Path target=mark.target();
 
 		if ( Files.exists(target) ) { // clean target folder
 

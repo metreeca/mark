@@ -45,14 +45,11 @@ public final class Work {
 
 	private static final class TestOpts implements Opts {
 
-		@Override public Path source() { return Paths.get("docs").toAbsolutePath().normalize(); }
+		@Override public Path source() { return Paths.get("docs"); }
 
-		@Override public Path target() { return source(); }
+		@Override public Path target() { return Paths.get(""); }
 
 		@Override public Path layout() { return Paths.get(""); }
-
-
-		@Override public Log logger() { return new SystemStreamLog(); }
 
 
 		@Override public Map<String, Object> global() {
@@ -85,6 +82,9 @@ public final class Work {
 
 			);
 		}
+
+
+		@Override public Log logger() { return new SystemStreamLog(); }
 
 	}
 

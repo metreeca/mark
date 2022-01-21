@@ -32,7 +32,7 @@ import java.util.Optional;
 	 *
 	 * @param source the path of the source file
 	 *
-	 * @return an optional site page, if this pipe actually handled the {@code source} file; an empty optional,
+	 * @return an optional site file, if this pipe actually handled the {@code source} file; an empty optional,
 	 * otherwise
 	 */
 	public Optional<File> process(final Path source);

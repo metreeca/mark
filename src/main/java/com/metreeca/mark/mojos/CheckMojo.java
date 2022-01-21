@@ -23,7 +23,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.POST_SITE;
 
-
 @Mojo(name="check", defaultPhase=POST_SITE)
 public class CheckMojo extends MarkMojo {
 

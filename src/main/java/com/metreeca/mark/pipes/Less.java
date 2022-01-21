@@ -25,8 +25,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.metreeca.mark.Mark.target;
-
 import static com.inet.lib.less.Less.compile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -34,28 +32,34 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class Less implements Pipe {
 
+	private final Mark mark;
+
+
 	public Less(final Mark mark) {
 
 		if ( mark == null ) {
 			throw new NullPointerException("null mark");
 		}
 
+		this.mark=mark;
 	}
 
 
 	@Override public Optional<File> process(final Path source) {
-		return target(source, ".css", ".css", ".less").map(target -> new File(target, Map.of(), (path, model) -> {
-			try {
+		return mark.target(source, ".css", ".css", ".less").map(target ->
+				new File(target, Map.of(), (path, model) -> {
+					try {
 
-				final String less=Files.readString(source);
-				final String css=compile(path.toUri().toURL(), less, true);
+						final String less=Files.readString(source);
+						final String css=compile(path.toUri().toURL(), less, true);
 
-				Files.write(path, css.getBytes(UTF_8));
+						Files.write(path, css.getBytes(UTF_8));
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		}));
+					} catch ( final IOException e ) {
+						throw new UncheckedIOException(e);
+					}
+				})
+		);
 	}
 
 }

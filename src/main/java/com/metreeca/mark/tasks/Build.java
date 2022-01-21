@@ -36,7 +36,7 @@ public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
 		try (
-				final Stream<Path> sources=Files.walk(opts.source())
+				final Stream<Path> sources=Files.walk(mark.source())
 		) {
 
 			final long start=currentTimeMillis();
@@ -44,7 +44,7 @@ public final class Build implements Task {
 			final long stop=currentTimeMillis();
 
 			if ( count > 0 ) {
-				opts.logger().info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000.0f));
+				mark.logger().info(String.format("processed %,d files in %,.3f s", count, (stop-start)/1000.0f));
 			}
 
 		} catch ( final IOException e ) {

@@ -78,8 +78,8 @@ public final class Markdown {
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
 
-				.set(SmartLinks, mark.opts().get(SmartLinks.getName(), Boolean::parseBoolean))
-				.set(ExternalLinks, mark.opts().get(ExternalLinks.getName(), Boolean::parseBoolean));
+				.set(SmartLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean))
+				.set(ExternalLinks, mark.get(ExternalLinks.getName(), Boolean::parseBoolean));
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);

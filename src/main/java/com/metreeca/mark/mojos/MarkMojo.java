@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
 
-
 public abstract class MarkMojo extends AbstractMojo implements Opts {
 
 	@Parameter(defaultValue="${project}", readonly=true)
@@ -38,7 +37,7 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
 	@Parameter(defaultValue="${project.basedir}/docs/", property="mark.source")
 	private String source;
 
-	@Parameter(defaultValue="${project.build.directory}/docs/", property="mark.target")
+	@Parameter(defaultValue="", property="mark.target")
 	private String target;
 
 	@Parameter(defaultValue="", property="mark.layout")
@@ -49,22 +48,26 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
 	private Map<String, String> options;
 
 
-	@Override public Path source() { return Paths.get(source); }
+	@Override public Path source() {
+		return Paths.get(source);
+	}
 
-	@Override public Path target() { return Paths.get(target); }
+	@Override public Path target() {
+		return Paths.get(target);
+	}
 
 	@Override public Path layout() { return Paths.get(layout); }
 
-
-	@Override public Log logger() { return getLog(); }
 
 	@Override public Map<String, Object> global() {
 		return Map.of("project", project);
 	}
 
-
 	@Override public <V> V get(final String option, final Function<String, V> mapper) {
 		return mapper.apply(options == null ? null : options.get(option));
 	}
+
+
+	@Override public Log logger() { return getLog(); }
 
 }

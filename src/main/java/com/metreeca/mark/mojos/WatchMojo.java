@@ -22,7 +22,6 @@ import com.metreeca.mark.tasks.Watch;
 
 import org.apache.maven.plugins.annotations.Mojo;
 
-
 @Mojo(name="watch")
 public class WatchMojo extends MarkMojo {
 

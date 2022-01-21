@@ -27,15 +27,13 @@ import java.awt.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.*;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.Root;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.formats.OutputFormat.output;
@@ -64,14 +62,14 @@ public final class Serve implements Task {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override public void exec(final Mark mark) {
-		serve(mark, opts);
-		watch(mark, opts);
+		serve(mark);
+		watch(mark);
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void serve(final Mark mark, final Opts opts) {
+	private void serve(final Mark mark) {
 
 		final Thread daemon=new Thread(() -> {
 			try {
@@ -82,7 +80,7 @@ public final class Serve implements Task {
 
 						.delegate(context -> context
 
-								.set(logger(), () -> new MavenLogger(opts.logger()))
+								.set(logger(), () -> new MavenLogger(mark.logger()))
 
 								.get(() -> server().wrap(router()
 
@@ -101,7 +99,7 @@ public final class Serve implements Task {
 										)
 
 										.path("/*", router()
-												.get(publisher(opts.target())
+												.get(publisher(mark.target())
 														.with(postprocessor(this::rewrite))
 												)
 										)
@@ -128,11 +126,13 @@ public final class Serve implements Task {
 		daemon.start();
 	}
 
-	private void watch(final Mark mark, final Opts opts) {
+	private void watch(final Mark mark) {
+
+		final Path root=Paths.get("/");
 
 		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> {
 
-			final String path=Root.resolve(opts.target().relativize(target)).toString();
+			final String path=root.resolve(mark.target().relativize(target)).toString();
 
 			Stream.of("", ".html", "index.html").forEach(suffix -> {
 				if ( path.endsWith(suffix) ) { updates.offer(path.substring(0, path.length()-suffix.length())); }

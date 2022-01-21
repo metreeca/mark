@@ -61,8 +61,8 @@ public final class Check implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		final Path target=opts.target();
-		final Log logger=opts.logger();
+		final Path target=mark.target();
+		final Log logger=mark.logger();
 
 		try ( final Stream<Path> walk=Files.walk(target) ) {
 
