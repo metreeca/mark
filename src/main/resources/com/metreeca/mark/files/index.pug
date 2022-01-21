@@ -22,8 +22,8 @@ doctype html
 				meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 				meta(http-equiv="Refresh" content="0; url=#{page.canonical}")
 
-				link(rel="shortcut icon" href="#{page.root}/index.svg")
-				link(rel="canonical" href="#{page.canonical}")
+				link(rel="shortcut icon" href=`${page.root}/index.svg`)
+				link(rel="canonical" href=page.canonical)
 
 		else
 
@@ -34,18 +34,16 @@ doctype html
 				meta(name="viewport" content="width=device-width,initial-scale=1")
 				meta(http-equiv="Content-Type" content="text/html; charset=UTF-8")
 
-				link(rel="shortcut icon" href="#{page.root}/index.svg")
+				link(rel="shortcut icon" href=`${page.root}/index.svg`)
 
-				//- prism.js code highlighting
+				//- default stylesheet after prism.js to override it
 
-				link(rel="stylesheet" href="#{prism}/themes/prism.min.css")
+				link(rel="stylesheet" href=`${prism}/themes/prism.min.css`)
+				link(rel="stylesheet" type="text/css" href=`${page.root}/index.css`)
 
-				script(type="text/javascript" src="#{prism}/components/prism-core.min.js")
-				script(type="text/javascript" src="#{prism}/plugins/autoloader/prism-autoloader.min.js")
-
-				//- default stylesheet (at end to override prism.js)
-
-				link(rel="stylesheet" type="text/css" href="#{page.root}/index.css")
+				script(type="text/javascript" src=`${prism}/components/prism-core.min.js`)
+				script(type="text/javascript" src=`${prism}/plugins/autoloader/prism-autoloader.min.js`)
+				script(type="text/javascript" src=`${page.root}/index.js`)
 
 		body
 
@@ -58,8 +56,8 @@ doctype html
 				header
 
 					span
-						a(href="#{home}") #{empty(owner) ? project.groupId : owner}
-						a(href="#{page.root}/index.html") #{module}
+						a(href=home) #{empty(owner) ? project.groupId : owner}
+						a(href=`${page.root}/index.html`) #{module}
 							span v#{version}
 
 					//- icon dynamically managed by default.css
@@ -73,7 +71,7 @@ doctype html
 
 					for heading in page.headings
 						#{"h"+heading.level}
-							a(href="##{heading.anchorRefId}") #{heading.anchorRefText}
+							a(href="#"+heading.anchor) #{heading.label}
 
 			main
 
@@ -88,4 +86,3 @@ doctype html
 						= ' '
 						| #[a(href="https://creativecommons.org/licenses/by-nc-sa/4.0/") Creative Commons BY-NC-SA 4.0 License]
 
-			script(type="text/javascript" src="#{page.root}/index.js")
