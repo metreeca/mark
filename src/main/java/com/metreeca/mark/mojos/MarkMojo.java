@@ -78,8 +78,6 @@ public abstract class MarkMojo extends AbstractMojo {
 
 		@Override public Path target() { return Paths.get(mojo.target); }
 
-		@Override public Path assets() { return Paths.get(mojo.assets); }
-
 		@Override public Path layout() { return Paths.get(mojo.layout); }
 
 

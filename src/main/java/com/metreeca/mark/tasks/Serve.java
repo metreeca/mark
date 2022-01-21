@@ -130,7 +130,7 @@ public final class Serve implements Task {
 
 	private void watch(final Mark mark) {
 
-		final Thread daemon=new Thread(() -> mark.watch(mark.target(), (kind, target) -> {
+		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> {
 
 			final String path=Root.resolve(mark.target().relativize(target)).toString();
 

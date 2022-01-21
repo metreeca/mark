@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,7 @@ public interface Opts {
 	public Path target();
 
 	/**
-	 * @return the path of the overlay assets folder to be merged with the {@linkplain #source() source} site folder
-	 */
-	public Path assets();
-
-	/**
-	 * @return the root-relative path of the default site layout
+	 * @return the source-relative path of the default site layout
 	 */
 	public Path layout();
 

@@ -42,7 +42,6 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.xpath.*;
 
-import static com.metreeca.mark.Mark.extension;
 import static com.metreeca.rest.handlers.Publisher.variants;
 
 import static java.lang.String.format;
@@ -138,7 +137,7 @@ public final class Check implements Task {
 
 		final String self=base.relativize(path).toString();
 
-		if ( extension(path).equals(".html") ) {
+		if ( path.toString().endsWith(".html") ) {
 
 			final Document document=document(path);
 

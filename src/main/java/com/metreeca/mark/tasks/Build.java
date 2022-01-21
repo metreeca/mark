@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,11 @@ public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
 		try (
-				final Stream<Path> assets=Files.walk(mark.assets());
 				final Stream<Path> sources=Files.walk(mark.source())
 		) {
 
 			final long start=currentTimeMillis();
-			final long count=mark.process(Stream.concat(assets, sources));
+			final long count=mark.process(sources);
 			final long stop=currentTimeMillis();
 
 			if ( count > 0 ) {

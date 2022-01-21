@@ -26,9 +26,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.basename;
-
 public final class None implements Pipe {
+
+	public static String basename(final Path path) {
+
+		final String filename=path.toString();
+		final int dot=filename.lastIndexOf('.');
+
+		return dot < 0 ? filename : filename.substring(0, dot);
+	}
 
 	public None(final Mark mark) {
 

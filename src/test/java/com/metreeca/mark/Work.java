@@ -51,8 +51,6 @@ public final class Work {
 
 		@Override public Path target() { return Paths.get("target/docs"); }
 
-		@Override public Path assets() { return Paths.get("src/main/themes/docs"); }
-
 		@Override public Path layout() { return Paths.get("layouts/default.pug"); }
 
 
