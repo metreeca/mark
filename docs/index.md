@@ -15,41 +15,41 @@ Add the plugin to your build configuration as:
 ```xml
 
 <build>
-  <plugins>
+	<plugins>
 
-    <plugin>
+		<plugin>
 
-      <groupId>com.metreeca</groupId>
-      <artifactId>mark-maven-plugin</artifactId>
-      <version>${mark.version}</version>
+			<groupId>com.metreeca</groupId>
+			<artifactId>mark-maven-plugin</artifactId>
+			<version>${project.version}</version>
 
-      <configuration> <!-- optional -->
+			<configuration> <!-- optional -->
 
-        <source>src/docs</source>
-        <target>target/docs</target>
-        <layout>layouts/default.pug</layout>
+				<source>src/docs</source>
+				<target>target/docs</target>
+				<layout>layouts/default.pug</layout>
 
-        <options> <!-- pipeline specific options -->
-          <pipeline-option>value</pipeline-option>
-        </options>
+				<options> <!-- pipeline specific options -->
+					<pipeline-option>value</pipeline-option>
+				</options>
 
-      </configuration>
+			</configuration>
 
-      <executions>
-        <execution> <!-- example -->
+			<executions>
+				<execution> <!-- example -->
 
-          <goals>
-            <goal>clean</goal> <!-- by default in the pre-clean phase-->
-            <goal>build</goal> <!-- by default in the pre-site phase-->
-            <goal>check</goal> <!-- by default in the post-site phase-->
-          </goals>
+					<goals>
+						<goal>clean</goal> <!-- by default in the pre-clean phase-->
+						<goal>build</goal> <!-- by default in the pre-site phase-->
+						<goal>check</goal> <!-- by default in the post-site phase-->
+					</goals>
 
-        </execution>
-      </executions>
+				</execution>
+			</executions>
 
-    </plugin>
+		</plugin>
 
-  </plugins>
+	</plugins>
 </build>
 ```
 
@@ -101,16 +101,15 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `page.root`     | the path of the site root relative to the page               |
 | `page.base` | the path of the page folder relative to the site root |
 | `page.path`     | the path of the page relative to the site root               |
-| `page.headings` | a list of page [headings](https://javadoc.io/doc/com.vladsch.flexmark/flexmark/undefined/com/vladsch/flexmark/ast/Heading.html); use `heading.anchorRefId`, `heading.level` and `heading.text` to generate TOCs |
+| `page.headings` | a list of page (use `heading.level`, `heading.id` and `heading.text` to generate TOCs |
 | `page.body`  | page content rendered as HTML                     |
 | `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
 > :warning:
 >
->  Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL]
-> (http://commons.apache.org/proper/commons-jexl/) rather than Javascript. Expression interpolation in HTML attributes
-> is supported as ```\${expression}```
+>  Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as [JEXL](http://commons.apache.org/proper/commons-jexl/)
+> rather than Javascript. Expression interpolation in HTML attributes is supported as ``\${expression}``
 
 ## Create site content
 
@@ -119,8 +118,6 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 ```markdown
 ---
 title: Lorem Ipsum
-date: 2019-11-05 # optional
-layout: post.pug # optional
 ---
 
 Lorem ipsum `\${project.version}` dolor sit amet, consectetur adipiscing elit…
@@ -157,6 +154,11 @@ mvn mark:build # by default in the pre-site phase
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
+> :warning:
+>
+>  When generating sites in-place, files converted without altering the file extension (for instance, `.css` › `.css`)
+> are silently ignored.
+
 **Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
 the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
 property; links to other `.md` files are converted to the corresponding `.html` file.
@@ -168,12 +170,6 @@ property; links to other `.md` files are converted to the corresponding `.html` 
 
 **CSS/Less** /  `.css` and `.less` files under the source folder are converted to minified `.css` files at the same
 relative path under the target.
-
-
-> :warning:
->
->  When generating sites in-place, files converted without altering the file extension (for instance, `.css` › `.css`)
-> are silently ignored.
 
 ## Check links
 

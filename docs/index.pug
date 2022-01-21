@@ -71,7 +71,7 @@ html(lang="en")
 
 				for heading in page.headings
 					#{"h"+heading.level}
-						a(href="#"+heading.anchor) #{heading.label}
+						a(href="#"+heading.id) #{heading.text}
 
 		main
 

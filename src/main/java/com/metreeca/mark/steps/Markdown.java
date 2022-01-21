@@ -16,7 +16,6 @@
 
 package com.metreeca.mark.steps;
 
-import com.metreeca.mark.Item;
 import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.ast.Heading;
@@ -32,6 +31,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.*;
 import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -40,6 +40,7 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -130,14 +131,14 @@ public final class Markdown {
 		));
 	}
 
-	private List<Item> headings(final Node document) {
+	private List<Map<String, Object>> headings(final Node document) {
 
 		final List<Heading> headings=new ArrayList<>();
 
 		new NodeVisitor(new VisitHandler<>(Heading.class, headings::add)).visit(document);
 
 		return headings.stream()
-				.map(heading -> new Item(heading.getLevel(), heading.getAnchorRefId(), heading.getAnchorRefText()))
+				.map(HeadingMap::new)
 				.collect(toList());
 	}
 
@@ -163,4 +164,21 @@ public final class Markdown {
 
 	}
 
+	private static final class HeadingMap extends AbstractMap<String, Object> {
+
+		private final Heading heading;
+
+
+		private HeadingMap(final Heading heading) { this.heading=heading; }
+
+
+		@NotNull @Override public Set<Entry<String, Object>> entrySet() {
+			return Set.of(
+					entry("level", heading.getLevel()),
+					entry("id", heading.getAnchorRefId()),
+					entry("text", heading.getAnchorRefText())
+			);
+		}
+
+	}
 }
