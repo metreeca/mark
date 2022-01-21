@@ -28,7 +28,7 @@
 	</parent>
 
 	<artifactId>mark-maven-plugin</artifactId>
-	<version>0.7.0</version>
+	<version>0.7.1</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Metreeca Static Site Generator</name>
@@ -141,34 +141,6 @@
 
 					</execution>
 
-				</executions>
-
-			</plugin>
-
-			<plugin>
-
-				<groupId>com.metreeca</groupId>
-				<artifactId>mark-maven-plugin</artifactId>
-				<version>${project.version}</version>
-
-				<configuration>
-
-					<options>
-						<index>README.md</index>
-					</options>
-
-				</configuration>
-
-				<executions>
-					<execution>
-
-						<goals>
-							<goal>clean</goal>
-							<goal>build</goal>
-							<goal>check</goal>
-						</goals>
-
-					</execution>
 				</executions>
 
 			</plugin>
