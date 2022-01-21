@@ -515,7 +515,7 @@ public final class Mark implements Opts {
 
 		// 1st pass › locate, compile and extend
 
-		final List<Page> pages=paths
+		final List<File> files=paths
 
 				.filter(Objects::nonNull)
 
@@ -527,21 +527,21 @@ public final class Mark implements Opts {
 
 		// 2nd pass › collect models
 
-		pages.stream()
+		files.stream()
 				.filter(page -> page.path().toString().endsWith(".html"))
 				.forEach(page -> models.put(page.path(), page.model()));
 
 		// 3rd pass › render
 
-		pages.forEach(this::render);
+		files.forEach(this::render);
 
-		return pages.size();
+		return files.size();
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private Optional<Page> compile(final Path source) {
+	private Optional<File> compile(final Path source) {
 		try {
 
 			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes
@@ -561,7 +561,7 @@ public final class Mark implements Opts {
 									MessagePattern.matcher(e.getMessage()).replaceAll("; ")
 							));
 
-							return Optional.<Page>empty();
+							return Optional.<File>empty();
 
 						}
 					})
@@ -577,10 +577,10 @@ public final class Mark implements Opts {
 		}
 	}
 
-	private Page extend(final Page page) {
+	private File extend(final File file) {
 
-		final Path path=common(page.path()).normalize();
-		final Map<String, Object> model=new HashMap<>(page.model());
+		final Path path=common(file.path()).normalize();
+		final Map<String, Object> model=new HashMap<>(file.model());
 
 		model.put("root", Optional
 				.ofNullable(path.getParent())
@@ -599,29 +599,29 @@ public final class Mark implements Opts {
 
 		model.computeIfAbsent("date", key -> ISO_LOCAL_DATE.format(LocalDate.now()));
 
-		return new Page(path, model, page.render());
+		return new File(path, model, file.render());
 	}
 
-	private void render(final Page page) {
+	private void render(final File file) {
 		try {
 
-			logger.info(page.path().toString());
+			logger.info(file.path().toString());
 
 			// create the root data model
 
 			final Map<String, Object> model=new HashMap<>(shared());
 
-			model.put("page", page.model());
+			model.put("page", file.model());
 			model.put("pages", models.values());
 
 
 			// make sure the output folder exists, then render page
 
-			final Path target=target(page.path());
+			final Path target=target(file.path());
 
 			Files.createDirectories(target.getParent());
 
-			page.render().accept(target, model);
+			file.render().accept(target, model);
 
 		} catch ( final IOException e ) {
 

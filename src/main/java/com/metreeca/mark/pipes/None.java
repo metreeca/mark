@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -38,10 +39,10 @@ public final class None implements Pipe {
 	}
 
 
-	@Override public Optional<Page> process(final Path source) {
+	@Override public Optional<File> process(final Path source) {
 		return Optional.of(source)
 				.filter(path -> !Files.exists(path))
-				.map(path -> new Page(path, target -> {
+				.map(path -> new File(path, Map.of(), (target, model) -> {
 					try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
 
 						files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {

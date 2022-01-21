@@ -2,9 +2,9 @@
 
 # Metreeca/Mark
 
-Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. Unlike other solutions, it is
-tightly integrated as a plugin in the Maven build process and doesn't require specific site layouts or complex setups:
-just throw in a couple of Markdown pages and a Pug/Less template and let the generator take care of the details…
+Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. It is tightly integrated as a Maven
+in the build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown
+pages and a Pug/Less template and let the generator take care of the details…
 
 # Usage
 
@@ -13,6 +13,7 @@ just throw in a couple of Markdown pages and a Pug/Less template and let the gen
 Add the plugin to your build configuration as:
 
 ```xml
+
 <build>
   <plugins>
 
@@ -117,7 +118,8 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 
 ```markdown
 ---
-title: Lorem Ipsum date: 2019-11-05 # optional layout: post.pug # optional
+title: Lorem Ipsum date: 2019-11-05 # optional layout:
+post.pug # optional
 ---
 
 Lorem ipsum ${project.version} dolor sit amet, consectetur adipiscing elit…
@@ -198,8 +200,7 @@ mvn mark:serve
 # Support
 
 - open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an open-ended
-  idea
+- start a [discussion](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an idea
 
 # License
 

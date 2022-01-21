@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.metreeca.mark.Mark.target;
@@ -42,10 +43,8 @@ public final class Less implements Pipe {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Optional<Page> process(final Path source) {
-		return target(source, ".css", ".less", ".css").map(target -> new Page(target, path -> {
+	@Override public Optional<File> process(final Path source) {
+		return target(source, ".css", ".css", ".less").map(target -> new File(target, Map.of(), (path, model) -> {
 			try {
 
 				final String less=Files.readString(source);

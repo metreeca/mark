@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,9 @@ public final class Md implements Pipe {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Optional<Page> process(final Path source) {
+	@Override public Optional<File> process(final Path source) {
 		return target(source, ".html", ".md").map(target ->
-				new Page(target, markdown.read(source), pug::write)
+				new File(target, markdown.read(source), pug::write)
 		);
 	}
 

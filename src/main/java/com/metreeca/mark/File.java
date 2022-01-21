@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,25 @@ package com.metreeca.mark;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 
 /**
- * Site page.
+ * Site file.
  */
-public final class Page {
+public final class File {
 
 	private final Path path;
 	private final Map<String, Object> model;
 	private final BiConsumer<Path, Map<String, Object>> render;
 
 
-	public Page(final Path path, final Consumer<Path> render) {
-		this(path, emptyMap(), (target, model) -> render.accept(target));
-	}
-
-	public Page(final Path path, final Map<String, Object> model, final BiConsumer<Path, Map<String, Object>> render) {
+	/**
+	 * @param path
+	 * @param model  may be extended
+	 * @param render
+	 */
+	public File(final Path path, final Map<String, Object> model, final BiConsumer<Path, Map<String, Object>> render) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -53,7 +52,7 @@ public final class Page {
 		}
 
 		this.path=path;
-		this.model=model;
+		this.model=unmodifiableMap(model);
 		this.render=render;
 	}
 
@@ -63,7 +62,7 @@ public final class Page {
 	}
 
 	public Map<String, Object> model() {
-		return unmodifiableMap(model);
+		return model;
 	}
 
 	public BiConsumer<Path, Map<String, Object>> render() {
