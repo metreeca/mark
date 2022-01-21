@@ -36,14 +36,6 @@ public final class Item {
 			throw new NullPointerException("null anchor");
 		}
 
-		if ( anchor.isEmpty() ) {
-			throw new IllegalArgumentException("empty anchor");
-		}
-
-		if ( label.isEmpty() ) {
-			throw new NullPointerException("empty label");
-		}
-
 		this.level=level;
 		this.anchorRefId=anchor;
 		this.label=label;

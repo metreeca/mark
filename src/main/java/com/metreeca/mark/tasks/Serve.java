@@ -25,9 +25,11 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.awt.*;
 import java.io.*;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -44,6 +46,7 @@ import static com.metreeca.rest.services.Logger.logger;
 import static com.metreeca.rest.wrappers.Server.server;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Site serving task.
@@ -149,22 +152,18 @@ public final class Serve implements Task {
 
 	private static final String Live=Optional
 
-			.of(Serve.class.getSimpleName()+".js")
-
-			.map(Serve.class::getResource)
+			.ofNullable(Serve.class.getResource(Serve.class.getSimpleName()+".js"))
 
 			.map(url -> {
-				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
-			})
 
-			.map(Paths::get)
+				try ( InputStream input=url.openStream() ) {
 
-			.map(path -> {
-				try {
-					return Files.readString(path);
+					return new String(input.readAllBytes(), UTF_8);
+
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
+
 			})
 
 			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))

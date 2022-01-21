@@ -1,0 +1,769 @@
+/*
+ * Copyright © 2019-2021 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
+
+*, *::before, *::after {
+	flex: 0 0 auto;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	outline: none 1px #CCC;
+	border: none 1px #CCC;
+	font: inherit;
+}
+
+/**** Fonts ***********************************************************************************************************/
+
+html {
+	font-family: Roboto, Helvetica, Arial, sans-serif;
+	font-weight: 300;
+	line-height: 1.3;
+}
+
+header, footer, nav, h1, h2, h3, dt, th, a, strong, small {
+	font-family: "Roboto Condensed", Helvetica, Arial, sans-serif;
+}
+
+code, code[class*=language-], pre[class*=language-] {
+	font-family: "Roboto Mono", monospace;
+	font-weight: 400;
+	line-height: inherit;
+	letter-spacing: -0.01em;
+	color: #333;
+}
+
+
+/**** Layout **********************************************************************************************************/
+
+html {
+
+	height: 100%;
+	width: 100%;
+	font-size: 12pt;
+	color: #000;
+	background-color: #FFF;
+
+	> body {
+
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		height: 100%;
+		width: 100%;
+		text-align: center;
+		overflow: hidden;
+
+		> input {
+
+			display: none;
+
+			&:not(:checked) {
+
+				~ nav > :not(header) {
+					display: none;
+				}
+
+			}
+
+			&:checked {
+
+				~ nav {
+				}
+
+				~ main {
+					height: 0; /* don't hide to enable navigation from TOC */
+					flex-grow: 0;
+				}
+
+			}
+
+		}
+
+		> nav, > main {
+
+			display: flex;
+			align-items: stretch;
+			flex-direction: column;
+
+			> *:empty {
+				display: none;
+			}
+
+			> header {
+
+				flex-shrink: 0;
+
+				padding-top: 0.75rem;
+				padding-bottom: 0.5rem;
+				font-size: 1.5rem;
+				overflow: hidden;
+
+			}
+
+			> section {
+				flex-grow: 1;
+				flex-shrink: 1;
+				padding-top: 1rem;
+				padding-bottom: 1rem;
+			}
+
+			> footer {
+				flex-shrink: 0;
+				padding-top: 0.75rem;
+				padding-bottom: 0.75rem;
+				font-size: 0.8rem;
+				color: #999;
+			}
+
+		}
+
+		> nav {
+
+			flex-shrink: 1; /* enable TOC scrolling */
+
+			> * {
+				padding-left: 0.5rem;
+				padding-right: 0.5rem;
+			}
+
+			> header {
+
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+
+				border-bottom-style: solid;
+				white-space: nowrap;
+				box-shadow: 0 0 0.5rem 0.5rem #FFF;
+				z-index: 1;
+
+				> span {
+
+					flex-shrink: 1;
+					overflow: hidden;
+					text-overflow: ellipsis;
+
+					> a + a::before {
+						content: "›";
+						padding: 0.25em;
+					}
+
+					> a + a > span {
+						margin-left: 0.25em;
+						font-size: 90%;
+					}
+
+				}
+
+			}
+
+			> section {
+
+				overflow-x: hidden;
+				overflow-y: auto;
+
+				a {
+					font-weight: inherit;
+				}
+
+				> * {
+					display: block;
+				}
+
+				> a:first-child {
+					margin-bottom: 1em;
+					white-space: normal;
+					font-size: 125%;
+					color: #999;
+				}
+
+				> h1,
+				> h2,
+				> h3 {
+					padding: 0;
+					margin: 0;
+					border: none;
+					font-size: inherit;
+					font-weight: 300;
+				}
+
+				> h1 {
+					font-weight: 700;
+				}
+
+				> h1 + h1 {
+					margin-top: 0.5em;
+				}
+
+				> * + h1 {
+					margin-top: 0.75em;
+				}
+
+				> h2 + h2 {
+					margin-top: 0;
+				}
+
+				> * + h2 {
+					margin-top: 0.5em;
+				}
+
+				> h3 {
+					display: none;
+				}
+
+			}
+
+		}
+
+		> main {
+
+			flex-shrink: 1;
+			flex-grow: 1;
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			> * {
+				max-width: 50rem;
+				padding-left: 1rem;
+				padding-right: 1rem;
+			}
+
+			> header {
+				font-weight: 300;
+				color: #999;
+			}
+
+			> footer {
+
+				a {
+
+					font: inherit !important;
+					color: inherit !important;
+
+					:hover {
+						text-decoration: underline;
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+}
+
+
+/**** Toggle **********************************************************************************************************/
+
+label:empty {
+
+	@size: 0.66em;
+	@color: #000;
+	@weight: 0.11em;
+
+	display: block;
+	position: relative;
+	width: @size;
+	height: @size;
+	margin-left: 0.25em;
+
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: @weight;
+		background-color: @color;
+		box-sizing: content-box;
+	}
+
+	body > input:not(:checked) ~ * & {
+
+		background-color: @color;
+
+		&::before,
+		&::after {
+			height: calc(1.05 * @weight);
+			background-color: #FFF;
+		}
+
+		&::before {
+			top: calc(@size / 5);
+		}
+
+		&::after {
+			bottom: calc(@size / 5);
+		}
+	}
+
+	body > :checked ~ * & {
+
+		&::before,
+		&::after {
+			top: calc(@size / 2 - @weight / 2);
+		}
+
+		&::before {
+			transform: rotate(45deg);
+		}
+
+		&::after {
+			transform: rotate(-45deg);
+		}
+
+	}
+
+}
+
+
+/**** Admonitions *****************************************************************************************************/
+
+.adm-hidden {
+	display: none;
+}
+
+.adm-block {
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	border-style: dotted;
+	border-left: solid 3px;
+	font-size: 90%;
+	background-color: #EEE;
+
+	.color(@color) {
+
+		border-left-color: @color;
+
+		svg {
+			color: @color;
+		}
+
+	}
+
+	& + :not(&) {
+		margin-top: 1.5em;
+	}
+
+	& + & {
+		margin-top: 0.25em;
+	}
+
+	&.adm-note, &.adm-info {
+		.color(#789);
+	}
+
+	&.adm-warning {
+		.color(#F80);
+	}
+
+	> * {
+
+		padding: 0.5em;
+
+	}
+
+	> .adm-heading {
+
+		@size: 1.75em;
+
+		flex: 0;
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		svg {
+			width: @size;
+			height: @size;
+		}
+
+		span {
+			display: none;
+		}
+
+	}
+
+	> .adm-body {
+
+		flex: 1;
+
+		> p {
+			margin: 0;
+		}
+	}
+
+}
+
+
+/**** Typography ******************************************************************************************************/
+
+h1,
+h2,
+h3 {
+	clear: both;
+	margin-bottom: 0.5em;
+	font-weight: 300;
+	color: #333;
+}
+
+* + h1,
+* + h2,
+* + h3 {
+	margin-top: 1em;
+}
+
+h1 {
+	padding-bottom: 0.2em;
+	border-bottom-style: solid;
+	scroll-margin-top: 0.25em;
+	font-size: 175%;
+}
+
+h2 {
+	padding-bottom: 0.2em;
+	border-bottom-style: dotted;
+	scroll-margin-top: 0.5em;
+	font-size: 125%;
+}
+
+h3 {
+	font-weight: 700;
+	font-size: 100%;
+}
+
+dl, ul, ol {
+	margin-bottom: 1.5em;
+}
+
+ul, ol {
+	list-style-position: inside;
+}
+
+ul {
+	list-style-type: none;
+}
+
+ul > li::before {
+	content: "›";
+	margin-right: 0.25em;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+li {
+	margin-bottom: 0.1em;
+}
+
+dt {
+
+	font-weight: 700;
+	font-size: 95%;
+	color: #333;
+
+	* + & {
+		margin-top: 1em;
+	}
+
+	* {
+		font-weight: 700;
+	}
+
+}
+
+dd {
+	margin-top: 0.5em;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 1.5em;
+	font-size: 95%;
+}
+
+table th:last-child {
+	width: 100%;
+}
+
+tr:nth-child(odd) > td {
+	background-color: #F8F8F8;
+}
+
+th,
+td {
+	padding: 0.5em 0.5em;
+	border-bottom-style: solid;
+	vertical-align: baseline;
+}
+
+th {
+	white-space: pre;
+	font-weight: 700;
+}
+
+pre {
+	position: relative;
+	overflow: auto;
+	padding: 0.5em 0.75em;
+	border-style: dotted;
+	border-radius: 0.25em;
+	white-space: pre-wrap;
+	text-align: left;
+	tab-size: 4;
+	font-size: 85%;
+	background-color: #F0F0F0;
+}
+
+pre {
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
+}
+
+pre + pre,
+div + div > pre {
+	margin-top: -1em;
+}
+
+p {
+
+	margin-bottom: 0.75em;
+
+	li > &:only-child {
+		display: inline;
+		margin: 0;
+	}
+
+}
+
+blockquote {
+	margin-top: 1.5em;
+	padding-left: 2em;
+	padding-right: 0.5em;
+	margin-bottom: 1.5em;
+	border-left: solid 0.5em #EEE;
+	font-style: italic;
+}
+
+blockquote > small:last-child {
+	display: block;
+	margin-top: 0.5em;
+	text-align: right;
+}
+
+img:only-child {
+	width: 100%;
+	height: auto;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	border-style: solid;
+	border-radius: 3px;
+	box-shadow: 3pt 3pt 9pt #999;
+}
+
+img:not(:only-child) {
+	float: right;
+	max-width: 40%;
+	height: auto;
+	margin-left: 1.5em;
+	margin-bottom: 1.5em;
+}
+
+hr {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	border-top-style: solid;
+}
+
+a, a:visited {
+	white-space: nowrap;
+	text-decoration: none;
+	font-weight: 700;
+	color: #567;
+}
+
+a:hover, button:active {
+	color: #C30 !important;
+	border-color: #C30 !important;
+	cursor: pointer;
+}
+
+a[target=_blank]:after { // external link
+	content: "⌝";
+	vertical-align: 5%;
+	font-size: 90%;
+}
+
+button {
+	background-color: transparent;
+}
+
+em {
+	font-style: italic;
+}
+
+strong {
+	color: #333;
+	white-space: pre;
+	font-weight: 700;
+}
+
+abbr {
+	text-transform: none;
+	white-space: pre;
+}
+
+code {
+	white-space: nowrap;
+	font-size: 90% !important;
+}
+
+pre[class*=language-] {
+
+	margin-bottom: 1.5em;
+
+	code {
+		tab-size: 2;
+		white-space: pre;
+	}
+
+}
+
+select {
+	border-style: solid;
+}
+
+
+/**** Left-Aligned Body ***********************************************************************************************/
+
+@media screen and (min-width: 480px), print {
+
+	html > body {
+		text-align: left;
+	}
+
+	ul, ol {
+		list-style-position: outside;
+		padding-left: 1.25em;
+	}
+
+	ul {
+		list-style-type: square;
+	}
+
+	ul > li::before {
+		display: none;
+	}
+
+	dd {
+		margin-left: 1em;
+	}
+
+}
+
+
+/**** Side TOC ********************************************************************************************************/
+
+@media screen and (min-width: 640px), print {
+
+	html {
+
+		> body {
+
+			flex-direction: row;
+
+			> * {
+
+				> section {
+					padding-top: 0.75rem;
+				}
+
+			}
+
+			> nav {
+
+				width: 17.5rem;
+				border-right-style: solid;
+
+				> * {
+					padding-left: 0.75rem;
+					padding-right: 0.75rem;
+				}
+
+				> header {
+
+					border-bottom: none;
+					box-shadow: none;
+
+					> label:empty {
+						display: none;
+					}
+
+				}
+
+				> section {
+					display: block !important;
+				}
+
+			}
+
+			> main {
+
+				> * {
+					padding-left: 2.5rem;
+					padding-right: 2.5rem;
+				}
+
+				> header {
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				}
+
+			}
+
+		}
+	}
+
+}
+
+
+/**** Printed *********************************************************************************************************/
+
+@media print {
+
+	html {
+
+		> body {
+
+			> nav {
+				display: none !important;
+			}
+
+		}
+
+	}
+
+}

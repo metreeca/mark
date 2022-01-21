@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * Site building task.
@@ -42,7 +43,7 @@ public final class Build implements Task {
 
 			try {
 
-				Files.copy(entry.getKey(), entry.getValue());
+				Files.copy(entry.getKey(), entry.getValue(), REPLACE_EXISTING);
 
 			} catch ( final IOException e ) {
 				throw new UncheckedIOException(e);
