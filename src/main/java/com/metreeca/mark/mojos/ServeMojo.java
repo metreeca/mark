@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugins.annotations.Mojo;
 
-@Mojo(name="serve") public final class ServeMojo extends MarkMojo {
+@Mojo(name="serve")
+public final class ServeMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts())
+		new Mark(this)
 				.exec(new Build())
 				.exec(new Serve())
 				.exec(new Watch());

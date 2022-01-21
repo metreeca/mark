@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,20 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.metreeca.rest.handlers.Publisher.basename;
-
-
 public final class None implements Pipe {
+
+	private static String basename(final Path path) { // !!!
+
+		final String filename=path.toString();
+		final int dot=filename.lastIndexOf('.');
+
+		return dot < 0 ? filename : filename.substring(0, dot);
+	}
+
 
 	public None(final Mark mark) {
 
@@ -39,12 +46,10 @@ public final class None implements Pipe {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Optional<Page> process(final Path source) {
+	@Override public Optional<File> process(final Path source) {
 		return Optional.of(source)
 				.filter(path -> !Files.exists(path))
-				.map(path -> new Page(path, target -> {
+				.map(path -> new File(path, Map.of(), (target, model) -> {
 					try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
 
 						files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {

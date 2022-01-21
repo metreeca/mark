@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 
 package com.metreeca.mark.tasks;
 
-import com.metreeca.jse.Server;
+import com.metreeca.jse.JSEServer;
 import com.metreeca.mark.*;
 import com.metreeca.rest.Response;
-import com.metreeca.rest.assets.Logger;
+import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
 
 import java.awt.*;
 import java.io.*;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
@@ -34,18 +36,17 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.*;
 import java.util.stream.Stream;
 
-import static com.metreeca.mark.Mark.Root;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
-import static com.metreeca.rest.assets.Logger.logger;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
 import static com.metreeca.rest.handlers.Publisher.publisher;
 import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.wrappers.Gateway.gateway;
+import static com.metreeca.rest.services.Logger.logger;
+import static com.metreeca.rest.wrappers.Server.server;
+
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.Files.readAllBytes;
 
 /**
  * Site serving task.
@@ -71,20 +72,20 @@ public final class Serve implements Task {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private void serve(final Opts opts) {
+	private void serve(final Opts mark) {
 
 		final Thread daemon=new Thread(() -> {
 			try {
 
-				new Server()
+				new JSEServer()
 
 						.address(address)
 
-						.handler(context -> context
+						.delegate(context -> context
 
-								.set(logger(), () -> new MavenLogger(opts.logger()))
+								.set(logger(), () -> new MavenLogger(mark.logger()))
 
-								.get(() -> gateway().wrap(router()
+								.get(() -> server().wrap(router()
 
 										.path("/~", router()
 												.get(request -> request.reply(response -> {
@@ -101,7 +102,7 @@ public final class Serve implements Task {
 										)
 
 										.path("/*", router()
-												.get(publisher(opts.target())
+												.get(publisher(mark.target())
 														.with(postprocessor(this::rewrite))
 												)
 										)
@@ -130,9 +131,11 @@ public final class Serve implements Task {
 
 	private void watch(final Mark mark) {
 
-		final Thread daemon=new Thread(() -> mark.watch(mark.target(), (kind, target) -> {
+		final Path root=Paths.get("/");
 
-			final String path=Root.resolve(mark.target().relativize(target)).toString();
+		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> {
+
+			final String path=root.resolve(mark.target().relativize(target)).toString();
 
 			Stream.of("", ".html", "index.html").forEach(suffix -> {
 				if ( path.endsWith(suffix) ) { updates.offer(path.substring(0, path.length()-suffix.length())); }
@@ -149,22 +152,18 @@ public final class Serve implements Task {
 
 	private static final String Live=Optional
 
-			.of(Serve.class.getSimpleName()+".js")
-
-			.map(Serve.class::getResource)
+			.ofNullable(Serve.class.getResource(Serve.class.getSimpleName()+".js"))
 
 			.map(url -> {
-				try { return url.toURI(); } catch ( final URISyntaxException e ) { throw new RuntimeException(e); }
-			})
 
-			.map(Paths::get)
+				try ( InputStream input=url.openStream() ) {
 
-			.map(path -> {
-				try {
-					return new String(readAllBytes(path), UTF_8);
+					return new String(input.readAllBytes(), UTF_8);
+
 				} catch ( final IOException e ) {
 					throw new UncheckedIOException(e);
 				}
+
 			})
 
 			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))
@@ -181,10 +180,9 @@ public final class Serve implements Task {
 
 				target.accept(buffer);
 
-				final byte[] data=buffer.toByteArray();
 				final Charset charset=Charset.forName(response.charset());
 
-				final byte[] body=new String(data, charset)
+				final byte[] body=buffer.toString(charset)
 						.replace("</body>", Live+"</body>")
 						.getBytes(charset);
 
@@ -227,9 +225,9 @@ public final class Serve implements Task {
 
 			if ( cause == null ) {
 
-				final Consumer<String> sink=(level == Level.Error) ? logger::error
-						: (level == Level.Warning) ? logger::warn
-						: (level == Level.Info) ? logger::info
+				final Consumer<String> sink=(level == Level.error) ? logger::error
+						: (level == Level.warning) ? logger::warn
+						: (level == Level.info) ? logger::info
 						: logger::debug;
 
 				sink.accept(message.get());
@@ -237,9 +235,9 @@ public final class Serve implements Task {
 
 			} else {
 
-				final BiConsumer<String, Throwable> sink=(level == Level.Error) ? logger::error
-						: (level == Level.Warning) ? logger::warn
-						: (level == Level.Info) ? logger::info
+				final BiConsumer<String, Throwable> sink=(level == Level.error) ? logger::error
+						: (level == Level.warning) ? logger::warn
+						: (level == Level.info) ? logger::info
 						: logger::debug;
 
 				sink.accept(message.get(), cause);

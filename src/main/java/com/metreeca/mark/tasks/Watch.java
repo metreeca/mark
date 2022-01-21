@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ public final class Watch implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		Stream.of(mark.source(), mark.assets()).forEach(root -> mark.watch(root, (kind, path) -> {
+		mark.watch((kind, path) -> {
 
 			if ( mark.isLayout(path) ) { mark.exec(new Build()); } else { mark.process(Stream.of(path)); }
 
-		}));
+		});
 
 		try {
 

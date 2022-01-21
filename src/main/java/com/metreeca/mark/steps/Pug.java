@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,25 +55,7 @@ public final class Pug {
 		this.pug=new PugConfiguration();
 
 		pug.setPrettyPrint(false); // minified output
-		pug.setTemplateLoader(new TemplateLoader() {
-
-			@Override public long getLastModified(final String name) throws IOException {
-				return Files.getLastModifiedTime(mark.layout(name)).toMillis();
-			}
-
-			@Override public Reader getReader(final String name) throws IOException {
-				return Files.newBufferedReader(mark.layout(name), UTF_8);
-			}
-
-			@Override public String getExtension() {
-				return "pug";
-			}
-
-			@Override public String getBase() {
-				return "";
-			}
-
-		});
+		pug.setTemplateLoader(new Loader(mark));
 
 	}
 
@@ -195,4 +177,32 @@ public final class Pug {
 		return builder.toString();
 	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private static final class Loader implements TemplateLoader {
+
+		private final Mark mark;
+
+
+		private Loader(final Mark mark) { this.mark=mark; }
+
+
+		@Override public long getLastModified(final String name) throws IOException {
+			return Files.getLastModifiedTime(mark.layout(name)).toMillis();
+		}
+
+		@Override public Reader getReader(final String name) throws IOException {
+			return Files.newBufferedReader(mark.layout(name), UTF_8);
+		}
+
+		@Override public String getExtension() {
+			return "pug";
+		}
+
+		@Override public String getBase() {
+			return "";
+		}
+
+	}
 }

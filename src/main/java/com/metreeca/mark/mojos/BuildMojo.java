@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,15 @@ package com.metreeca.mark.mojos;
 import com.metreeca.mark.Mark;
 import com.metreeca.mark.tasks.Build;
 
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_SITE;
 
-@Mojo(name="build", defaultPhase=LifecyclePhase.PRE_SITE) public class BuildMojo extends MarkMojo {
+@Mojo(name="build", defaultPhase=PRE_SITE)
+public class BuildMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(opts()).exec(new Build());
+		new Mark(this).exec(new Build());
 	}
 
 }

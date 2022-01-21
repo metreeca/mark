@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,26 +38,15 @@ public interface Opts {
 	public Path target();
 
 	/**
-	 * @return the path of the overlay assets folder to be merged with the {@linkplain #source() source} site folder
-	 */
-	public Path assets();
-
-	/**
-	 * @return the root-relative path of the default site layout
+	 * @return the source-relative path of the default site layout
 	 */
 	public Path layout();
 
 
 	/**
-	 * @return the shared variables
+	 * @return the global variables
 	 */
-	public Map<String, Object> shared();
-
-	/**
-	 * @return the system logger
-	 */
-	public Log logger();
-
+	public Map<String, Object> global();
 
 	/**
 	 * Retrieves a pipeline option.
@@ -67,10 +56,16 @@ public interface Opts {
 	 * @param <V>    the expected type of the option value
 	 *
 	 * @return the value produced by applying {@code mapper} to a possibly null string value retrieved from a
-	 * system-specific source
+	 * system-specific source or {@code null} the optipn is not defined
 	 *
 	 * @throws NullPointerException if {@code mapper} is null
 	 */
 	public <V> V get(final String option, final Function<String, V> mapper);
+
+
+	/**
+	 * @return the system logger
+	 */
+	public Log logger();
 
 }

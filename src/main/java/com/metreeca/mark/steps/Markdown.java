@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.metreeca.mark.steps;
 
+import com.metreeca.mark.Item;
 import com.metreeca.mark.Mark;
 
 import com.vladsch.flexmark.ast.Heading;
@@ -129,13 +130,15 @@ public final class Markdown {
 		));
 	}
 
-	private List<Heading> headings(final Node document) {
+	private List<Item> headings(final Node document) {
 
 		final List<Heading> headings=new ArrayList<>();
 
 		new NodeVisitor(new VisitHandler<>(Heading.class, headings::add)).visit(document);
 
-		return headings;
+		return headings.stream()
+				.map(heading -> new Item(heading.getLevel(), heading.getAnchorRefId(), heading.getAnchorRefText()))
+				.collect(toList());
 	}
 
 	private String body(final Node document) {

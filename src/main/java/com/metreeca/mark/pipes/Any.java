@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -38,10 +39,8 @@ public final class Any implements Pipe {
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	@Override public Optional<Page> process(final Path source) {
-		return Optional.of(new Page(source, target -> {
+	@Override public Optional<File> process(final Path source) {
+		return Optional.of(new File(source, Map.of(), (target, model) -> {
 			try {
 
 				Files.copy(source, target, REPLACE_EXISTING);

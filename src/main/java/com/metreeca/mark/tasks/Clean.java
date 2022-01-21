@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import static java.util.Comparator.reverseOrder;
 
@@ -35,20 +36,55 @@ public final class Clean implements Task {
 
 	@Override public void exec(final Mark mark) {
 
+		final Path source=mark.source();
 		final Path target=mark.target();
 
-		if ( Files.exists(target) ) { // clean target folder
+		if ( source.equals(target) ) { // in-place generation › remove volatile files
 
-			try ( final Stream<Path> walk=Files.walk(target) ) {
+			try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
-				walk.sorted(reverseOrder()).forEachOrdered(path -> {
+				// delete generated files
 
-					try {
+				mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
 
-						Files.delete(path);
+				// delete bundled assets
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
+				mark.assets().forEach((path, url) -> {
+
+					final Path asset=target.resolve(path);
+
+					if ( Files.exists(asset) ) {
+						try (
+								final InputStream origin=url.openStream();
+								final InputStream actual=Files.newInputStream(asset)
+						) {
+
+							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
+
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
+					}
+
+				});
+
+				// delete index file
+
+				mark.index().ifPresent(entry -> {
+
+					final Path asset=target.resolve(entry.getValue());
+
+					if ( Files.exists(asset) ) {
+						try (
+								final InputStream origin=Files.newInputStream(entry.getKey());
+								final InputStream actual=Files.newInputStream(asset)
+						) {
+
+							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
+
+						} catch ( final IOException e ) {
+							throw new UncheckedIOException(e);
+						}
 					}
 
 				});
@@ -57,6 +93,39 @@ public final class Clean implements Task {
 				throw new UncheckedIOException(e);
 			}
 
+		} else if ( Files.exists(target) ) { // delete target folder
+
+			try ( final Stream<Path> walk=Files.walk(target) ) {
+
+				walk.sorted(reverseOrder()).forEachOrdered(this::delete);
+
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
+			}
+
+		}
+	}
+
+
+	private static long checksum(final InputStream input) throws IOException {
+		try ( final CheckedInputStream checker=new CheckedInputStream(input, new CRC32()) ) {
+
+			final byte[] buffer=new byte[1024];
+
+			while ( checker.read(buffer, 0, buffer.length) >= 0 ) { }
+
+			return checker.getChecksum().getValue();
+		}
+	}
+
+
+	private void delete(final Path path) {
+		try {
+
+			if ( Files.exists(path) ) { Files.delete(path); }
+
+		} catch ( final IOException e ) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

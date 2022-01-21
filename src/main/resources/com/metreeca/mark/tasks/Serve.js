@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2021 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@
 
 	const styles=Array.from(document.querySelectorAll("style"))
 		.map(style => style.src)
-		.filter(src => src.startsWith(location.origin))
+		.filter(src => src && src.startsWith(location.origin)) // ignore embedded styles
 		.map(src => src.substring(location.origin.length));
 
 	const scripts=Array.from(document.querySelectorAll("script"))
 		.map(script => script.src)
-		.filter(src => src.startsWith(location.origin))
+		.filter(src => src && src.startsWith(location.origin)) // ignore embedded scripts
 		.map(src => src.substring(location.origin.length));
 
 

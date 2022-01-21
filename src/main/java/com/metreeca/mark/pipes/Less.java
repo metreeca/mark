@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,18 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.inet.lib.less.Less.compile;
-import static com.metreeca.mark.Mark.target;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 public final class Less implements Pipe {
+
+	private final Mark mark;
+
 
 	public Less(final Mark mark) {
 
@@ -37,24 +41,25 @@ public final class Less implements Pipe {
 			throw new NullPointerException("null mark");
 		}
 
+		this.mark=mark;
 	}
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	@Override public Optional<File> process(final Path source) {
+		return mark.target(source, ".css", ".css", ".less").map(target ->
+				new File(target, Map.of(), (path, model) -> {
+					try {
 
-	@Override public Optional<Page> process(final Path source) {
-		return target(source, ".css", ".less", ".css").map(target -> new Page(target, path -> {
-			try {
+						final String less=Files.readString(source);
+						final String css=compile(path.toUri().toURL(), less, true);
 
-				final String less=new String(Files.readAllBytes(source), UTF_8);
-				final String css=compile(path.toUri().toURL(), less, true);
+						Files.write(path, css.getBytes(UTF_8));
 
-				Files.write(path, css.getBytes(UTF_8));
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-		}));
+					} catch ( final IOException e ) {
+						throw new UncheckedIOException(e);
+					}
+				})
+		);
 	}
 
 }

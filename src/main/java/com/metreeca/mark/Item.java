@@ -16,21 +16,42 @@
 
 package com.metreeca.mark;
 
-
 /**
- * Site generation task.
- *
- * <p>Coordinates the execution of a site generation task</p>
+ * TOC item.
  */
-@FunctionalInterface public interface Task {
+public final class Item {
 
-	/**
-	 * Executes this task.
-	 *
-	 * @param mark the site generation engine
-	 *
-	 * @throws NullPointerException if {@code mark}
-	 */
-	public void exec(final Mark mark);
+	private final int level;
+	private final String anchorRefId;
+	private final String label;
+
+
+	public Item(final int level, final String anchor, final String label) {
+
+		if ( level < 0 || level > 6 ) {
+			throw new IllegalArgumentException("illegal level");
+		}
+
+		if ( anchor == null ) {
+			throw new NullPointerException("null anchor");
+		}
+
+		this.level=level;
+		this.anchorRefId=anchor;
+		this.label=label;
+	}
+
+
+	public int level() {
+		return level;
+	}
+
+	public String anchor() {
+		return anchorRefId;
+	}
+
+	public String label() {
+		return label;
+	}
 
 }
