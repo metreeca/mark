@@ -16,7 +16,7 @@
 
 (function (window) {
 
-	//// TOC Toggling //////////////////////////////////////////////////////////////////////////////////////////////////
+	//// Side Toggling /////////////////////////////////////////////////////////////////////////////////////////////////
 
 	window.onhashchange=function () {
 		window.document.getElementById("toggle").checked=false;
@@ -25,14 +25,16 @@
 
 	//// browser-specific css selectors (eg html[data-useragent*='MSIE 10.0']) /////////////////////////////////////////
 
-	document.documentElement.setAttribute('data-useragent', navigator.userAgent);
+	document.documentElement.setAttribute("data-useragent", navigator.userAgent);
 
 
 	//// ;) ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	(function (a) {
 
-		for (var i=0; i < a.length; ++i) { a[i]=255-a[i]; }
+		for (var i=0; i < a.length; ++i) {
+			a[i]=255-a[i];
+		}
 
 		var b=String.fromCharCode.apply(String, a);
 		var c=b.substr(0, 7);
@@ -44,14 +46,14 @@
 
 			var e=(_[i].getAttribute("href") || "").match(/^#@([-\w]+)(.*)$/);
 
-			if ( e ) {
+			if (e) {
 
 				var f=e[1] || "";
 				var g=e[2] || "";
 
-				_[i].setAttribute('href', c+f+d+g);
+				_[i].setAttribute("href", c+f+d+g);
 
-				if ( _[i].childNodes.length === 0 ) {
+				if (_[i].childNodes.length === 0) {
 					_[i].appendChild(document.createTextNode(f+d));
 				}
 

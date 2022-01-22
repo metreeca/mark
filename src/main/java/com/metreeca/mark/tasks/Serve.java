@@ -18,7 +18,7 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.jse.JSEServer;
 import com.metreeca.mark.*;
-import com.metreeca.rest.Response;
+import com.metreeca.rest.*;
 import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
@@ -30,14 +30,16 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.*;
-import java.util.stream.Stream;
+
+import javax.json.Json;
 
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
+import static com.metreeca.rest.formats.DataFormat.data;
 import static com.metreeca.rest.formats.OutputFormat.output;
 import static com.metreeca.rest.formats.TextFormat.text;
 import static com.metreeca.rest.handlers.Publisher.publisher;
@@ -46,7 +48,7 @@ import static com.metreeca.rest.services.Logger.logger;
 import static com.metreeca.rest.wrappers.Server.server;
 
 import static java.lang.String.format;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Site serving task.
@@ -57,20 +59,43 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class Serve implements Task {
 
+	private static final String ReloadQueue="/~";
+	private static final String ReloadScript="/~script";
+
+	private static final String ReloadSrc=Serve.class.getSimpleName()+".js";
+	private static final String ReloadTag=format("<script type=\"text/javascript\" src=\"%s\"></script>", ReloadScript);
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	private final InetSocketAddress address=new InetSocketAddress("localhost", 2020);
 
 	private final BlockingDeque<String> updates=new LinkedBlockingDeque<>();
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	@Override public void exec(final Mark mark) {
-		serve(mark);
 		watch(mark);
+		serve(mark);
 	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	private void watch(final Mark mark) {
+
+		final Path root=Paths.get("/");
+
+		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> updates.offer(root
+
+				.resolve(mark.target().relativize(target))
+				.toString()
+				.replace("/index.html", "/")
+
+		)));
+
+		daemon.setDaemon(true);
+		daemon.start();
+	}
 
 	private void serve(final Opts mark) {
 
@@ -87,18 +112,12 @@ public final class Serve implements Task {
 
 								.get(() -> server().wrap(router()
 
-										.path("/~", router()
-												.get(request -> request.reply(response -> {
-													try {
+										.path(ReloadQueue, router()
+												.get(this::queue)
+										)
 
-														return response.status(OK).body(text(), updates.take());
-
-													} catch ( final InterruptedException e ) {
-
-														return response.status(OK);
-
-													}
-												}))
+										.path(ReloadScript, router()
+												.get(this::script)
 										)
 
 										.path("/*", router()
@@ -129,46 +148,46 @@ public final class Serve implements Task {
 		daemon.start();
 	}
 
-	private void watch(final Mark mark) {
-
-		final Path root=Paths.get("/");
-
-		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> {
-
-			final String path=root.resolve(mark.target().relativize(target)).toString();
-
-			Stream.of("", ".html", "index.html").forEach(suffix -> {
-				if ( path.endsWith(suffix) ) { updates.offer(path.substring(0, path.length()-suffix.length())); }
-			});
-
-		}));
-
-		daemon.setDaemon(true);
-		daemon.start();
-	}
-
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final String Live=Optional
+	private Future<Response> queue(final Request request) {
+		return request.reply(response -> {
 
-			.ofNullable(Serve.class.getResource(Serve.class.getSimpleName()+".js"))
+			try {
 
-			.map(url -> {
+				final Collection<String> batch=new HashSet<>(Set.of(updates.take()));
 
-				try ( InputStream input=url.openStream() ) {
+				updates.drainTo(batch);
 
-					return new String(input.readAllBytes(), UTF_8);
+				return response.status(OK)
+						.header("Content-Type", "application/json")
+						.body(text(), Json.createArrayBuilder(batch).build().toString());
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
+			} catch ( final InterruptedException e ) {
 
-			})
+				return response.status(OK);
 
-			.map(script -> format("<script type=\"text/javascript\">\n\n%s\n\n</script>", script))
+			}
 
-			.orElse("");
+		});
+	}
+
+	private Future<Response> script(final Request request) {
+		return request.reply(response -> {
+			try ( final InputStream script=requireNonNull(getClass().getResourceAsStream(ReloadSrc)) ) {
+
+				return response.status(OK)
+						.header("Content-Type", "text/javascript")
+						.body(data(), script.readAllBytes());
+
+			} catch ( final IOException e ) {
+
+				throw new UncheckedIOException(e);
+
+			}
+		});
+	}
 
 
 	private Response rewrite(final Response response) {
@@ -183,7 +202,7 @@ public final class Serve implements Task {
 				final Charset charset=Charset.forName(response.charset());
 
 				final byte[] body=buffer.toString(charset)
-						.replace("</body>", Live+"</body>")
+						.replace("</head>", format("%s</head>", ReloadTag))
 						.getBytes(charset);
 
 				return response

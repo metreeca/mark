@@ -63,8 +63,8 @@ public final class Work {
 							entry("artifactId", "metreeca-test"),
 							entry("version", "1.2.3"),
 
-							entry("name", "Metreeca Test Project"),
-							entry("description", "A dummy test project"),
+							entry("name", "Metreeca/Mark"),
+							entry("description", "A minimalist Maven plugin for static site generation"),
 							entry("url", "https://github.com/metreeca/mark"),
 
 							entry("organization", Map.ofEntries(

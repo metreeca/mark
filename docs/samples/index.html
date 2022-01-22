@@ -16,7 +16,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
-	<head><title>Samples | Metreeca Static Site Generator</title>
+	<head><title>Samples | Metreeca/Mark</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="shortcut icon" href="../index.svg">
@@ -28,41 +28,30 @@
 	</head>
 	<body><input id="toggle" type="checkbox">
 		<nav>
-			<header><span><a href="https://www.metreeca.com/">metreeca</a><a href="../index.html">mark-maven-plugin<span>v0.7.0</span></a></span><label for="toggle"></label>
+			<header><a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(../index.svg)"></a><a href="/">Metreeca/Mark</a><label for="toggle"></label>
 			</header>
-			<section><a class="title" onclick="document.querySelector('main').scrollTo(0, 0)">Samples</a>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-				<h><a href="#"></a></h>
-			</section>
+			<section><a href="https://github.com/metreeca/mark">v1.2.3</a><h1><a href="#headings">Headings</a></h1><h2>
+				<a href="#donec-non">Donec Non</a></h2><h3><a href="#sit-amet">Sit Amet</a></h3><h1><a href="#panels">Panels</a>
+			</h1><h2><a href="#code">Code</a></h2><h2><a href="#admonitions">Admonitions</a></h2><h1>
+				<a href="#typography">Typography</a></h1><h2><a href="#links">Links</a></h2><h2>
+				<a href="#lists">Lists</a></h2><h2><a href="#tables">Tables</a></h2><h2>
+				<a href="#layout-default-title-markdown-kitchen-sink-nav-order-99">layout: default title: Markdown
+					kitchen sink nav_order: 99</a></h2><h1><a href="#header-1">Header 1</a></h1><h2><a href="#header-2">Header
+				2</a></h2><h3><a href="#header-3">Header 3</a></h3><h4><a href="#header-4-with-code-not-transformed">Header
+				4 with code not transformed</a></h4><h5><a href="#header-5">Header 5</a></h5><h6><a href="#header-6">Header
+				6</a></h6><h3><a href="#theres-a-horizontal-rule-below-this">There's a horizontal rule below this.</a>
+			</h3><h3><a href="#here-is-an-unordered-list">Here is an unordered list:</a></h3><h3>
+				<a href="#and-an-ordered-list">And an ordered list:</a></h3><h3><a href="#and-a-nested-list">And a nested
+				list:</a></h3><h3><a href="#nesting-an-ol-in-ul-in-an-ol">Nesting an ol in ul in an ol</a></h3><h3>
+				<a href="#and-a-task-list">And a task list</a></h3><h3><a href="#small-image">Small image</a></h3><h3>
+				<a href="#large-image">Large image</a></h3><h3><a href="#definition-lists-can-be-used-with-html-syntax">Definition
+				lists can be used with HTML syntax.</a></h3><h4><a href="#multiple-description-terms-and-values">Multiple
+				description terms and values</a></h4><h3><a href="#more-code">More code</a></h3></section>
 		</nav>
 		<main>
-			<header>Samples</header>
+			<header><a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(../index.svg)"></a>
+				<button title="SCroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)">Samples</button>
+				<label for="toggle"></label></header>
 			<section><p>Shared theme for Metreeca docs sites.</p>
 				<table>
 					<thead>
@@ -74,11 +63,11 @@
 					<tbody>
 						<tr>
 							<td>project.artifactId</td>
-							<td>mark-maven-plugin</td>
+							<td>metreeca-test</td>
 						</tr>
 						<tr>
 							<td>project.version</td>
-							<td>0.7.0</td>
+							<td>1.2.3</td>
 						</tr>
 						<tr>
 							<td>page.root</td>
@@ -132,7 +121,7 @@ public static void main(final String...args){
 				<h1 id="typography">Typography</h1>
 				<h2 id="links">Links</h2>
 				<ul>
-					<li><a href="work.html">home</a></li>
+					<li><a href="work">home</a></li>
 				</ul>
 				<h2 id="lists">Lists</h2>
 				<ul>
@@ -327,9 +316,9 @@ end
 					<li>[x] Goodbye, this item is done</li>
 				</ul>
 				<h3 id="small-image">Small image</h3>
-				<p><img src="https://assets-cdn.github.com/images/icons/emoji/octocat.png" alt=""/></p>
+				<p><img src="https://assets-cdn.github.com/images/icons/emoji/octocat.png" alt="" target="_blank"/></p>
 				<h3 id="large-image">Large image</h3>
-				<p><img src="https://guides.github.com/activities/hello-world/branching.png" alt=""/></p>
+				<p><img src="https://guides.github.com/activities/hello-world/branching.png" alt="" target="_blank"/></p>
 				<h3 id="definition-lists-can-be-used-with-html-syntax">Definition lists can be used with HTML
 					syntax.</h3>
 				<dl>

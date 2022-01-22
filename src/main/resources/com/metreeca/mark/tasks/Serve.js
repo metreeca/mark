@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2021 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,21 @@
 
 (function () {
 
-	const styles=Array.from(document.querySelectorAll("style"))
-		.map(style => style.src)
-		.filter(src => src && src.startsWith(location.origin)) // ignore embedded styles
-		.map(src => src.substring(location.origin.length));
+	const styles=resources("link[rel=stylesheet]");
+	const scripts=resources("script");
 
-	const scripts=Array.from(document.querySelectorAll("script"))
-		.map(script => script.src)
-		.filter(src => src && src.startsWith(location.origin)) // ignore embedded scripts
-		.map(src => src.substring(location.origin.length));
+	console.log(styles);
+	console.log(scripts);
 
+
+	function resources(selector) {
+		return Array.from(document.querySelectorAll(selector))
+			.map(style => style.href || style.src)
+			.map(url => url && new URL(url, location.href))
+			.filter(url => url && url.origin === location.origin)
+			.map(url => url && url.pathname)
+			.filter(url => url);
+	}
 
 	function resource(path) {
 		return path === location.pathname
@@ -33,16 +38,21 @@
 			|| scripts.some(script => script === path);
 	}
 
-	function poll() {
-		fetch("/~").then(response => response.text()).then(update => {
 
-			if (resource(update)) {
+	function listen() {
+		fetch("/~").then(response => response.json()).then(updates => {
+
+			console.log(updates);
+
+			if (updates.some(resource)) {
+
+				console.log("reloading");
 
 				location.reload();
 
 			} else {
 
-				poll();
+				listen();
 
 			}
 
@@ -50,6 +60,6 @@
 	}
 
 
-	window.addEventListener("load", poll);
+	window.addEventListener("load", listen);
 
 })();
