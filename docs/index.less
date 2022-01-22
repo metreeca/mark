@@ -691,11 +691,15 @@ select {
 
 		& > body {
 
-			display: flex;
-			flex-direction: row;
+			display: grid;
 			align-items: stretch;
 
+			grid-template-columns: minmax(15em, 1fr) 3fr;
+			grid-template-rows: 1fr;
+
 			& > * {
+
+				grid-row: 1;
 
 				& > header {
 
@@ -711,8 +715,7 @@ select {
 
 			& > nav {
 
-				flex-grow: 1;
-				flex-shrink: 0;
+				grid-column: 1;
 
 				border-right-style: solid;
 
@@ -732,7 +735,7 @@ select {
 
 			& > main {
 
-				flex-grow: 2;
+				grid-column: 2;
 
 				& > * {
 					padding-left: 2rem;

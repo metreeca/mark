@@ -63,7 +63,7 @@ The following optional configuration parameters are available:
 
 ## Define a template
 
-> :information_source:  If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
+> :information_source: If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
 > folder to use the default bundled docs template ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
@@ -105,7 +105,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
-> :warning:  Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
+> :warning: Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
 > [JEXL](http://commons.apache.org/proper/commons-jexl/)
 > rather than Javascript. Expression interpolation in HTML attributes is supported as ``\${expression}``
 
@@ -127,7 +127,7 @@ interpolation inside pages using the `${expression}` syntax (escape like `\${exp
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property
 to the path of the required template, relative to the plugin `layout` parameter.
 
-> :warning:  Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is
+> :warning: Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is
 > supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
 # Maven Goals
