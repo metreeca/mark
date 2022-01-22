@@ -2,9 +2,9 @@
 
 # Metreeca/Mark
 
-Metreeca/Mark is a minimalist static site generator, optimized for project/app docs. It is tightly integrated as a Maven
-in the build process and doesn't require specific site layouts or complex setups: just throw in a couple of Markdown
-pages and maybe a Pug/Less template and let the generator take care of the details…
+Metreeca/Mark is a minimalist Maven plugin for static site generation. It is tightly integrated in the build process and
+doesn't require specific site layouts or complex setups: just throw in a couple of Markdown pages and maybe a Pug/Less
+template and let the generator take care of the details…
 
 # Usage
 
@@ -58,12 +58,13 @@ The following optional configuration parameters are available:
 | parameter | default       | value                                                  |
 | --------- | ------------- | ------------------------------------------------------ |
 | `source`  | `./docs`    | the source folder for the site                         |
-| `target`  | `\${source}` (in-place generation)| the target folder for the generated site               |
-| `layout`  | default bundled layout | the path of default page template relative to `\${source}` |
+| `target`  | `\${source}`| the target folder for the generated site <br/>                |
+| `layout`  | _bundled_ | the path of default page template relative to `\${source}` |
 
 ## Define a template
 
-> :information_source: If you feel lazy, just omit the `layout` parameters to use the default bundled docs theme ;-)
+> :information_source: If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
+> folder to use the default bundled docs template ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:

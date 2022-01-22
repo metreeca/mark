@@ -16,15 +16,13 @@
 
 @import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
 
-*, *::before, *::after {
-	flex: 0 0 auto;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	outline: none 1px #CCC;
-	border: none 1px #CCC;
-	font: inherit;
+html {
+
+	--color: #000;
+	--background-color: #FFF;
+
 }
+
 
 /**** Fonts ***********************************************************************************************************/
 
@@ -49,152 +47,169 @@ code, code[class*=language-], pre[class*=language-] {
 
 /**** Layout **********************************************************************************************************/
 
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	outline: none 1px #CCC;
+	border: none 1px #CCC;
+	font: inherit;
+}
+
 html {
 
 	height: 100%;
 	width: 100%;
+
 	font-size: 12pt;
-	color: #000;
-	background-color: #FFF;
 
-	> body {
+	color: var(--color);
+	background-color: var(--background-color);
 
-		display: flex;
-		flex-direction: column;
+	& > body {
+
+		display: grid;
 		align-items: stretch;
+		justify-items: stretch;
+
+		grid-template-columns: 1fr;
+		grid-template-rows: 1fr;
+
 		height: 100%;
 		width: 100%;
+
 		text-align: center;
 		overflow: hidden;
 
-		> input {
+		& > input {
 
 			display: none;
 
-			&:not(:checked) {
+			&:checked ~ nav {
+				z-index: 10
+			}
 
-				~ nav > :not(header) {
+		}
+
+		& > * {
+
+			grid-column: 1;
+			grid-row: 1;
+
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+
+			overflow-x: hidden;
+			overflow-y: auto;
+
+			scroll-padding-top: 4.5rem;
+
+			background-color: var(--background-color);
+
+			& > * {
+
+				padding-left: 1rem;
+				padding-right: 1rem;
+
+				&:empty {
 					display: none;
 				}
 
 			}
 
-			&:checked {
+			& > header {
 
-				~ nav {
-				}
-
-				~ main {
-					height: 0; /* don't hide to enable navigation from TOC */
-					flex-grow: 0;
-				}
-
-			}
-
-		}
-
-		> nav, > main {
-
-			display: flex;
-			align-items: stretch;
-			flex-direction: column;
-
-			> *:empty {
-				display: none;
-			}
-
-			> header {
+				z-index: 1;
+				position: sticky;
+				top: 0;
 
 				flex-shrink: 0;
-
-				padding-top: 0.75rem;
-				padding-bottom: 0.5rem;
-				font-size: 1.5rem;
-				overflow: hidden;
-
-			}
-
-			> section {
-				flex-grow: 1;
-				flex-shrink: 1;
-				padding-top: 1rem;
-				padding-bottom: 1rem;
-			}
-
-			> footer {
-				flex-shrink: 0;
-				padding-top: 0.75rem;
-				padding-bottom: 0.75rem;
-				font-size: 0.8rem;
-				color: #999;
-			}
-
-		}
-
-		> nav {
-
-			flex-shrink: 1; /* enable TOC scrolling */
-
-			> * {
-				padding-left: 0.5rem;
-				padding-right: 0.5rem;
-			}
-
-			> header {
 
 				display: flex;
 				flex-direction: row;
 				align-items: center;
 				justify-content: space-between;
+				grid-column-gap: 0.5em;
 
+				padding-top: 0.75rem;
+				padding-bottom: 0.5rem;
 				border-bottom-style: solid;
-				white-space: nowrap;
-				box-shadow: 0 0 0.5rem 0.5rem #FFF;
-				z-index: 1;
+				box-shadow: 0 0 0.75rem 0.75rem var(--background-color);
+				overflow: hidden;
 
-				> span {
+				white-space: nowrap;
+				font-size: 1.5rem;
+
+				background-color: inherit;
+
+				& > * {
 
 					flex-shrink: 1;
 					overflow: hidden;
 					text-overflow: ellipsis;
 
-					> a + a::before {
-						content: "›";
-						padding: 0.25em;
-					}
+				}
 
-					> a + a > span {
-						margin-left: 0.25em;
-						font-size: 90%;
-					}
+				& > a:first-child {
 
+					display: block;
+
+					width: 1em;
+					height: 1em;
+
+					background-position-x: center;
+					background-size: contain;
+					background-repeat: no-repeat;
+
+				}
+
+				& > :not(:nth-child(2)) {
+					flex-shrink: 0;
 				}
 
 			}
 
-			> section {
+			& > section {
 
-				overflow-x: hidden;
-				overflow-y: auto;
+				flex-grow: 1;
+				flex-shrink: 1;
 
-				a {
+				padding-top: 2rem;
+				padding-bottom: 1rem;
+
+			}
+
+			& > footer {
+
+				flex-shrink: 0;
+
+				padding-top: 0.75rem;
+				padding-bottom: 0.75rem;
+
+				font-size: 0.8rem;
+				color: #999;
+
+			}
+
+		}
+
+		& > nav {
+
+			& > section {
+
+				a, a:visited {
 					font-weight: inherit;
 				}
 
-				> * {
-					display: block;
+				& > a, & > a:visited {
+					font-weight: 700;
+					color: #BBB;
 				}
 
-				> a:first-child {
-					margin-bottom: 1em;
-					white-space: normal;
-					font-size: 125%;
-					color: #999;
-				}
-
-				> h1,
-				> h2,
-				> h3 {
+				& > h1,
+				& > h2,
+				& > h3 {
 					padding: 0;
 					margin: 0;
 					border: none;
@@ -202,27 +217,27 @@ html {
 					font-weight: 300;
 				}
 
-				> h1 {
+				& > h1 {
 					font-weight: 700;
 				}
 
-				> h1 + h1 {
+				& > h1 + h1 {
 					margin-top: 0.5em;
 				}
 
-				> * + h1 {
+				& > * + h1 {
 					margin-top: 0.75em;
 				}
 
-				> h2 + h2 {
+				& > h2 + h2 {
 					margin-top: 0;
 				}
 
-				> * + h2 {
+				& > * + h2 {
 					margin-top: 0.5em;
 				}
 
-				> h3 {
+				& > h3 {
 					display: none;
 				}
 
@@ -230,25 +245,22 @@ html {
 
 		}
 
-		> main {
+		& > main {
 
-			flex-shrink: 1;
-			flex-grow: 1;
-			overflow-x: hidden;
-			overflow-y: auto;
-
-			> * {
+			& > * {
 				max-width: 50rem;
-				padding-left: 1rem;
-				padding-right: 1rem;
 			}
 
-			> header {
-				font-weight: 300;
-				color: #999;
+			& > header {
+
+				& > button {
+					font-weight: 300;
+					color: #999;
+				}
+
 			}
 
-			> footer {
+			& > footer {
 
 				a {
 
@@ -274,15 +286,13 @@ html {
 
 label:empty {
 
-	@size: 0.66em;
-	@color: #000;
-	@weight: 0.11em;
+	--size: 0.75em;
+	--weight: 0.125em;
 
 	display: block;
 	position: relative;
-	width: @size;
-	height: @size;
-	margin-left: 0.25em;
+	width: var(--size);
+	height: var(--size);
 
 	&::before,
 	&::after {
@@ -291,27 +301,19 @@ label:empty {
 		position: absolute;
 		left: 0;
 		right: 0;
-		height: @weight;
-		background-color: @color;
+		height: var(--weight);
+		background-color: var(--color);
 		box-sizing: content-box;
 	}
 
 	body > input:not(:checked) ~ * & {
 
-		background-color: @color;
-
-		&::before,
-		&::after {
-			height: calc(1.05 * @weight);
-			background-color: #FFF;
-		}
-
 		&::before {
-			top: calc(@size / 5);
+			top: 20%;
 		}
 
 		&::after {
-			bottom: calc(@size / 5);
+			bottom: 20%;
 		}
 	}
 
@@ -319,7 +321,7 @@ label:empty {
 
 		&::before,
 		&::after {
-			top: calc(@size / 2 - @weight / 2);
+			top: calc(var(--size) / 3);
 		}
 
 		&::before {
@@ -378,13 +380,13 @@ label:empty {
 		.color(#F80);
 	}
 
-	> * {
+	& > * {
 
 		padding: 0.5em;
 
 	}
 
-	> .adm-heading {
+	& > .adm-heading {
 
 		@size: 1.75em;
 
@@ -405,11 +407,11 @@ label:empty {
 
 	}
 
-	> .adm-body {
+	& > .adm-body {
 
 		flex: 1;
 
-		> p {
+		& > p {
 			margin: 0;
 		}
 	}
@@ -574,6 +576,10 @@ blockquote > small:last-child {
 	text-align: right;
 }
 
+a > img:only-child {
+	vertical-align: middle;
+}
+
 p > img:only-child {
 	width: 100%;
 	height: auto;
@@ -603,12 +609,12 @@ a, a:visited {
 	text-decoration: none;
 	font-weight: 700;
 	color: #567;
+	cursor: pointer;
 }
 
 a:hover, button:active {
 	color: #C30 !important;
 	border-color: #C30 !important;
-	cursor: pointer;
 }
 
 a[target=_blank]:after { // external link
@@ -619,6 +625,7 @@ a[target=_blank]:after { // external link
 
 button {
 	background-color: transparent;
+	cursor: pointer;
 }
 
 em {
@@ -691,60 +698,98 @@ select {
 
 	html {
 
-		> body {
+		& > body {
 
+			display: flex;
 			flex-direction: row;
+			align-items: stretch;
 
-			> * {
+			& > * {
 
-				> section {
-					padding-top: 0.75rem;
-				}
+				& > header {
 
-			}
+					border-bottom-style: none;
 
-			> nav {
-
-				width: 17.5rem;
-				border-right-style: solid;
-
-				> * {
-					padding-left: 0.75rem;
-					padding-right: 0.75rem;
-				}
-
-				> header {
-
-					border-bottom: none;
-					box-shadow: none;
-
-					> label:empty {
+					& > label:empty {
 						display: none;
 					}
 
 				}
 
-				> section {
-					display: block !important;
+			}
+
+			& > nav {
+
+				flex-grow: 1;
+				flex-shrink: 0;
+
+				border-right-style: solid;
+
+				text-align: right;
+
+				& > header {
+
+					justify-content: end;
+
+					& > a:first-child {
+						display: none;
+					}
+
 				}
 
 			}
 
-			> main {
+			& > main {
 
-				> * {
-					padding-left: 2.5rem;
-					padding-right: 2.5rem;
+				flex-grow: 2;
+
+				& > * {
+					padding-left: 2rem;
+					padding-right: 2rem;
 				}
 
-				> header {
-					white-space: nowrap;
-					text-overflow: ellipsis;
+				& > header {
+
+					& > a:first-child {
+						order: 2;
+					}
+
 				}
 
 			}
 
 		}
+	}
+
+}
+
+
+/**** Large Screens ***************************************************************************************************/
+
+@media screen and (min-width: 960px) {
+
+	html {
+
+		font-size: 14pt;
+
+		& > body {
+
+			& > nav {
+
+				& > * {
+					padding-right: 1.5rem;
+				}
+
+			}
+		}
+	}
+
+}
+
+@media screen and (min-width: 1280px) {
+
+	html {
+		font-size: 15pt;
 	}
 
 }
@@ -756,9 +801,9 @@ select {
 
 	html {
 
-		> body {
+		& > body {
 
-			> nav {
+			& > nav {
 				display: none !important;
 			}
 
