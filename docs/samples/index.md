@@ -1,8 +1,6 @@
 ---
-title: "Samples"
+![small](images/small.png)title: "Samples"
 ---
-
-Shared theme for Metreeca docs sites.
 
 |Variable|Value|
 |--------|-----|
@@ -12,65 +10,120 @@ Shared theme for Metreeca docs sites.
 | page.base          | ${page.base}          |
 | page.path          |${page.path}|
 
-# Headings
+[TOC]
+
+# Heading 1
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt
 nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
 
-## Donec Non
+## Heading 2
 
 Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit
 feugiat.
 
-### Sit Amet
+### Heading 3
 
 Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
 
-# Panels
-
-## Code
-
-```java
-final class $ {
-    page.title
-} {
-
-public static void main(final String...args){
-        new Mark()
-
-        .source(Paths.get("src/docs"))
-        .target(Paths.get("target/docs"))
-
-        .build();
-
-        }
-
-        }
-```
-
-## Admonitions
-
-!!! info Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
-
-!!! warning Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum, tortor
-felis tincidunt felis, at convallis lorem orci a lacus.
-
 # Typography
 
-## Links
+Text can be **bold**, _italic_, or ~~strikethrough~~.
 
-- [home](work.md)
+:warning: :information_source:
+
+- [external](https://example.com/)
+  - https://example.com/
+- [internal](../index.md)
+- [anchor](#heading-1)
+- [redirect](redirect.md)
+- [broken](broken.md)
+
+# Blocks
+
+## Paragraphs
+
+Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit
+feugiat.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt
+nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
+
+## Quotes
+
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
+
+## Rules
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt.
+
+---
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt.
+
+## Images
+
+![Large Image](images/large.png)
+
+![Small Image](images/small.png) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex.
+Nunc non sem vitae est blandit feugiat.
 
 ## Lists
+
+### Unordered
 
 - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 - Aliquam condimentum neque id quam cursus mollis.
 - Sed viverra risus non dui scelerisque pulvinar.
 
+### Ordered
 
 1. Integer id turpis mattis, aliquam neque tincidunt, porttitor orci.
 2. Vestibulum at ante in tortor tincidunt tincidunt.
 3. Pellentesque tincidunt nunc et urna efficitur egestas.
+
+### Tasks
+
+- [ ] One
+- [ ] two
+- [x] three
+
+### Definitions
+
+Integer
+: id turpis mattis, aliquam neque tincidunt, porttitor orci.
+
+Vestibulum
+: at ante in tortor tincidunt tincidunt.
+
+Pellentesque
+: tincidunt nunc et urna efficitur egestas.
+
+### Nested
+
+- level 1 item (ul)
+
+  1. level 2 item (ol)
+  1. level 2 item (ol)
+
+  - level 3 item (ul)
+  - level 3 item (ul)
+
+- level 1 item (ul)
+
+  1. level 2 item (ol)
+  1. level 2 item (ol)
+
+  - level 3 item (ul)
+  - level 3 item (ul)
+
+  1. level 4 item (ol)
+  1. level 4 item (ol)
+
+  - level 3 item (ul)
+  - level 3 item (ul)
+
+- level 1 item (ul)
 
 ## Tables
 
@@ -79,180 +132,27 @@ felis tincidunt felis, at convallis lorem orci a lacus.
 | 1 | 2 |
 | a | b |
 
----
+## Sources
 
----
-layout: default title: Markdown kitchen sink nav_order: 99
----
+```java
+final class Samples {
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+    public static void main(final String... args) {
+        new Mark()
 
-[Link to another page](another-page).
+                .source(Paths.get("src/docs"))
+                .target(Paths.get("target/docs"))
 
-There should be whitespace between paragraphs.
+                .build();
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your
-project.
+    }
 
-# [](#header-1)Header 1
-
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration.
-It lets you and others work together on projects from anywhere.
-
-## [](#header-2)Header 2
-
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
-
-### [](#header-3)Header 3
-
-```js
-// Javascript code with syntax highlighting.
-var fun=function lang(l) {
-    dateformat.i18n=require('./lang/'+l)
-    return true;
 }
 ```
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
+## Admonitions
 
-#### [](#header-4)Header 4 `with code not transformed`
+!!! info Info Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
 
-* This is an unordered list following a header.
-* This is an unordered list following a header.
-* This is an unordered list following a header.
-
-##### [](#header-5)Header 5
-
-1. This is an ordered list following a header.
-2. This is an ordered list following a header.
-3. This is an ordered list following a header.
-
-###### [](#header-6)Header 6
-
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
-
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-* Item foo
-* Item bar
-* Item baz
-* Item zip
-
-### And an ordered list:
-
-1. Item one
-1. Item two
-1. Item three
-1. Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Nesting an ol in ul in an ol
-
-- level 1 item (ul)
-  1. level 2 item (ol)
-  1. level 2 item (ol)
-
-  - level 3 item (ul)
-  - level 3 item (ul)
-- level 1 item (ul)
-  1. level 2 item (ol)
-  1. level 2 item (ol)
-
-  - level 3 item (ul)
-  - level 3 item (ul)
-
-  1. level 4 item (ol)
-  1. level 4 item (ol)
-
-  - level 3 item (ul)
-  - level 3 item (ul)
-- level 1 item (ul)
-
-### And a task list
-
-- [ ] Hello, this is a TODO item
-- [ ] Hello, this is another TODO item
-- [x] Goodbye, this item is done
-
-### Small image
-
-![](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![](https://guides.github.com/activities/hello-world/branching.png)
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-#### Multiple description terms and values
-
-Term
-: Brief description of Term
-
-Longer Term
-: Longer description of Term, possibly more than one line
-
-Term
-: First description of Term, possibly more than one line
-
-: Second description of Term, possibly more than one line
-
-Term1 Term2
-: Single description of Term1 and Term2, possibly more than one line
-
-Term1 Term2
-: First description of Term1 and Term2, possibly more than one line
-
-: Second description of Term1 and Term2, possibly more than one line
-
-### More code
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
-
-```
-The final element.
-```
+!!! warning Warning Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum,
+tortor felis tincidunt felis, at convallis lorem orci a lacus.
