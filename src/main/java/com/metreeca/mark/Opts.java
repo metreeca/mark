@@ -27,45 +27,52 @@ import java.util.function.Function;
  */
 public interface Opts {
 
-	/**
-	 * @return the path of source site folder
-	 */
-	public Path source();
+    /**
+     * @return the path of source site folder
+     */
+    public Path source();
 
-	/**
-	 * @return the path of target site folder
-	 */
-	public Path target();
+    /**
+     * @return the path of target site folder
+     */
+    public Path target();
 
-	/**
-	 * @return the source-relative path of the default site layout
-	 */
-	public Path layout();
-
-
-	/**
-	 * @return the global variables
-	 */
-	public Map<String, Object> global();
-
-	/**
-	 * Retrieves a pipeline option.
-	 *
-	 * @param option the name of the option to be retrieved
-	 * @param mapper a function mapping from a possibly null string value to an option value of the expected type
-	 * @param <V>    the expected type of the option value
-	 *
-	 * @return the value produced by applying {@code mapper} to a possibly null string value retrieved from a
-	 * system-specific source or {@code null} the optipn is not defined
-	 *
-	 * @throws NullPointerException if {@code mapper} is null
-	 */
-	public <V> V get(final String option, final Function<String, V> mapper);
+    /**
+     * @return the source-relative path of the default site layout
+     */
+    public Path layout();
 
 
-	/**
-	 * @return the system logger
-	 */
-	public Log logger();
+    /**
+     * @return flag indicating whether to generate a README.md file in the project base folder from {@link #source()}
+     * source}/index.md}
+     */
+    public boolean readme();
+
+
+    /**
+     * @return the global variables
+     */
+    public Map<String, Object> global();
+
+    /**
+     * Retrieves a pipeline option.
+     *
+     * @param option the name of the option to be retrieved
+     * @param mapper a function mapping from a possibly null string value to an option value of the expected type
+     * @param <V>    the expected type of the option value
+     *
+     * @return the value produced by applying {@code mapper} to a possibly null string value retrieved from a
+     * system-specific source or {@code null} the optipn is not defined
+     *
+     * @throws NullPointerException if {@code mapper} is null
+     */
+    public <V> V get(final String option, final Function<String, V> mapper);
+
+
+    /**
+     * @return the system logger
+     */
+    public Log logger();
 
 }

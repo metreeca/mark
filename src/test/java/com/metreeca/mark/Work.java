@@ -17,7 +17,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.tasks.*;
+import com.metreeca.mark.tasks.Check;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -32,64 +32,67 @@ import static java.util.Map.entry;
 
 public final class Work {
 
-	public static void main(final String... args) {
-		new Mark(new TestOpts())
-				.exec(new Build())
-				.exec(new Serve())
-				.exec(new Watch())
-		;
-	}
+    public static void main(final String... args) {
+        new Mark(new TestOpts())
+                .exec(new Check())
+        //.exec(new Build())
+        //.exec(new Serve())
+        //.exec(new Watch())
+        ;
+    }
 
 
-	private Work() { }
+    private Work() { }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final class TestOpts implements Opts {
+    private static final class TestOpts implements Opts {
 
-		@Override public Path source() { return Paths.get("docs"); }
-
-		@Override public Path target() { return Paths.get(""); }
-
-		@Override public Path layout() { return Paths.get(""); }
-
-
-		@Override public Map<String, Object> global() {
-			return Map.ofEntries(
-					entry("project", Map.ofEntries(
-
-							entry("groupId", "com.metreeca"),
-							entry("artifactId", "metreeca-test"),
-							entry("version", "1.2.3"),
-
-							entry("name", "Metreeca/Mark"),
-							entry("description", "A minimalist Maven plugin for static site generation"),
-							entry("url", "https://github.com/metreeca/mark"),
-
-							entry("organization", Map.ofEntries(
-									entry("name", "Metreeca"),
-									entry("url", "https://www.metreeca.com/")
-							))
-
-					))
-			);
-		}
-
-		@Override public <V> V get(final String option, final Function<String, V> mapper) {
-			return mapper.apply(
-
-					option.equals("index") ? "README.md"
-							: option.equals(Markdown.SmartLinks.getName()) ? "true"
-							: option.equals(Markdown.ExternalLinks.getName()) ? "true"
-							: null
-
-			);
-		}
+        private final Map<String, String> options=Map.ofEntries(
+                entry(Markdown.SmartLinks.getName(), "true"),
+                entry(Markdown.ExternalLinks.getName(), "true")
+        );
 
 
-		@Override public Log logger() { return new SystemStreamLog(); }
+        @Override public Path source() { return Paths.get("docs"); }
 
-	}
+        @Override public Path target() { return Paths.get(""); }
+
+        @Override public Path layout() { return Paths.get(""); }
+
+
+        @Override public boolean readme() { return false; }
+
+
+        @Override public Map<String, Object> global() {
+            return Map.ofEntries(
+                    entry("project", Map.ofEntries(
+
+                            entry("groupId", "com.metreeca"),
+                            entry("artifactId", "metreeca-test"),
+                            entry("version", "1.2.3"),
+
+                            entry("name", "Metreeca/Mark"),
+                            entry("description", "A minimalist Maven plugin for static site generation"),
+                            entry("url", "https://github.com/metreeca/mark"),
+
+                            entry("organization", Map.ofEntries(
+                                    entry("name", "Metreeca"),
+                                    entry("url", "https://www.metreeca.com/")
+                            ))
+
+                    ))
+            );
+        }
+
+        @Override public <V> V get(final String option, final Function<String, V> mapper) {
+            return mapper.apply(options.get(option));
+        }
+
+
+        @Override public Log logger() { return new SystemStreamLog(); }
+
+    }
 
 }

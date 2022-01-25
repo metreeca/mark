@@ -28,7 +28,7 @@
 	</parent>
 
 	<artifactId>mark-maven-plugin</artifactId>
-	<version>0.7.1</version>
+	<version>0.0.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Metreeca/Mark</name>
@@ -46,6 +46,20 @@
 		<system>GitHub</system>
 		<url>https://github.com/metreeca/mark/issues</url>
 	</issueManagement>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>com.metreeca</groupId>
+				<artifactId>metreeca-base</artifactId>
+				<version>1.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 
@@ -74,8 +88,13 @@
 		<dependency>
 			<groupId>com.metreeca</groupId>
 			<artifactId>metreeca-jse</artifactId>
-			<version>1.0.2</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.metreeca</groupId>
+			<artifactId>metreeca-xml</artifactId>
+		</dependency>
+
 
 		<dependency> <!-- https://github.com/vsch/flexmark-java -->
 			<groupId>com.vladsch.flexmark</groupId>
@@ -93,12 +112,6 @@
 			<groupId>de.inetsoftware</groupId>
 			<artifactId>jlessc</artifactId>
 			<version>1.10</version>
-		</dependency>
-
-		<dependency> <!-- TagSoup SAX HTML Parser -->
-			<groupId>org.ccil.cowan.tagsoup</groupId>
-			<artifactId>tagsoup</artifactId>
-			<version>1.2.1</version>
 		</dependency>
 
 	</dependencies>

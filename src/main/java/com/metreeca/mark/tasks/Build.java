@@ -37,11 +37,15 @@ public final class Build implements Task {
 
 	@Override public void exec(final Mark mark) {
 
-		// copy index file to source folder
+		// copy index file to project folder
 
 		mark.index().ifPresent(entry -> {
 
 			try {
+
+				// !!! rebase links
+				// !!! remove expression escapes
+				// !!! replace ${project.*}
 
 				Files.copy(entry.getKey(), entry.getValue(), REPLACE_EXISTING);
 

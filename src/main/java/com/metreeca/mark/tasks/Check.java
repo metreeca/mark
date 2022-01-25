@@ -17,35 +17,32 @@
 package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
+import com.metreeca.rest.Either;
 
 import org.apache.maven.plugin.logging.Log;
-import org.ccil.cowan.tagsoup.Parser;
 import org.w3c.dom.*;
-import org.xml.sax.InputSource;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.AbstractMap.SimpleImmutableEntry;
+import java.nio.file.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.*;
 
 import static com.metreeca.rest.handlers.Publisher.variants;
+import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Map.entry;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -56,278 +53,259 @@ import static java.util.stream.Collectors.toSet;
  */
 public final class Check implements Task {
 
-	private static final Pattern URLPattern=Pattern.compile("^\\w+:.*$");
+    private static final Pattern URLPattern=Pattern.compile("^\\w+:.*$");
 
 
-	@Override public void exec(final Mark mark) {
+    @Override public void exec(final Mark mark) {
 
-		final Path target=mark.target();
-		final Log logger=mark.logger();
+        final Path target=mark.target();
+        final Log logger=mark.logger();
 
-		try ( final Stream<Path> walk=Files.walk(target) ) {
+        try ( final Stream<Path> walk=Files.walk(target) ) {
 
-			final long start=currentTimeMillis();
+            final long start=currentTimeMillis();
 
-			final List<Map.Entry<String, String>> links=walk
-					.filter(Files::isRegularFile)
-					.flatMap(path -> scan(target, path))
-					.collect(toList());
+            final List<Entry<String, String>> links=walk
 
-			final Set<String> internal=links.stream() // verified internal link targets
-					.map(Map.Entry::getKey)
-					.collect(toSet());
+                    .filter(Files::isRegularFile)
 
-			final Set<String> external=links.stream() // verified external link targets
-					.map(Map.Entry::getValue)
-					.filter(URLPattern.asPredicate())
+                    .flatMap(path -> Stream.concat(
 
-					// !!! external links
+                            Stream.of(entry(
+                                    target.relativize(path).toString(),
+                                    target.relativize(path).toString()
+                            )),
 
-					//.distinct()
-					//.filter(url -> {
-					//	try {
-					//
-					//		logger.info(format("checking %s", url));
-					//
-					//		return validate(url);
-					//
-					//	} catch ( final IOException e ) {
-					//
-					//		logger.warn(e.toString());
-					//
-					//		return false;
-					//
-					//	}
-					//})
+                            path.toString().endsWith(".html")
 
-					.collect(toSet());
+                                    ? scan(target, path).fold(error -> {
 
-			final long broken=links.stream()
+                                mark.logger().warn(format("%s / %s", path, error.getMessage()));
 
-					.filter(link -> variants(link.getValue()).noneMatch(internal::contains))
-					.filter(link -> Stream.of(link.getValue()).noneMatch(external::contains))
+                                return Stream.empty();
 
-					.peek(link -> logger.warn(format("%s ~› %s", link.getKey(), link.getValue())))
+                            })
 
-					.count();
+                                    : Stream.empty()
 
-			final long stop=currentTimeMillis();
+                    ))
 
-			if ( broken > 0 ) {
-				logger.warn(format("%d broken links", broken));
-			} else {
-				logger.info("no broken links");
-			}
+                    .distinct()
+                    .collect(toList());
 
-			if ( !links.isEmpty() ) {
-				logger.info(format("processed %,d files in %,.3f s", links.size(), (stop-start)/1000.0f));
-			}
+            final Set<String> internal=links.stream() // verified internal link targets
+                    .map(Entry::getKey)
+                    .collect(toSet());
 
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+            final Set<String> external=links.stream() // verified external link targets
+                    .map(Entry::getValue)
+                    .filter(URLPattern.asPredicate())
 
+                    // !!! external links
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    //.distinct()
+                    //.filter(url -> {
+                    //	try {
+                    //
+                    //		logger.info(format("checking %s", url));
+                    //
+                    //		return validate(url);
+                    //
+                    //	} catch ( final IOException e ) {
+                    //
+                    //		logger.warn(e.toString());
+                    //
+                    //		return false;
+                    //
+                    //	}
+                    //})
 
-	private Stream<Map.Entry<String, String>> scan(final Path base, final Path path) {
+                    .collect(toSet());
 
-		final String self=base.relativize(path).toString();
+            final long broken=links.stream()
 
-		if ( path.toString().endsWith(".html") ) {
+                    .filter(link -> variants(link.getValue()).noneMatch(internal::contains))
+                    .filter(link -> Stream.of(link.getValue()).noneMatch(external::contains))
 
-			final Document document=document(path);
+                    .peek(link -> logger.warn(format("%s ~› %s", link.getKey(), link.getValue())))
 
-			return Stream.of(
+                    .count();
 
-					Stream.of(new SimpleImmutableEntry<>(self, self)), // document self flink
+            final long stop=currentTimeMillis();
 
-					nodes(document, "//@id|//html:a/@name") // anchors self links
-							.map(Node::getTextContent)
-							.map(anchor -> self+"#"+anchor)
-							.map(anchor -> new SimpleImmutableEntry<>(anchor, anchor)),
+            if ( broken > 0 ) {
+                logger.warn(format("%d broken links", broken));
+            } else {
+                logger.info("no broken links");
+            }
 
-					nodes(document, "//@href|//@src") // actual links
-							.map(Node::getTextContent)
-							.map(link -> URLPattern.matcher(link).matches() ? link
-									: link.startsWith("//") ? "http:"+link
-									: link.startsWith("#") ? self+link
-									: base.relativize(path.resolveSibling(clean(link)).normalize()).toString()
-							)
-							.map(link -> new SimpleImmutableEntry<>(self, link))
+            if ( !links.isEmpty() ) {
+                logger.info(format("processed %,d files in %,.3f s", links.size(), (stop-start)/1000.0f));
+            }
 
-			).flatMap(stream -> stream);
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
-		} else {
 
-			return Stream.of(new SimpleImmutableEntry<>(self, self)); // document self flink
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		}
+    private Either<TransformerException, Stream<Entry<String, String>>> scan(final Path base, final Path path) {
 
-	}
+        final String self=base.relativize(path).toString();
 
+        return parse(path).map(document -> Stream.concat(
 
-	private String clean(final String link) { // fix glitches in local links
-		return index(query(link));
-	}
+                nodes(document, "//@id|//html:a/@name") // anchors self links
+                        .map(Node::getTextContent)
+                        .map(anchor -> self+"#"+anchor)
+                        .map(anchor -> entry(anchor, anchor)),
 
-	private String index(final String link) { // add missing index files
+                nodes(document, "//@href|//@src") // actual links
+                        .map(Node::getTextContent)
+                        .map(link -> URLPattern.matcher(link).matches() ? link
+                                : link.startsWith("//") ? "http:"+link
+                                : link.startsWith("#") ? self+link
+                                : link.startsWith("/") ? Paths.get(".", clean(link)).normalize().toString()
+                                : base.relativize(path.resolveSibling(clean(link))).normalize().toString()
+                        )
+                        .map(link -> entry(self, link))
 
-		return link.endsWith("/") ? link+"index.html"
-				: link.endsWith(".") ? link+"/index.html"
-				: link;
+        ));
+    }
 
-	}
 
-	private String query(final String link) { // remove query components (e.g. javadocs)
+    private String clean(final String link) { // fix glitches in local links
+        return index(query(link));
+    }
 
-		final int question=link.indexOf('?');
+    private String index(final String link) { // add missing index files
 
-		return question >= 0 ? link.substring(0, question) : link;
-	}
+        return link.endsWith("/") ? link+"index.html"
+                : link.endsWith(".") ? link+"/index.html"
+                : link;
 
+    }
 
-	private Document document(final Path path) {
-		try ( final InputStream stream=Files.newInputStream(path) ) {
+    private String query(final String link) { // remove query components (e.g. javadocs)
 
-			final String uri=path.toUri().toString();
+        final int question=link.indexOf('?');
 
-			final InputSource input=new InputSource();
+        return question >= 0 ? link.substring(0, question) : link;
+    }
 
-			input.setSystemId(uri);
-			input.setByteStream(stream);
 
-			final Document document=DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    private Either<TransformerException, Document> parse(final Path path) {
+        try ( final InputStream stream=Files.newInputStream(path) ) {
 
-			document.setDocumentURI(uri);
+            return html(stream, UTF_8.name(), path.toString());
 
-			TransformerFactory.newInstance().newTransformer().transform(
+        } catch ( final IOException e ) {
 
-					new SAXSource(new Parser(), input),
-					new DOMResult(document)
+            throw new UncheckedIOException(e);
 
-			);
+        }
+    }
 
-			return document;
+    private Stream<Node> nodes(final Document document, final String query) {
+        try {
 
-		} catch ( final ParserConfigurationException e ) {
+            final XPath xpath=XPathFactory
 
-			throw new RuntimeException("unable to create document builder", e);
+                    .newInstance()
+                    .newXPath();
 
-		} catch ( final TransformerConfigurationException e ) {
+            xpath.setNamespaceContext(new NamespaceContext() {
 
-			throw new RuntimeException("unable to create transformer", e);
+                @Override public String getNamespaceURI(final String prefix) {
+                    return prefix.equals("html") ? "http://www.w3.org/1999/xhtml" : null;
+                }
 
-		} catch ( final TransformerException e ) {
+                @Override public String getPrefix(final String namespaceURI) {
+                    throw new UnsupportedOperationException("prefix lookup");
+                }
 
-			throw new RuntimeException("unable to parse document", e);
+                @Override public Iterator<String> getPrefixes(final String namespaceURI) {
+                    throw new UnsupportedOperationException("prefixes lookup");
+                }
 
-		} catch ( final IOException e ) {
+            });
 
-			throw new UncheckedIOException(e);
+            return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new NodeIterator((NodeList)xpath
 
-		}
-	}
+                    .compile(query)
+                    .evaluate(document, XPathConstants.NODESET)
 
-	private Stream<Node> nodes(final Document document, final String query) {
-		try {
+            ), Spliterator.ORDERED), false);
 
-			final XPath xpath=XPathFactory
+        } catch ( final XPathExpressionException e ) {
+            throw new RuntimeException("unable to evaluate xpath expression", e);
+        }
+    }
 
-					.newInstance()
-					.newXPath();
 
-			xpath.setNamespaceContext(new NamespaceContext() {
+    private boolean validate(final String url) throws IOException {
+        if ( url.startsWith("javascript:") ) {
 
-				@Override public String getNamespaceURI(final String prefix) {
-					return prefix.equals("html") ? "http://www.w3.org/1999/xhtml" : null;
-				}
+            return true;
 
-				@Override public String getPrefix(final String namespaceURI) {
-					throw new UnsupportedOperationException("prefix lookup");
-				}
+        } else if ( url.startsWith("http") ) {
 
-				@Override public Iterator<String> getPrefixes(final String namespaceURI) {
-					throw new UnsupportedOperationException("prefixes lookup");
-				}
+            final HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();
 
-			});
+            connection.setRequestMethod("HEAD");
+            connection.setRequestProperty("User-Agent", ""
+                    +"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6)"
+                    +"AppleWebKit/537.36 (KHTML, like Gecko)"
+                    +"Chrome/85.0.4183.102 "
+                    +"Safari/537.36"
+            );
 
-			return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new NodeIterator((NodeList)xpath
+            connection.setInstanceFollowRedirects(true);
+            connection.setConnectTimeout(2500);
+            connection.setReadTimeout(2500);
 
-					.compile(query)
-					.evaluate(document, XPathConstants.NODESET)
+            connection.connect();
 
-			), Spliterator.ORDERED), false);
+            return connection.getResponseCode()/100 == 2;
 
-		} catch ( final XPathExpressionException e ) {
-			throw new RuntimeException("unable to evaluate xpath expression", e);
-		}
-	}
+        } else {
 
+            new URL(url); // only well-formedness tests
 
-	private boolean validate(final String url) throws IOException {
-		if ( url.startsWith("javascript:") ) {
+            return true;
 
-			return true;
+        }
 
-		} else if ( url.startsWith("http") ) {
+    }
 
-			final HttpURLConnection connection=(HttpURLConnection)new URL(url).openConnection();
 
-			connection.setRequestMethod("HEAD");
-			connection.setRequestProperty("User-Agent", ""
-					+"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6)"
-					+"AppleWebKit/537.36 (KHTML, like Gecko)"
-					+"Chrome/85.0.4183.102 "
-					+"Safari/537.36"
-			);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			connection.setInstanceFollowRedirects(true);
-			connection.setConnectTimeout(2500);
-			connection.setReadTimeout(2500);
+    private static final class NodeIterator implements Iterator<Node> {
 
-			connection.connect();
+        private final NodeList nodes;
+        private int next;
 
-			return connection.getResponseCode()/100 == 2;
 
-		} else {
+        private NodeIterator(final NodeList nodes) { this.nodes=nodes; }
 
-			new URL(url); // only well-formedness tests
 
-			return true;
+        @Override public boolean hasNext() {
+            return next < nodes.getLength();
+        }
 
-		}
+        @Override public Node next() throws NoSuchElementException {
 
-	}
+            if ( !hasNext() ) {
+                throw new NoSuchElementException("no more iterator elements");
+            }
 
+            return nodes.item(next++);
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        }
 
-	private static final class NodeIterator implements Iterator<Node> {
-
-		private final NodeList nodes;
-		private int next;
-
-
-		private NodeIterator(final NodeList nodes) { this.nodes=nodes; }
-
-
-		@Override public boolean hasNext() {
-			return next < nodes.getLength();
-		}
-
-		@Override public Node next() throws NoSuchElementException {
-
-			if ( !hasNext() ) {
-				throw new NoSuchElementException("no more iterator elements");
-			}
-
-			return nodes.item(next++);
-
-		}
-
-	}
+    }
 
 }
