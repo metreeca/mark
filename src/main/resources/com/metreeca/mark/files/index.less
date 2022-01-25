@@ -161,7 +161,7 @@ html {
 
                 }
 
-                & > label {
+                & > span {
                     flex-shrink: 1;
                     flex-grow: 1;
                 }
@@ -198,14 +198,6 @@ html {
 
         & > nav {
 
-            & > header {
-
-                & > span > a {
-                    font-weight: 700;
-                }
-
-            }
-
             & > section {
 
                 a, a:visited {
@@ -234,19 +226,15 @@ html {
                 }
 
                 & > h1 + h1 {
-                    margin-top: 0.5em;
+                    margin-top: 0.1em;
+                }
+
+                & > h1 + h2 {
+                    margin-top: 0.25em;
                 }
 
                 & > h2 + h1 {
                     margin-top: 0.75em;
-                }
-
-                & > h2 + h2 {
-                    margin-top: 0;
-                }
-
-                & > h1 + h2 {
-                    margin-top: 0.5em;
                 }
 
                 & > h3 {
@@ -273,7 +261,6 @@ html {
                     }
 
                     & > button {
-
                         font-weight: 300;
                         color: #999;
                     }
@@ -623,7 +610,7 @@ hr {
 a, a:visited {
     white-space: nowrap;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 700;
     color: #567;
     cursor: pointer;
 }
@@ -635,6 +622,7 @@ a:hover, button:active {
 
 a[target=_blank]:after { // external link
     content: "⌝";
+    margin-left: 0.1em;
     vertical-align: 5%;
     font-size: 90%;
 }
@@ -745,9 +733,7 @@ select {
 
                 & > header {
 
-                    justify-content: end;
-
-                    & > a:first-child {
+                    & > a {
                         display: none;
                     }
 
@@ -766,7 +752,7 @@ select {
 
                 & > header {
 
-                    & > a:first-child {
+                    & > a {
                         order: 2;
                     }
 
