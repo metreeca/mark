@@ -1,30 +1,11 @@
 ---
-![small](images/small.png)title: "Samples"
+title: "Samples"
+trail: "Context"
 ---
 
-|Variable|Value|
-|--------|-----|
-|project.artifactId|${project.artifactId}|
-|project.version|${project.version}|
-|page.root| ${page.root}          |
-| page.base          | ${page.base}          |
-| page.path          |${page.path}|
+**Table of Contents**
 
 [TOC]
-
-# Heading 1
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt
-nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
-
-## Heading 2
-
-Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit
-feugiat.
-
-### Heading 3
-
-Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
 
 # Typography
 
@@ -35,7 +16,7 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 - [external](https://example.com/)
   - https://example.com/
 - [internal](../index.md)
-- [anchor](#heading-1)
+- [anchor](#tables)
 - [redirect](redirect.md)
 - [broken](broken.md)
 
@@ -55,11 +36,10 @@ nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem 
 
 ## Rules
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
 ---
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt.
+Quisque semper erat non dignissim porta. Donec non tincidunt.
 
 ## Images
 
@@ -127,10 +107,13 @@ Pellentesque
 
 ## Tables
 
-| x | y |
-|---|---|
-| 1 | 2 |
-| a | b |
+|Variable|Value|
+|--------|-----|
+|project.artifactId|${project.artifactId}|
+|project.version|${project.version}|
+|page.root| ${page.root}          |
+| page.base          | ${page.base}          |
+| page.path          |${page.path}|
 
 ## Sources
 
@@ -152,7 +135,9 @@ final class Samples {
 
 ## Admonitions
 
-!!! info Info Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
+!!! info "Info"  
+Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
 
-!!! warning Warning Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum,
-tortor felis tincidunt felis, at convallis lorem orci a lacus.
+!!! warning "Warning"  
+Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum, tortor felis tincidunt
+felis, at convallis lorem orci a lacus.

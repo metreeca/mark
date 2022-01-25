@@ -57,7 +57,8 @@ html(lang="en")
 
 				a(href=organizationURL title=organizationName style=logo)
 
-				a(href="/") #{package}
+				span
+					a(href=page.root) #{package}
 
 				label(for="toggle")
 
@@ -77,7 +78,12 @@ html(lang="en")
 
 				a(href=organizationURL title=organizationName style=logo)
 
-				button(title="SCroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
+				span
+
+					if page.trail
+						a(href="..") #{page.trail}
+
+					button(title="Scroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)") #{title}
 
 				label(for="toggle")
 
