@@ -21,11 +21,16 @@ import com.metreeca.mark.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 /**
  * Site building task.
@@ -35,57 +40,83 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  */
 public final class Build implements Task {
 
-	@Override public void exec(final Mark mark) {
+    private static final Pattern ExpressionPattern=Pattern.compile("(?!\\\\)\\$\\{project\\.(\\w+)}");
+    private static final Pattern EscapePattern=Pattern.compile("\\\\\\$");
 
-		// copy index file to project folder
 
-		mark.index().ifPresent(entry -> {
+    @Override public void exec(final Mark mark) {
 
-			try {
+        // copy index file to project folder
 
-				// !!! rebase links
-				// !!! remove expression escapes
-				// !!! replace ${project.*}
+        mark.index().ifPresent(entry -> {
 
-				Files.copy(entry.getKey(), entry.getValue(), REPLACE_EXISTING);
+            try {
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
+                final Path index=entry.getKey();
+                final Path readme=entry.getValue();
 
-		});
+                final Map<?, ?> project=Optional
+                        .ofNullable(mark.global().get("project"))
+                        .filter(Map.class::isInstance)
+                        .map(Map.class::cast)
+                        .orElseGet(Map::of);
 
-		// copy bundled assets to source folder
+                final String text=Optional.of(Files.readString(index, UTF_8))
 
-		mark.assets().forEach((path, url) -> {
+                        // replace ${project.*} variables
 
-			final Path source=mark.source().resolve(path);
+                        .map(s -> ExpressionPattern.matcher(s).replaceAll(result -> Optional
+                                .ofNullable(project.get(result.group(1)))
+                                .map(Object::toString)
+                                .orElseGet(result::group)
+                        ))
 
-			try ( final InputStream resource=url.openStream() ) {
+                        // remove expression escapes
 
-				Files.copy(resource, source, REPLACE_EXISTING);
+                        .map(s -> EscapePattern.matcher(s).replaceAll("\\$"))
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
+                        .orElseThrow();
 
-		});
 
-		// process resources
+                Files.write(readme, List.of(text), CREATE, TRUNCATE_EXISTING);
 
-		try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
 
-			final long start=currentTimeMillis();
-			final long count=mark.process(sources).size();
-			final long stop=currentTimeMillis();
+        });
 
-			if ( count > 0 ) {
-				mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
-			}
+        // copy bundled assets to source folder
 
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+        mark.assets().forEach((path, url) -> {
+
+            final Path source=mark.source().resolve(path);
+
+            try ( final InputStream resource=url.openStream() ) {
+
+                Files.copy(resource, source, REPLACE_EXISTING);
+
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
+
+        });
+
+        // process resources
+
+        try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
+
+            final long start=currentTimeMillis();
+            final long count=mark.process(sources).size();
+            final long stop=currentTimeMillis();
+
+            if ( count > 0 ) {
+                mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
+            }
+
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 }

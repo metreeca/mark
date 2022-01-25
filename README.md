@@ -22,7 +22,7 @@ Add the plugin to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>1.2.3</version>
 
             <configuration> <!-- optional -->
 
@@ -61,15 +61,15 @@ The following optional configuration parameters are available:
 | parameter | default       | value                                                  |
 | --------- | ------------- | ------------------------------------------------------ |
 | `source`  | `./docs`    | the source folder for the site                         |
-| `target`  | `\${source}`| the target folder for the generated site<br/>defaults to in-place generation|
-| `layout`  |  | the path of default page template relative to `\${source}`<br/>defaults to a bundled docs layout |
-| `readme`  | `false`  | generates a `README.md` file in the base project folder from `\${source}/index.md` |
+| `target`  | `${source}`| the target folder for the generated site<br/>defaults to in-place generation|
+| `layout`  |  | the path of default page template relative to `${source}`<br/>defaults to a bundled docs layout |
+| `readme`  | `false`  | generates a `README.md` file in the base project folder from `${source}/index.md` |
 
 ## Define a template
 
 > :information_source:  
 > If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default [bundled docs layout](samples/index.md) ;-)
+> folder to use the default [bundled docs layout](https://metreeca.github.io/mark/samples/) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -113,7 +113,7 @@ The following properties are available for inclusion using the `#/!{expression}`
 > :warning:  
 > Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
 > [JEXL](http://commons.apache.org/proper/commons-jexl/)
-> rather than Javascript. Expression interpolation in HTML attributes is supported as ``\${expression}``
+> rather than Javascript. Expression interpolation in HTML attributes is supported as ``${expression}``
 
 ## Create site content
 
@@ -124,11 +124,11 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 title: Lorem Ipsum
 ---
 
-Lorem ipsum `\${project.version}` dolor sit amet, consectetur adipiscing elit…
+Lorem ipsum `\1.2.3` dolor sit amet, consectetur adipiscing elit…
 ```
 
 All the properties available to templates (with the obvious exception of `page.body`) are also available for
-interpolation inside pages using the `${expression}` syntax (escape like `\${expression}` to include verbatim).
+interpolation inside pages using the `${expression}` syntax (escape like `${expression}` to include verbatim).
 
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property
 to the path of the required template, relative to the plugin `layout` parameter.

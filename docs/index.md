@@ -69,7 +69,7 @@ The following optional configuration parameters are available:
 
 > :information_source:  
 > If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default [bundled docs layout](samples/index.md) ;-)
+> folder to use the default [bundled docs layout](https://metreeca.github.io/mark/samples/) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:

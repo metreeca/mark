@@ -17,7 +17,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.tasks.Clean;
+import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -37,11 +37,11 @@ public final class Work {
 
                 .exec(new Clean())
 
-        //.exec(new Build())
-        //.exec(new Check())
-        //
-        //.exec(new Serve())
-        //.exec(new Watch())
+                .exec(new Build())
+                .exec(new Check())
+
+                .exec(new Serve())
+                .exec(new Watch())
         ;
     }
 
