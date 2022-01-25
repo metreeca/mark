@@ -18,12 +18,11 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedInputStream;
 
 import static java.util.Comparator.reverseOrder;
 
@@ -34,99 +33,49 @@ import static java.util.Comparator.reverseOrder;
  */
 public final class Clean implements Task {
 
-	@Override public void exec(final Mark mark) {
+    @Override public void exec(final Mark mark) {
 
-		final Path source=mark.source();
-		final Path target=mark.target();
+        final Path source=mark.source();
+        final Path target=mark.target();
 
-		if ( source.equals(target) ) { // in-place generation › remove volatile files
+        if ( source.equals(target) ) { // in-place generation › remove volatile files
 
-			try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
+            try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
-				// delete generated files
+                // delete generated files
 
-				mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
+                mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
 
-				// delete bundled assets
+                // delete bundled assets
 
-				mark.assets().forEach((path, url) -> {
+                mark.assets().forEach((path, url) -> delete(target.resolve(path)));
 
-					final Path asset=target.resolve(path);
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
 
-					if ( Files.exists(asset) ) {
-						try (
-								final InputStream origin=url.openStream();
-								final InputStream actual=Files.newInputStream(asset)
-						) {
+        } else if ( Files.exists(target) ) { // delete target folder
 
-							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
+            try ( final Stream<Path> walk=Files.walk(target) ) {
 
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					}
+                walk.sorted(reverseOrder()).forEachOrdered(this::delete);
 
-				});
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
 
-				// delete index file
-
-				mark.index().ifPresent(entry -> {
-
-					final Path asset=target.resolve(entry.getValue());
-
-					if ( Files.exists(asset) ) {
-						try (
-								final InputStream origin=Files.newInputStream(entry.getKey());
-								final InputStream actual=Files.newInputStream(asset)
-						) {
-
-							if ( checksum(origin) == checksum(actual) ) { delete(asset); }
-
-						} catch ( final IOException e ) {
-							throw new UncheckedIOException(e);
-						}
-					}
-
-				});
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-
-		} else if ( Files.exists(target) ) { // delete target folder
-
-			try ( final Stream<Path> walk=Files.walk(target) ) {
-
-				walk.sorted(reverseOrder()).forEachOrdered(this::delete);
-
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
-
-		}
-	}
+        }
+    }
 
 
-	private static long checksum(final InputStream input) throws IOException {
-		try ( final CheckedInputStream checker=new CheckedInputStream(input, new CRC32()) ) {
+    private void delete(final Path path) {
+        try {
 
-			final byte[] buffer=new byte[1024];
+            if ( Files.exists(path) ) { Files.delete(path); }
 
-			while ( checker.read(buffer, 0, buffer.length) >= 0 ) { }
-
-			return checker.getChecksum().getValue();
-		}
-	}
-
-
-	private void delete(final Path path) {
-		try {
-
-			if ( Files.exists(path) ) { Files.delete(path); }
-
-		} catch ( final IOException e ) {
-			throw new UncheckedIOException(e);
-		}
-	}
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 }

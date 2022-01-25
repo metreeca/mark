@@ -61,14 +61,12 @@ public final class Build implements Task {
 
 			final Path source=mark.source().resolve(path);
 
-			if ( !Files.exists(source) ) {
-				try ( final InputStream resource=url.openStream() ) {
+			try ( final InputStream resource=url.openStream() ) {
 
-					Files.copy(resource, source);
+				Files.copy(resource, source, REPLACE_EXISTING);
 
-				} catch ( final IOException e ) {
-					throw new UncheckedIOException(e);
-				}
+			} catch ( final IOException e ) {
+				throw new UncheckedIOException(e);
 			}
 
 		});
