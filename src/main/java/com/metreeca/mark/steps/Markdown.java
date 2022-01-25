@@ -39,6 +39,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -51,6 +52,9 @@ public final class Markdown {
 
 	public static final DataKey<Boolean> SmartLinks=new DataKey<>("markdown-smart-links", false);
 	public static final DataKey<Boolean> ExternalLinks=new DataKey<>("markdown-external-links", false);
+
+
+	private static final Pattern TrimPattern=Pattern.compile("^\\s*\"\\s*|\\s*\"\\s*$");
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,8 +135,11 @@ public final class Markdown {
 
 				field -> field.getKey().trim(),
 
-				field -> new JoiningList(field.getValue().stream().map(String::trim).collect(toList()))
+				// ;(idea) IDEA-257666 formatting a markdown file scrambles the yaml frontmatter.
 
+				field -> field.getValue().stream()
+						.map(value -> TrimPattern.matcher(value).replaceAll(""))
+						.collect(toList())
 		));
 	}
 
@@ -154,21 +161,6 @@ public final class Markdown {
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final class JoiningList extends AbstractList<String> {
-
-		private final List<String> values;
-
-		private JoiningList(final List<String> values) { this.values=values; }
-
-
-		@Override public int size() { return values.size(); }
-
-		@Override public String get(final int index) { return values.get(index); }
-
-		@Override public String toString() { return String.join(", ", values); }
-
-	}
-
 	private static final class HeadingMap extends AbstractMap<String, Object> {
 
 		private final Heading heading;
@@ -186,4 +178,5 @@ public final class Markdown {
 		}
 
 	}
+
 }

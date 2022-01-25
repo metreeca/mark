@@ -1,5 +1,5 @@
 ---
-title: Samples
+title: "Samples"
 ---
 
 Shared theme for Metreeca docs sites.
@@ -32,20 +32,20 @@ Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non vol
 
 ```java
 final class $ {
-	page.title
+    page.title
 } {
 
 public static void main(final String...args){
-		new Mark()
+        new Mark()
 
-		.source(Paths.get("src/docs"))
-		.target(Paths.get("target/docs"))
+        .source(Paths.get("src/docs"))
+        .target(Paths.get("target/docs"))
 
-		.build();
+        .build();
 
-		}
+        }
 
-		}
+        }
 ```
 
 ## Admonitions
@@ -110,8 +110,8 @@ It lets you and others work together on projects from anywhere.
 ```js
 // Javascript code with syntax highlighting.
 var fun=function lang(l) {
-	dateformat.i18n=require('./lang/'+l)
-	return true;
+    dateformat.i18n=require('./lang/'+l)
+    return true;
 }
 ```
 

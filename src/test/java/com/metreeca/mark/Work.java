@@ -17,7 +17,7 @@
 package com.metreeca.mark;
 
 import com.metreeca.mark.steps.Markdown;
-import com.metreeca.mark.tasks.Check;
+import com.metreeca.mark.tasks.Clean;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -34,8 +34,12 @@ public final class Work {
 
     public static void main(final String... args) {
         new Mark(new TestOpts())
-                .exec(new Check())
+
+                .exec(new Clean())
+
         //.exec(new Build())
+        //.exec(new Check())
+
         //.exec(new Serve())
         //.exec(new Watch())
         ;
@@ -62,7 +66,7 @@ public final class Work {
         @Override public Path layout() { return Paths.get(""); }
 
 
-        @Override public boolean readme() { return false; }
+        @Override public boolean readme() { return true; }
 
 
         @Override public Map<String, Object> global() {
