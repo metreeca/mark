@@ -85,8 +85,20 @@ html {
 
             display: none;
 
+            &:not(:checked) ~ nav {
+                visibility: hidden;
+            }
+
+            &:not(:checked) ~ main {
+                visibility: visible;
+            }
+
             &:checked ~ nav {
-                z-index: 10
+                visibility: visible;
+            }
+
+            &:checked ~ main {
+                visibility: hidden;
             }
 
         }
@@ -261,8 +273,28 @@ html {
                     }
 
                     & > button {
+
+                        position: relative;
+                        display: inline-block;
+
                         font-weight: 300;
                         color: #999;
+
+                        /* min-width: 100%; */
+                        /* animation: 5s linear 0s infinite move; */
+                    }
+
+                    @keyframes move {
+                        0%,
+                        10% {
+                            transform: translateX(0%);
+                            left: 0;
+                        }
+                        90%,
+                        100% {
+                            transform: translateX(-100%);
+                            left: 100%;
+                        }
                     }
 
                 }
@@ -622,7 +654,6 @@ a:hover, button:active {
 
 a[target=_blank]:after { // external link
     content: "⌝";
-    margin-left: 0.1em;
     vertical-align: 5%;
     font-size: 90%;
 }
@@ -718,6 +749,18 @@ select {
                         display: none;
                     }
 
+                }
+
+            }
+
+            & > input {
+
+                &:not(:checked) ~ nav {
+                    visibility: visible;
+                }
+
+                &:not(:checked) ~ main {
+                    visibility: visible;
                 }
 
             }

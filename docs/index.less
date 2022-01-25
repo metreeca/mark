@@ -85,8 +85,20 @@ html {
 
             display: none;
 
+            &:not(:checked) ~ nav {
+                visibility: hidden;
+            }
+
+            &:not(:checked) ~ main {
+                visibility: visible;
+            }
+
             &:checked ~ nav {
-                z-index: 10
+                visibility: visible;
+            }
+
+            &:checked ~ main {
+                visibility: hidden;
             }
 
         }
@@ -737,6 +749,18 @@ select {
                         display: none;
                     }
 
+                }
+
+            }
+
+            & > input {
+
+                &:not(:checked) ~ nav {
+                    visibility: visible;
+                }
+
+                &:not(:checked) ~ main {
+                    visibility: visible;
                 }
 
             }
