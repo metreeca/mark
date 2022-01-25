@@ -18,7 +18,6 @@ package com.metreeca.mark;
 
 import com.metreeca.mark.pipes.*;
 
-import com.sun.nio.file.SensitivityWatchEventModifier;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
@@ -27,6 +26,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.function.*;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -41,7 +41,6 @@ import static java.util.Arrays.asList;
 import static java.util.Locale.ROOT;
 import static java.util.Map.entry;
 import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -52,547 +51,568 @@ import static java.util.stream.Collectors.toMap;
  */
 public final class Mark implements Opts {
 
-	private static final Path Root=Paths.get("/");
-	private static final Path Base=Paths.get("");
-	private static final Path Work=Base.toAbsolutePath().normalize();
+    private static final Path Root=Paths.get("/");
+    private static final Path Base=Paths.get("");
+    private static final Path Work=Base.toAbsolutePath().normalize();
 
-	private static final String Date=ISO_LOCAL_DATE.format(LocalDate.now());
+    private static final String Date=ISO_LOCAL_DATE.format(LocalDate.now());
 
-	private static final Pattern IndexPattern=Pattern.compile("^[^.]*");
-	private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
+    private static final Pattern IndexPattern=Pattern.compile("^[^.]*");
+    private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 
-	private static final Path Layout=Paths.get("index.pug");
+    //// Bundled Layout ////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private static final Map<Path, URL> Assets=Stream.of(
+    private static final Path Layout=Paths.get("index.pug");
 
-			"index.js", "index.less", "index.pug", "index.svg"
+    private static final Map<Path, URL> Assets=Stream.of(
 
-	).collect(toMap(Paths::get, asset -> requireNonNull(
+            "index.js", "index.less", "index.pug", "index.svg"
 
-			Mark.class.getResource(format("files/%s", asset)),
-			format("missing asset ‹%s›", asset)
+    ).collect(toMap(Paths::get, asset -> requireNonNull(
 
-	)));
+            Mark.class.getResource(format("files/%s", asset)),
+            format("missing asset ‹%s›", asset)
 
+    )));
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Opts opts;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	private final Path source;
-	private final Path target;
-	private final Path layout;
+    private final Opts opts;
 
-	private final Map<String, Object> global;
+    private final Path source;
+    private final Path target;
+    private final Path layout;
 
-	private final Log logger;
+    private final Map<String, Object> global;
 
-	private final boolean inplace; // in-place processing
-	private final boolean bundled; // use bundled skin
+    private final boolean readme; // readme generation
+    private final boolean inplace; // in-place processing
+    private final boolean bundled; // use bundled skin
 
-	private final String template; // template layout extension
+    private final Log logger;
 
+    private final String template; // template layout extension
 
-	private final Collection<Function<Mark, Pipe>> pipes=asList(
-			None::new, Md::new, Less::new, Any::new
-	);
 
+    private final Collection<Function<Mark, Pipe>> pipes=asList(
+            None::new, Md::new, Less::new, Any::new
+    );
 
-	/**
-	 * Creates a site generation engine
-	 *
-	 * @param opts the site generation options
-	 *
-	 * @throws NullPointerException if {@code opts} is null or one of its methods returns a null value
-	 */
-	public Mark(final Opts opts) {
 
-		this.opts=requireNonNull(opts, "null opts");
+    /**
+     * Creates a site generation engine
+     *
+     * @param opts the site generation options
+     *
+     * @throws NullPointerException if {@code opts} is null or one of its methods returns a null value
+     */
+    public Mark(final Opts opts) {
 
-		final Path _source=requireNonNull(opts.source(), "null source path");
-		final Path _target=requireNonNull(opts.target(), "null target path");
-		final Path _layout=requireNonNull(opts.layout(), "null layout path");
+        this.opts=requireNonNull(opts, "null opts");
 
-		this.source=_source.toAbsolutePath().normalize();
-		this.target=_target.equals(Base) ? source : _target.toAbsolutePath().normalize();
-		this.layout=_target.equals(Base) ? Layout : source.relativize(source.resolve(_layout)).normalize();
+        final Path _source=requireNonNull(opts.source(), "null source path");
+        final Path _target=requireNonNull(opts.target(), "null target path");
+        final Path _layout=requireNonNull(opts.layout(), "null layout path");
 
-		this.inplace=target.equals(source);
-		this.bundled=layout.equals(Layout);
+        this.source=_source.toAbsolutePath().normalize();
+        this.target=_target.equals(Base) ? source : _target.toAbsolutePath().normalize();
+        this.layout=_target.equals(Base) ? Layout : source.relativize(source.resolve(_layout)).normalize();
 
-		if ( !Files.exists(source) ) {
-			throw new IllegalArgumentException(format("missing source folder ‹%s›", local(source)));
-		}
+        this.readme=opts.readme();
+        this.inplace=target.equals(source);
+        this.bundled=layout.equals(Layout);
 
-		if ( !isDirectory(source) ) {
-			throw new IllegalArgumentException(format("source path ‹%s› is not a folder", local(source)));
-		}
+        if ( !Files.exists(source) ) {
+            throw new IllegalArgumentException(format("missing source folder ‹%s›", local(source)));
+        }
 
-		if ( Files.exists(target) && !isDirectory(target) ) {
-			throw new IllegalArgumentException(format("target path ‹%s› is not a folder", local(target)));
-		}
+        if ( !isDirectory(source) ) {
+            throw new IllegalArgumentException(format("source path ‹%s› is not a folder", local(source)));
+        }
 
-		if ( !inplace && (target.startsWith(source) || source.startsWith(target)) ) {
-			throw new IllegalArgumentException(
-					format("partly overlapping source/target folders ‹%s›/‹%s›", local(source), local(target))
-			);
-		}
+        if ( Files.exists(target) && !isDirectory(target) ) {
+            throw new IllegalArgumentException(format("target path ‹%s› is not a folder", local(target)));
+        }
 
-		if ( !bundled && !Files.exists(layout) ) {
-			throw new IllegalArgumentException(format("missing layout ‹%s›", local(layout)));
-		}
+        if ( !inplace && (target.startsWith(source) || source.startsWith(target)) ) {
+            throw new IllegalArgumentException(
+                    format("partly overlapping source/target folders ‹%s›/‹%s›", local(source), local(target))
+            );
+        }
 
-		if ( !bundled && !Files.isRegularFile(layout) ) {
-			throw new IllegalArgumentException(format("layout path ‹%s› is not a folder", local(layout)));
-		}
+        if ( !bundled && !Files.exists(layout) ) {
+            throw new IllegalArgumentException(format("missing layout ‹%s›", local(layout)));
+        }
 
+        if ( !bundled && !Files.isRegularFile(layout) ) {
+            throw new IllegalArgumentException(format("layout path ‹%s› is not a folder", local(layout)));
+        }
 
-		this.global=Map.copyOf(requireNonNull(opts.global(), "null global variables"));
-		this.logger=requireNonNull(opts.logger(), "null logger");
 
+        this.global=Map.copyOf(requireNonNull(opts.global(), "null global variables"));
+        this.logger=requireNonNull(opts.logger(), "null logger");
 
-		final String _template=layout.toString();
 
-		this.template=_template.substring(max(0, _template.lastIndexOf('.')));
+        final String _template=layout.toString();
 
-		if ( !template.startsWith(".") ) {
-			throw new IllegalArgumentException(format("layout ‹%s› has no extension", layout));
-		}
+        this.template=_template.substring(max(0, _template.lastIndexOf('.')));
 
-	}
+        if ( !template.startsWith(".") ) {
+            throw new IllegalArgumentException(format("layout ‹%s› has no extension", layout));
+        }
 
+    }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Path source() {
-		return source;
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Override public Path target() {
-		return target;
-	}
+    @Override public Path source() {
+        return source;
+    }
 
-	@Override public Path layout() {
-		return layout;
-	}
+    @Override public Path target() {
+        return target;
+    }
 
+    @Override public Path layout() {
+        return layout;
+    }
 
-	@Override public Map<String, Object> global() {
-		return global;
-	}
 
-	@Override public <V> V get(final String option, final Function<String, V> mapper) {
-		return opts.get(option, mapper);
-	}
+    @Override public boolean readme() {
+        return readme;
+    }
 
 
-	@Override public Log logger() {
-		return logger;
-	}
+    @Override public Map<String, Object> global() {
+        return global;
+    }
 
+    @Override public <V> V get(final String option, final Function<String, V> mapper) {
+        return opts.get(option, mapper);
+    }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Checks if a path is a layout
-	 *
-	 * @param path the path to be checked
-	 *
-	 * @return {@code true} if {@code path} has the same file extension as the default {@linkplain Opts#layout() layout}
-	 *
-	 * @throws NullPointerException if {@code path} is {@code null}
-	 */
-	public boolean isLayout(final Path path) {
+    @Override public Log logger() {
+        return logger;
+    }
 
-		if ( path == null ) {
-			throw new NullPointerException("null path");
-		}
 
-		return path.toString().endsWith(template);
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	/**
-	 * Locates a layout.
-	 *
-	 * @param name the name of the layout to be located
-	 *
-	 * @return the absolute path of the layout identified by {@code name}
-	 *
-	 * @throws NullPointerException     if {@code name} is null
-	 * @throws IllegalArgumentException if unable to locate a layout identified by {@code name}
-	 */
-	public Path layout(final String name) {
+    /**
+     * Checks if a path is a layout
+     *
+     * @param path the path to be checked
+     *
+     * @return {@code true} if {@code path} has the same file extension as the default {@linkplain Opts#layout() layout}
+     *
+     * @throws NullPointerException if {@code path} is {@code null}
+     */
+    public boolean isLayout(final Path path) {
 
-		if ( name == null ) {
-			throw new NullPointerException("null name");
-		}
+        if ( path == null ) {
+            throw new NullPointerException("null path");
+        }
 
-		return source(name.isEmpty() || name.equals(template) ? layout // ;( handle extension-only paths…
-				: layout.resolveSibling(name.contains(".") ? name : name+template)
-		);
-	}
+        return path.toString().endsWith(template);
+    }
 
+    /**
+     * Locates a layout.
+     *
+     * @param name the name of the layout to be located
+     *
+     * @return the absolute path of the layout identified by {@code name}
+     *
+     * @throws NullPointerException     if {@code name} is null
+     * @throws IllegalArgumentException if unable to locate a layout identified by {@code name}
+     */
+    public Path layout(final String name) {
 
-	public Optional<Path> target(final Path source, final String to, final String... from) {
+        if ( name == null ) {
+            throw new NullPointerException("null name");
+        }
 
-		if ( source == null ) {
-			throw new NullPointerException("null source");
-		}
+        return source(name.isEmpty() || name.equals(template) ? layout // ;( handle extension-only paths…
+                : layout.resolveSibling(name.contains(".") ? name : name+template)
+        );
+    }
 
-		if ( to == null ) {
-			throw new NullPointerException("null target extension");
-		}
 
-		if ( !to.startsWith(".") ) {
-			throw new IllegalArgumentException("missing leading dot in target extension");
-		}
+    public Optional<Path> target(final Path source, final String to, final String... from) {
 
-		if ( from == null || Arrays.stream(from).anyMatch(Objects::isNull) ) {
-			throw new NullPointerException("null source extension");
-		}
+        if ( source == null ) {
+            throw new NullPointerException("null source");
+        }
 
-		if ( Arrays.stream(from).anyMatch(ext -> !ext.startsWith(".")) ) {
-			throw new IllegalArgumentException("missing leading dot in source extension");
-		}
+        if ( to == null ) {
+            throw new NullPointerException("null target extension");
+        }
 
+        if ( !to.startsWith(".") ) {
+            throw new IllegalArgumentException("missing leading dot in target extension");
+        }
 
-		final String path=source.toString();
+        if ( from == null || Arrays.stream(from).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null source extension");
+        }
 
-		return Arrays.stream(from)
+        if ( Arrays.stream(from).anyMatch(ext -> !ext.startsWith(".")) ) {
+            throw new IllegalArgumentException("missing leading dot in source extension");
+        }
 
-				.map(extension -> path.endsWith(extension)
-						? source.resolveSibling(path.substring(0, path.length()-extension.length())+to)
-						: null
-				)
 
-				.filter(Objects::nonNull)
+        final String path=source.toString();
 
-				.findFirst();
-	}
+        return Arrays.stream(from)
 
+                .map(extension -> path.endsWith(extension)
+                        ? source.resolveSibling(path.substring(0, path.length()-extension.length())+to)
+                        : null
+                )
 
-	public Optional<Map.Entry<Path, Path>> index() {
-		return Optional.ofNullable(get("index", identity())).map(index -> entry(
-				Paths.get(index),
-				target().resolve(Paths.get(IndexPattern.matcher(index).replaceFirst("index")))
-		));
-	}
+                .filter(Objects::nonNull)
 
-	public Map<Path, URL> assets() {
-		return bundled ? Assets : Map.of();
-	}
+                .findFirst();
+    }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public Optional<Entry<Path, Path>> index() {
+        if ( readme ) {
 
-	/**
-	 * Executes a site generation task.
-	 *
-	 * @param task the site generation task to be executed
-	 *
-	 * @return this engine
-	 *
-	 * @throws NullPointerException if {@code resource} is null
-	 */
-	public Mark exec(final Task task) {
+            final Path index=source.resolve("index.md").normalize();
 
-		if ( task == null ) {
-			throw new NullPointerException("null task");
-		}
+            if ( !Files.exists(index) ) {
+                logger.error(format("missing index file <%s>", relative(index)));
+            }
 
-		logger.info(format("%s %s ›› %s",
-				task.getClass().getSimpleName().toLowerCase(ROOT), local(source), local(target)
-		));
+            return Optional.of(entry(index, Work.resolve("README.md").normalize()));
 
-		task.exec(this);
+        } else {
 
-		return this;
-	}
+            return Optional.empty();
 
+        }
+    }
 
-	/**
-	 * Watches site source folder.
-	 *
-	 * @param action an action to be performed on change events; takes as argument the kind of change event and the path
-	 *               of the changed file
-	 *
-	 * @return this engine
-	 *
-	 * @throws NullPointerException if {@code action} is null
-	 */
-	public Mark watch(final BiConsumer<WatchEvent.Kind<?>, Path> action) {
+    public Map<Path, URL> assets() {
+        return bundled ? Assets : Map.of();
+    }
 
-		if ( action == null ) {
-			throw new NullPointerException("null action");
-		}
 
-		final Thread thread=new Thread(() -> {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			try ( final WatchService service=source.getFileSystem().newWatchService() ) {
+    /**
+     * Executes a site generation task.
+     *
+     * @param task the site generation task to be executed
+     *
+     * @return this engine
+     *
+     * @throws NullPointerException if {@code resource} is null
+     */
+    public Mark exec(final Task task) {
 
-				final Consumer<Path> register=path -> {
-					try {
+        if ( task == null ) {
+            throw new NullPointerException("null task");
+        }
 
-						path.register(service,
-								new WatchEvent.Kind<?>[]{ ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE },
-								SensitivityWatchEventModifier.HIGH
-						);
+        final String name=task.getClass().getSimpleName().toLowerCase(ROOT);
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				};
+        logger.info(source.equals(target)
+                ? format("%s %s", name, local(source))
+                : format("%s %s ›› %s", name, local(source), local(target))
+        );
 
-				try ( final Stream<Path> sources=Files.walk(source) ) {
-					sources.filter(Files::isDirectory).forEach(register); // register existing folders
-				}
+        task.exec(this);
 
-				for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
-					for (final WatchEvent<?> event : key.pollEvents()) {
+        return this;
+    }
 
-						final WatchEvent.Kind<?> kind=event.kind();
-						final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-						if ( kind.equals(OVERFLOW) ) {
+    /**
+     * Watches site source folder.
+     *
+     * @param action an action to be performed on change events; takes as argument the kind of change event and the path
+     *               of the changed file
+     *
+     * @return this engine
+     *
+     * @throws NullPointerException if {@code action} is null
+     */
+    public Mark watch(final BiConsumer<WatchEvent.Kind<?>, Path> action) {
 
-							logger.error("sync lost ;-(");
+        if ( action == null ) {
+            throw new NullPointerException("null action");
+        }
 
-						} else if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
+        final Thread thread=new Thread(() -> {
 
-							logger.info(source.relativize(path).toString());
+            try ( final WatchService service=source.getFileSystem().newWatchService() ) {
 
-							register.accept(path);
+                final Consumer<Path> register=path -> {
+                    try {
 
-						} else if ( kind.equals(ENTRY_DELETE) || Files.isRegularFile(path) ) {
+                        path.register(service, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
 
-							action.accept(kind, path);
+                    } catch ( final IOException e ) {
+                        throw new UncheckedIOException(e);
+                    }
+                };
 
-						}
-					}
-				}
+                try ( final Stream<Path> sources=Files.walk(source) ) {
+                    sources.filter(Files::isDirectory).forEach(register); // register existing folders
+                }
 
-			} catch ( final UnsupportedOperationException ignored ) {
+                for (WatchKey key; (key=service.take()) != null; key.reset()) { // watch changes
+                    for (final WatchEvent<?> event : key.pollEvents()) {
 
-			} catch ( final InterruptedException e ) {
+                        final WatchEvent.Kind<?> kind=event.kind();
+                        final Path path=((Path)key.watchable()).resolve((Path)event.context());
 
-				logger.error("interrupted…");
+                        if ( kind.equals(OVERFLOW) ) {
 
-			} catch ( final IOException e ) {
+                            logger.error("sync lost ;-(");
 
-				throw new UncheckedIOException(e);
+                        } else if ( kind.equals(ENTRY_CREATE) && isDirectory(path) ) { // register new folders
 
-			}
+                            logger.info(source.relativize(path).toString());
 
-		});
+                            register.accept(path);
 
-		thread.setDaemon(true);
-		thread.start();
+                        } else if ( kind.equals(ENTRY_DELETE) || Files.isRegularFile(path) ) {
 
-		return this;
-	}
+                            action.accept(kind, path);
 
+                        }
+                    }
+                }
 
-	/**
-	 * Processes site resources.
-	 *
-	 * <p>Generates processed version of site resources in the {@linkplain Opts#target() target} site folder.</p>
-	 *
-	 * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
-	 *              site folder
-	 *
-	 * @return the collection of generated site files
-	 *
-	 * @throws NullPointerException if {@code source} is null
-	 */
-	public Collection<File> process(final Stream<Path> paths) {
+            } catch ( final UnsupportedOperationException ignored ) {
 
-		if ( paths == null ) {
-			throw new NullPointerException("null path stream");
-		}
+            } catch ( final InterruptedException e ) {
 
-		final Collection<File> files=scan(paths);
+                logger.error("interrupted…");
 
-		final List<Map<String, Object>> models=files.stream()
-				.filter(page -> page.path().toString().endsWith(".html"))
-				.map(File::model)
-				.collect(toList());
+            } catch ( final IOException e ) {
 
-		files.forEach(file -> process(file, models));
+                throw new UncheckedIOException(e);
 
-		return files;
-	}
+            }
 
-	/**
-	 * Identifies site resources to be processed.
-	 *
-	 * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
-	 *              site folder
-	 *
-	 * @return the collection of site files to be generated
-	 *
-	 * @throws NullPointerException if {@code source} is null
-	 */
-	public Collection<File> scan(final Stream<Path> paths) {
+        });
 
-		if ( paths == null ) {
-			throw new NullPointerException("null paths");
-		}
+        thread.setDaemon(true);
+        thread.start();
 
-		return paths
+        return this;
+    }
 
-				.filter(Objects::nonNull)
-				.filter(Files::isRegularFile)
 
-				.map(this::source)
-				.map(this::scan).flatMap(Optional::stream)
-				.map(this::extend)
+    /**
+     * Processes site resources.
+     *
+     * <p>Generates processed version of site resources in the {@linkplain Opts#target() target} site folder.</p>
+     *
+     * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
+     *              site folder
+     *
+     * @return the collection of generated site files
+     *
+     * @throws NullPointerException if {@code source} is null
+     */
+    public Collection<File> process(final Stream<Path> paths) {
 
-				.collect(toList());
-	}
+        if ( paths == null ) {
+            throw new NullPointerException("null path stream");
+        }
 
+        final Collection<File> files=scan(paths);
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        final List<Map<String, Object>> models=files.stream()
+                .filter(page -> page.path().toString().endsWith(".html"))
+                .map(File::model)
+                .collect(toList());
 
-	private Optional<File> scan(final Path source) {
-		try {
+        files.forEach(file -> process(file, models));
 
-			return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes.stream()
+        return files;
+    }
 
-					.map(factory -> factory.apply(this))
+    /**
+     * Identifies site resources to be processed.
+     *
+     * @param paths the paths of the site resources to be processed, relative to the {@linkplain Opts#source() source}
+     *              site folder
+     *
+     * @return the collection of site files to be generated
+     *
+     * @throws NullPointerException if {@code source} is null
+     */
+    public Collection<File> scan(final Stream<Path> paths) {
 
-					.map(pipe -> {
-						try {
+        if ( paths == null ) {
+            throw new NullPointerException("null paths");
+        }
 
-							return pipe.process(source).filter(not(file ->
-									inplace && file.path().equals(source) // prevent overwriting
-							));
+        return paths
 
+                .filter(Objects::nonNull)
+                .filter(Files::isRegularFile)
 
-						} catch ( final RuntimeException e ) {
+                .map(this::source)
+                .map(this::scan).flatMap(Optional::stream)
+                .map(this::extend)
 
-							logger.error(format("%s › %s",
-									pipe.getClass().getSimpleName().toLowerCase(ROOT),
-									MessagePattern.matcher(e.getMessage()).replaceAll("; ")
-							));
+                .collect(toList());
+    }
 
-							return Optional.<File>empty();
 
-						}
-					})
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-					.flatMap(Optional::stream)
+    private Optional<File> scan(final Path source) {
+        try {
 
-					.findFirst();
+            return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes.stream()
 
-		} catch ( final IOException e ) {
+                    .map(factory -> factory.apply(this))
 
-			throw new UncheckedIOException(e);
+                    .map(pipe -> {
+                        try {
 
-		}
-	}
+                            return pipe.process(source).filter(not(file ->
+                                            inplace && file.path().equals(source) //
+                                    // prevent overwriting
+                            ));
 
-	private File extend(final File file) {
 
-		final Path relative=relative(file.path());
+                        } catch ( final RuntimeException e ) {
 
-		final Map<String, Object> model=new HashMap<>(file.model());
+                            logger.error(format("%s › %s",
+                                    pipe.getClass().getSimpleName().toLowerCase(ROOT),
+                                    MessagePattern.matcher(e.getMessage()).replaceAll("; ")
+                            ));
 
-		model.put("root", Optional
-				.ofNullable(relative.getParent())
-				.map(parent -> Root.resolve(parent).relativize(Root)) // ;( must be both absolute
-				.map(Path::toString)
-				.orElse(".")
-		);
+                            return Optional.<File>empty();
 
-		model.put("base", Optional
-				.ofNullable(relative.getParent())
-				.map(Path::toString)
-				.orElse(".")
-		);
+                        }
+                    })
 
-		model.put("path", relative.toString());
+                    .flatMap(Optional::stream)
 
-		model.putIfAbsent("date", Date);
+                    .findFirst();
 
-		return new File(relative, model, file.process());
-	}
+        } catch ( final IOException e ) {
 
-	private void process(final File file, final List<Map<String, Object>> models) {
-		try {
+            throw new UncheckedIOException(e);
 
-			final Path relative=relative(file.path());
+        }
+    }
 
-			logger.info(relative.toString());
+    private File extend(final File file) {
 
+        final Path relative=relative(file.path());
 
-			// create the root data model
+        final Map<String, Object> model=new HashMap<>(file.model());
 
-			final Map<String, Object> model=new HashMap<>(global);
+        model.put("root", Optional
+                .ofNullable(relative.getParent())
+                .map(parent -> Root.resolve(parent).relativize(Root)) // ;( must be both absolute
+                .map(Path::toString)
+                .orElse(".")
+        );
 
-			model.put("page", file.model());
-			model.put("pages", models);
+        model.put("base", Optional
+                .ofNullable(relative.getParent())
+                .map(Path::toString)
+                .orElse(".")
+        );
 
+        model.put("path", relative.toString());
 
-			// make sure the output folder exists, then process file
+        model.putIfAbsent("date", Date);
 
-			final Path path=target(relative);
+        return new File(relative, model, file.process());
+    }
 
-			Files.createDirectories(path.getParent());
+    private void process(final File file, final List<Map<String, Object>> models) {
+        try {
 
-			file.process().accept(path, model);
+            final Path relative=relative(file.path());
 
-		} catch ( final IOException e ) {
+            logger.info(relative.toString());
 
-			throw new UncheckedIOException(e);
 
-		}
-	}
+            // create the root data model
 
+            final Map<String, Object> model=new HashMap<>(global);
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            model.put("page", file.model());
+            model.put("pages", models);
 
-	private Path relative(final Path path) {
-		return source.relativize(source.resolve(path)).normalize();
-	}
 
-	private Path source(final Path path) {
+            // make sure the output folder exists, then process file
 
-		final Path absolute=source.resolve(path).toAbsolutePath().normalize();
+            final Path path=target(relative);
 
-		if ( !absolute.startsWith(source) ) {
-			throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
-		}
+            Files.createDirectories(path.getParent());
 
-		if ( !Files.exists(absolute) ) {
-			throw new IllegalArgumentException(format("missing resource ‹%s›", local(path)));
-		}
+            file.process().accept(path, model);
 
-		if ( !Files.isRegularFile(absolute) ) {
-			throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
-		}
+        } catch ( final IOException e ) {
 
-		return absolute;
-	}
+            throw new UncheckedIOException(e);
 
-	private Path target(final Path path) {
+        }
+    }
 
-		final Path absolute=target.resolve(path).toAbsolutePath().normalize();
 
-		if ( !absolute.startsWith(target) ) {
-			throw new IllegalArgumentException(format("resource ‹%s› outside target folder", local(path)));
-		}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if ( Files.exists(absolute) && !Files.isRegularFile(absolute) ) {
-			throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
-		}
+    private Path relative(final Path path) {
+        return source.relativize(source.resolve(path)).normalize();
+    }
 
-		return absolute;
-	}
+    private Path source(final Path path) {
 
+        final Path absolute=source.resolve(path).toAbsolutePath().normalize();
 
-	private Path local(final Path path) {
-		return Work.relativize(path.toAbsolutePath()).normalize();
-	}
+        if ( !absolute.startsWith(source) ) {
+            throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
+        }
+
+        if ( !Files.exists(absolute) ) {
+            throw new IllegalArgumentException(format("missing resource ‹%s›", local(path)));
+        }
+
+        if ( !Files.isRegularFile(absolute) ) {
+            throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
+        }
+
+        return absolute;
+    }
+
+    private Path target(final Path path) {
+
+        final Path absolute=target.resolve(path).toAbsolutePath().normalize();
+
+        if ( !absolute.startsWith(target) ) {
+            throw new IllegalArgumentException(format("resource ‹%s› outside target folder", local(path)));
+        }
+
+        if ( Files.exists(absolute) && !Files.isRegularFile(absolute) ) {
+            throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
+        }
+
+        return absolute;
+    }
+
+
+    private Path local(final Path path) {
+        return Work.relativize(path.toAbsolutePath()).normalize();
+    }
 
 }

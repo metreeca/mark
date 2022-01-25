@@ -15,41 +15,44 @@ Add the plugin to your build configuration as:
 ```xml
 
 <build>
-	<plugins>
 
-		<plugin>
+    <plugins>
 
-			<groupId>com.metreeca</groupId>
-			<artifactId>mark-maven-plugin</artifactId>
-			<version>${project.version}</version>
+        <plugin>
 
-			<configuration> <!-- optional -->
+            <groupId>com.metreeca</groupId>
+            <artifactId>mark-maven-plugin</artifactId>
+            <version>${project.version}</version>
 
-				<source>src/docs</source>
-				<target>target/docs</target>
-				<layout>layouts/default.pug</layout>
+            <configuration> <!-- optional -->
 
-				<options> <!-- pipeline specific options -->
-					<pipeline-option>value</pipeline-option>
-				</options>
+                <source>src/docs</source>
+                <target>target/docs</target>
+                <layout>layouts/default.pug</layout>
+                <readme>true</readme>
 
-			</configuration>
+                <options> <!-- pipeline specific options -->
+                    <pipeline-option>value</pipeline-option>
+                </options>
 
-			<executions>
-				<execution> <!-- example -->
+            </configuration>
 
-					<goals>
-						<goal>clean</goal> <!-- by default in the pre-clean phase-->
-						<goal>build</goal> <!-- by default in the pre-site phase-->
-						<goal>check</goal> <!-- by default in the post-site phase-->
-					</goals>
+            <executions>
+                <execution> <!-- example -->
 
-				</execution>
-			</executions>
+                    <goals>
+                        <goal>clean</goal> <!-- by default in the pre-clean phase-->
+                        <goal>build</goal> <!-- by default in the pre-site phase-->
+                        <goal>check</goal> <!-- by default in the post-site phase-->
+                    </goals>
 
-		</plugin>
+                </execution>
+            </executions>
 
-	</plugins>
+        </plugin>
+
+    </plugins>
+
 </build>
 ```
 
@@ -58,13 +61,15 @@ The following optional configuration parameters are available:
 | parameter | default       | value                                                  |
 | --------- | ------------- | ------------------------------------------------------ |
 | `source`  | `./docs`    | the source folder for the site                         |
-| `target`  | `\${source}`| the target folder for the generated site <br/>                |
-| `layout`  | _bundled_ | the path of default page template relative to `\${source}` |
+| `target`  | `\${source}`| the target folder for the generated site<br/>defaults to in-place generation|
+| `layout`  |  | the path of default page template relative to `\${source}`<br/>defaults to a bundled docs layout |
+| `readme`  | `false`  | generates a `README.md` file in the base project folder from `\${source}/index.md` |
 
 ## Define a template
 
-> :information_source: If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default bundled docs template ;-)
+> :information_source:  
+> If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
+> folder to use the default [bundled docs layout](https://metreeca.github.io/mark/samples/) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -105,7 +110,8 @@ The following properties are available for inclusion using the `#/!{expression}`
 | `pages[]` | a list containing  `page` objects for all HTML pages |
 | `project.*`     | Maven project properties                                     |
 
-> :warning: Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
+> :warning:  
+> Pug templates are rendered using [pug4j](https://github.com/neuland/pug4j): expressions are evaluated as
 > [JEXL](http://commons.apache.org/proper/commons-jexl/)
 > rather than Javascript. Expression interpolation in HTML attributes is supported as ``\${expression}``
 
@@ -127,7 +133,8 @@ interpolation inside pages using the `${expression}` syntax (escape like `\${exp
 The template to be used for rendering the page may be explicitly selected by setting the `layout` front matter property
 to the path of the required template, relative to the plugin `layout` parameter.
 
-> :warning: Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is
+> :warning:  
+> Markdown pages are parsed using [flexmark](https://github.com/vsch/flexmark-java): YAML front matter is
 > supported with a [limited syntax](https://github.com/vsch/flexmark-java/wiki/Extensions#yaml-front-matter).
 
 # Maven Goals
@@ -151,8 +158,9 @@ mvn mark:build # by default in the pre-site phase
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
 
-> :warning:  When generating sites in-place, files converted without altering the file extension (for instance, `.
-> css` › `.css`) > are silently ignored.
+> :warning:  
+> When generating sites in-place, files converted without altering the file extension (for instance, `.
+> css` › `.css`) > are silently ignored.
 
 **Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
 the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
@@ -202,4 +210,5 @@ mvn mark:serve
 
 # License
 
-This project is licensed under the Apache 2.0 License – see [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License – see [LICENSE](https://github.com/metreeca/mark/blob/main/LICENSE)
+file for details.
