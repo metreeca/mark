@@ -58,6 +58,14 @@
 				<scope>import</scope>
 			</dependency>
 
+			<dependency> <!-- https://github.com/vsch/flexmark-java -->
+				<groupId>com.vladsch.flexmark</groupId>
+				<artifactId>flexmark-all</artifactId>
+				<version>0.62.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
@@ -96,11 +104,36 @@
 		</dependency>
 
 
-		<dependency> <!-- https://github.com/vsch/flexmark-java -->
+		<dependency>
 			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-all</artifactId>
-			<version>0.62.2</version>
+			<artifactId>flexmark-ext-admonition</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-autolink</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-definition</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-emoji</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-toc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-yaml-front-matter</artifactId>
+		</dependency>
+
 
 		<dependency> <!-- https://github.com/neuland/pug4j -->
 			<groupId>de.neuland-bfi</groupId>
@@ -113,6 +146,7 @@
 			<artifactId>jlessc</artifactId>
 			<version>1.10</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
