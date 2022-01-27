@@ -381,7 +381,13 @@ body > * > header > label {
 /**** Admonitions *****************************************************************************************************/
 
 .adm-hidden {
+
     display: none;
+
+    &:first-child + * {
+        margin-top: 0;
+    }
+
 }
 
 .adm-block {
