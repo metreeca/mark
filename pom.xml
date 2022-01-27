@@ -28,7 +28,7 @@
 	</parent>
 
 	<artifactId>mark-maven-plugin</artifactId>
-	<version>0.8.0</version>
+	<version>0.8.2</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Metreeca/Mark</name>
@@ -54,6 +54,14 @@
 				<groupId>com.metreeca</groupId>
 				<artifactId>metreeca-base</artifactId>
 				<version>1.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency> <!-- https://github.com/vsch/flexmark-java -->
+				<groupId>com.vladsch.flexmark</groupId>
+				<artifactId>flexmark-all</artifactId>
+				<version>0.62.2</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -96,11 +104,36 @@
 		</dependency>
 
 
-		<dependency> <!-- https://github.com/vsch/flexmark-java -->
+		<dependency>
 			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-all</artifactId>
-			<version>0.62.2</version>
+			<artifactId>flexmark-ext-admonition</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-autolink</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-definition</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-emoji</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-toc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-ext-yaml-front-matter</artifactId>
+		</dependency>
+
 
 		<dependency> <!-- https://github.com/neuland/pug4j -->
 			<groupId>de.neuland-bfi</groupId>
@@ -112,6 +145,19 @@
 			<groupId>de.inetsoftware</groupId>
 			<artifactId>jlessc</artifactId>
 			<version>1.10</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

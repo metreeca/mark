@@ -9,9 +9,7 @@ trail: "Context"
 
 # Typography
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
-
-:warning: :information_source:
+Text can be **bold** or _italic_ and can contain :warning: :information_source: .
 
 - [external](https://example.com/)
   - https://example.com/
