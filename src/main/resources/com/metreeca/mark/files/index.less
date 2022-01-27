@@ -325,7 +325,7 @@ html {
 
 /**** Toggle **********************************************************************************************************/
 
-label:empty {
+body > * > header > label {
 
     --size: 0.75em;
     --weight: 0.125em;
@@ -626,7 +626,7 @@ a > img:only-child {
     vertical-align: middle;
 }
 
-p > img:only-child {
+p > img:only-child:not([alt~=emoji]) {
     width: 100%;
     height: auto;
     margin-top: 1.5em;

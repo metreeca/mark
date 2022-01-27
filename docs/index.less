@@ -325,7 +325,7 @@ html {
 
 /**** Toggle **********************************************************************************************************/
 
-label:empty {
+body > * > header > label {
 
     --size: 0.75em;
     --weight: 0.125em;
@@ -626,20 +626,11 @@ a > img:only-child {
     vertical-align: middle;
 }
 
-p > img {
-
-    display: block;
+p > img:only-child:not([alt~=emoji]) {
     width: 100%;
     height: auto;
-
-    p:not(:first-child) > & {
-        margin-top: 1.5em;
-    }
-
-    p:not(:last-child) > & {
-        margin-bottom: 1.5em;
-    }
-
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 }
 
 hr {
@@ -744,22 +735,15 @@ select {
 
         & > body {
 
-            display: grid;
-            align-items: stretch;
-            justify-items: stretch;
-
             grid-template-columns: minmax(min-content, 1fr) 3fr;
-            grid-template-rows: 1fr;
 
             & > * {
-
-                grid-row: 1;
 
                 & > header {
 
                     border-bottom-style: none;
 
-                    & > label:empty {
+                    & > label {
                         display: none;
                     }
 
