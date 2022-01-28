@@ -19,9 +19,9 @@ package com.metreeca.mark.tasks;
 import com.metreeca.mark.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -40,9 +40,13 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
  */
 public final class Build implements Task {
 
-    private static final Pattern ExpressionPattern=Pattern.compile("(?!\\\\)\\$\\{project\\.(\\w+)}");
+    private static final Pattern ExpressionPattern=Pattern.compile("(?!\\\\)\\$\\{(\\w+(?:\\.\\w+)*)}");
+    private static final Pattern RelativePattern=Pattern.compile("\\[([^]\\[]*)]\\((?!\\w+:)([^)]+)\\)");
     private static final Pattern EscapePattern=Pattern.compile("\\\\\\$");
+    private static final Pattern DollarPattern=Pattern.compile("\\$");
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override public void exec(final Mark mark) {
 
@@ -55,21 +59,37 @@ public final class Build implements Task {
                 final Path index=entry.getKey();
                 final Path readme=entry.getValue();
 
-                final Map<?, ?> project=Optional
-                        .ofNullable(mark.global().get("project"))
-                        .filter(Map.class::isInstance)
-                        .map(Map.class::cast)
-                        .orElseGet(Map::of);
+                final String base=mark
+                        .global(String.class, "project.distributionManagement.site.url")
+                        .orElseGet(() -> readme.getParent().relativize(mark.target()).toString());
+
 
                 final String text=Optional.of(Files.readString(index, UTF_8))
 
-                        // replace ${project.*} variables
+                        // replace ${*} variables
 
-                        .map(s -> ExpressionPattern.matcher(s).replaceAll(result -> Optional
-                                .ofNullable(project.get(result.group(1)))
-                                .map(Object::toString)
-                                .orElseGet(result::group)
+                        .map(s -> ExpressionPattern.matcher(s).replaceAll(result ->
+                                mark.global(String.class, result.group(1)).orElseGet(() ->
+                                        DollarPattern.matcher(result.group()).replaceAll("\\\\\\$")
+                                )
                         ))
+
+                        // relocate relative links
+
+                        .map(s -> RelativePattern.matcher(s).replaceAll(result -> format(
+
+                                "[%s](%s)", result.group(1), base.startsWith("http")
+
+                                        ? (base+"/"+result.group(2))
+                                        .replace("/./", "/")
+                                        .replace("//", "/")
+                                        .replace(".md", ".html")
+                                        .replace("/index.html", "/")
+
+                                        : Paths.get(base, result.group(2)).normalize())
+
+                        ))
+
 
                         // remove expression escapes
 

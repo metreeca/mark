@@ -19,7 +19,8 @@ package com.metreeca.mark;
 import org.apache.maven.plugin.logging.Log;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -59,28 +60,30 @@ public interface Opts {
      * @param path the dotted path of a global variable
      * @param <V>  the expected value type
      *
-     * @return the global variable corresponding to {@code path}
+     * @return the optional value of the global variable identified by {@code path} or an empty optional is no matching
+     * value is found
      *
-     * @throws NullPointerException if either {@code type} or {@code path} is null or {@code path} contains null
-     *                              elements
+     * @throws NullPointerException if either {@code type} or {@code path} is null
      */
-    public default <V> Optional<V> global(final Class<V> type, final String... path) {
+    public default <V> Optional<V> global(final Class<V> type, final String path) {
 
         if ( type == null ) {
             throw new NullPointerException("null type");
         }
 
-        if ( path == null || Arrays.stream(path).anyMatch(Objects::isNull) ) {
+        if ( path == null ) {
             throw new NullPointerException("null path");
         }
 
-        if ( path.length == 0 ) { return Optional.empty(); } else {
+        final String[] steps=path.split("\\.");
+
+        if ( steps.length == 0 ) { return Optional.empty(); } else {
 
             Map<?, ?> map=global();
 
-            for (int i=0; i < path.length-1; i++) {
+            for (int i=0; i < steps.length-1; i++) {
 
-                final String step=path[i];
+                final String step=steps[i];
 
                 map=Optional.ofNullable(map.get(step))
                         .filter(Map.class::isInstance)
@@ -89,7 +92,7 @@ public interface Opts {
 
             }
 
-            return Optional.ofNullable(map.get(path[path.length-1]))
+            return Optional.ofNullable(map.get(steps[steps.length-1]))
                     .filter(type::isInstance)
                     .map(type::cast);
 

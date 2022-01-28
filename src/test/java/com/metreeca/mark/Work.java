@@ -84,13 +84,19 @@ public final class Work {
                             entry("organization", Map.ofEntries(
                                     entry("name", "Metreeca"),
                                     entry("url", "https://www.metreeca.com/")
+                            )),
+
+                            entry("distributionManagement", Map.ofEntries(
+                                    entry("site",
+                                            Map.of("url", "https://metreeca.github.io/mark/")
+                                    )
                             ))
 
                     ))
             );
         }
 
-        @Override public <V> V get(final String option, final Function<String, V> mapper) {
+        @Override public <V> V option(final String option, final Function<String, V> mapper) {
             return mapper.apply(options.get(option));
         }
 

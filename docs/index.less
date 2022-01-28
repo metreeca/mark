@@ -634,7 +634,7 @@ hr {
     border-top-style: solid;
 }
 
-img:not([class~=emoji]) {
+img:not([alt~=emoji]) {
 
     display: block;
     max-width: 100%;
@@ -666,6 +666,7 @@ a, a:visited {
 
 
     & > img:only-child {
+        display: inline-block;
         margin: 0;
         vertical-align: middle;
     }
