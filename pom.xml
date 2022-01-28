@@ -47,6 +47,14 @@
 		<url>https://github.com/metreeca/mark/issues</url>
 	</issueManagement>
 
+	<distributionManagement>
+
+		<site>
+			<url>https://metreeca.github.io/${project.artifactId}</url>
+		</site>
+
+	</distributionManagement>
+
 	<dependencyManagement>
 		<dependencies>
 
@@ -203,36 +211,6 @@
 				</executions>
 
 			</plugin>
-
-			<plugin>
-
-				<groupId>com.metreeca</groupId>
-				<artifactId>mark-maven-plugin</artifactId>
-				<version>${project.version}</version>
-
-				<configuration>
-
-					<options>
-						<markdown-smart-links>true</markdown-smart-links>
-						<markdown-external-links>true</markdown-external-links>
-					</options>
-
-				</configuration>
-
-				<executions>
-					<execution>
-
-						<goals>
-							<goal>clean</goal>
-							<goal>build</goal>
-							<goal>check</goal>
-						</goals>
-
-					</execution>
-				</executions>
-
-			</plugin>
-
 
 		</plugins>
 
