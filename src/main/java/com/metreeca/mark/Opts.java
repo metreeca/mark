@@ -19,7 +19,7 @@ package com.metreeca.mark;
 import org.apache.maven.plugin.logging.Log;
 
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -56,6 +56,48 @@ public interface Opts {
     public Map<String, Object> global();
 
     /**
+     * @param path the dotted path of a global variable
+     * @param <V>  the expected value type
+     *
+     * @return the global variable corresponding to {@code path}
+     *
+     * @throws NullPointerException if either {@code type} or {@code path} is null or {@code path} contains null
+     *                              elements
+     */
+    public default <V> Optional<V> global(final Class<V> type, final String... path) {
+
+        if ( type == null ) {
+            throw new NullPointerException("null type");
+        }
+
+        if ( path == null || Arrays.stream(path).anyMatch(Objects::isNull) ) {
+            throw new NullPointerException("null path");
+        }
+
+        if ( path.length == 0 ) { return Optional.empty(); } else {
+
+            Map<?, ?> map=global();
+
+            for (int i=0; i < path.length-1; i++) {
+
+                final String step=path[i];
+
+                map=Optional.ofNullable(map.get(step))
+                        .filter(Map.class::isInstance)
+                        .map(Map.class::cast)
+                        .orElseGet(Map::of);
+
+            }
+
+            return Optional.ofNullable(map.get(path[path.length-1]))
+                    .filter(type::isInstance)
+                    .map(type::cast);
+
+        }
+    }
+
+
+    /**
      * Retrieves a pipeline option.
      *
      * @param option the name of the option to be retrieved
@@ -67,7 +109,7 @@ public interface Opts {
      *
      * @throws NullPointerException if {@code mapper} is null
      */
-    public <V> V get(final String option, final Function<String, V> mapper);
+    public <V> V option(final String option, final Function<String, V> mapper);
 
 
     /**
