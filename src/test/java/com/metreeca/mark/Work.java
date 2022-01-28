@@ -40,8 +40,8 @@ public final class Work {
                 .exec(new Build())
                 .exec(new Check())
 
-                .exec(new Serve())
-                .exec(new Watch())
+        //.exec(new Serve())
+        //.exec(new Watch())
         ;
     }
 
@@ -75,7 +75,7 @@ public final class Work {
 
                             entry("groupId", "com.metreeca"),
                             entry("artifactId", "mark-maven-plugin"),
-                            entry("version", "0.8.0"),
+                            entry("version", "0.8.3"),
 
                             entry("name", "Metreeca/Mark"),
                             entry("description", "A minimalist Maven plugin for static site generation"),

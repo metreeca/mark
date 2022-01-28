@@ -22,7 +22,7 @@ Add the plugin to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>0.8.0</version>
+            <version>0.8.3</version>
 
             <configuration> <!-- optional -->
 
@@ -126,7 +126,7 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 title: Lorem Ipsum
 ---
 
-Lorem ipsum `\0.8.0` dolor sit amet, consectetur adipiscing elit…
+Lorem ipsum `\0.8.3` dolor sit amet, consectetur adipiscing elit…
 ```
 
 All the properties available to templates (with the obvious exception of `page.body`) are also available for
