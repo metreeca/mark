@@ -41,10 +41,10 @@ Quisque semper erat non dignissim porta. Donec non tincidunt.
 
 ## Images
 
-![Large Image](images/large.png)
+![Large Image](images/large.png#center)
 
-![Small Image](images/small.png) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex.
-Nunc non sem vitae est blandit feugiat.
+![Small Image](images/small.png#right) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac
+ex. Nunc non sem vitae est blandit feugiat.
 
 ## Lists
 

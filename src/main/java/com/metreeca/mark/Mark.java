@@ -190,8 +190,8 @@ public final class Mark implements Opts {
         return global;
     }
 
-    @Override public <V> V get(final String option, final Function<String, V> mapper) {
-        return opts.get(option, mapper);
+    @Override public <V> V option(final String option, final Function<String, V> mapper) {
+        return opts.option(option, mapper);
     }
 
 

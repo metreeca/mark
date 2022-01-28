@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,400,700|Roboto+Mono:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
 
 html {
 
@@ -615,7 +615,7 @@ p {
 
 blockquote {
     margin-top: 1.5em;
-    padding-left: 2em;
+    padding-left: 1em;
     padding-right: 0.5em;
     margin-bottom: 1.5em;
     border-left: solid 0.5em #EEE;
@@ -628,29 +628,49 @@ blockquote > small:last-child {
     text-align: right;
 }
 
-a > img:only-child {
-    vertical-align: middle;
-}
-
-p > img:only-child:not([alt~=emoji]) {
-    width: 100%;
-    height: auto;
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
-}
-
 hr {
     margin-top: 1em;
     margin-bottom: 1em;
     border-top-style: solid;
 }
 
+img:not([alt~=emoji]) {
+
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+
+    &[src$='#left'] {
+        float: left;
+        max-width: 33%;
+        margin: 0 1.5em 1.5em 0;
+    }
+
+    &[src$='#right'] {
+        float: right;
+        max-width: 33%;
+        margin: 0 0 1.5em 1.5em;
+    }
+
+}
+
 a, a:visited {
+
     white-space: nowrap;
     text-decoration: none;
     font-weight: 700;
-    color: #567;
+    color: #678;
     cursor: pointer;
+
+
+    & > img:only-child {
+        display: inline-block;
+        margin: 0;
+        vertical-align: middle;
+    }
+
 }
 
 a:hover, button:active {
@@ -660,6 +680,7 @@ a:hover, button:active {
 
 a[target=_blank]:after { // external link
     content: "⌝";
+    margin-left: 0.1em;
     vertical-align: 5%;
     font-size: 90%;
 }
@@ -675,7 +696,6 @@ em {
 
 strong {
     color: #333;
-    white-space: pre;
     font-weight: 700;
 }
 
@@ -719,7 +739,7 @@ select {
     }
 
     ul {
-        list-style-type: square;
+        list-style-type: disc;
     }
 
     ul > li::before {

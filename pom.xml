@@ -28,7 +28,7 @@
 	</parent>
 
 	<artifactId>mark-maven-plugin</artifactId>
-	<version>0.8.2</version>
+	<version>0.8.3</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Metreeca/Mark</name>
@@ -46,6 +46,14 @@
 		<system>GitHub</system>
 		<url>https://github.com/metreeca/mark/issues</url>
 	</issueManagement>
+
+	<distributionManagement>
+
+		<site>
+			<url>https://metreeca.github.io/${project.artifactId}</url>
+		</site>
+
+	</distributionManagement>
 
 	<dependencyManagement>
 		<dependencies>

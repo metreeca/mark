@@ -72,7 +72,7 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
         return Map.of("project", project);
     }
 
-    @Override public <V> V get(final String option, final Function<String, V> mapper) {
+    @Override public <V> V option(final String option, final Function<String, V> mapper) {
         return mapper.apply(options == null ? null : options.get(option));
     }
 

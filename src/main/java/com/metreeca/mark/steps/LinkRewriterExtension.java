@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,30 +22,15 @@ import com.vladsch.flexmark.html.renderer.ResolvedLink;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
+
+import static com.metreeca.mark.steps.Markdown.plain;
+import static com.metreeca.mark.steps.Markdown.smart;
 
 final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension {
 
-	public static LinkRewriterExtension create() {
+	static LinkRewriterExtension create() {
 		return new LinkRewriterExtension();
-	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private static final Pattern URLPattern=Pattern.compile("(?<=^|/)(index|([^/#]*))\\.md(#[^/#]*)?$");
-
-
-	static String plain(final String url) {
-		return url == null ? null : URLPattern.matcher(url).replaceAll("$1.html$3");
-	}
-
-	static String smart(final String url) {
-		return url == null ? null : Optional.of(URLPattern.matcher(url).replaceAll("$2$3"))
-				.filter(smart -> !smart.isEmpty())
-				.orElse(".");
 	}
 
 

@@ -20,6 +20,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -56,6 +57,50 @@ public interface Opts {
     public Map<String, Object> global();
 
     /**
+     * @param path the dotted path of a global variable
+     * @param <V>  the expected value type
+     *
+     * @return the optional value of the global variable identified by {@code path} or an empty optional is no matching
+     * value is found
+     *
+     * @throws NullPointerException if either {@code type} or {@code path} is null
+     */
+    public default <V> Optional<V> global(final Class<V> type, final String path) {
+
+        if ( type == null ) {
+            throw new NullPointerException("null type");
+        }
+
+        if ( path == null ) {
+            throw new NullPointerException("null path");
+        }
+
+        final String[] steps=path.split("\\.");
+
+        if ( steps.length == 0 ) { return Optional.empty(); } else {
+
+            Map<?, ?> map=global();
+
+            for (int i=0; i < steps.length-1; i++) {
+
+                final String step=steps[i];
+
+                map=Optional.ofNullable(map.get(step))
+                        .filter(Map.class::isInstance)
+                        .map(Map.class::cast)
+                        .orElseGet(Map::of);
+
+            }
+
+            return Optional.ofNullable(map.get(steps[steps.length-1]))
+                    .filter(type::isInstance)
+                    .map(type::cast);
+
+        }
+    }
+
+
+    /**
      * Retrieves a pipeline option.
      *
      * @param option the name of the option to be retrieved
@@ -67,7 +112,7 @@ public interface Opts {
      *
      * @throws NullPointerException if {@code mapper} is null
      */
-    public <V> V get(final String option, final Function<String, V> mapper);
+    public <V> V option(final String option, final Function<String, V> mapper);
 
 
     /**

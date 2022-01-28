@@ -54,7 +54,19 @@ public final class Markdown {
 	public static final DataKey<Boolean> ExternalLinks=new DataKey<>("markdown-external-links", false);
 
 
+	private static final Pattern URLPattern=Pattern.compile("(?<=^|/)(index|([^/#]*))\\.md(#[^/#]*)?$");
 	private static final Pattern TrimPattern=Pattern.compile("^\\s*\"\\s*|\\s*\"\\s*$");
+
+
+	static String plain(final CharSequence url) {
+		return url == null ? null : URLPattern.matcher(url).replaceAll("$1.html$3");
+	}
+
+	static String smart(final CharSequence url) {
+		return url == null ? null : Optional.of(URLPattern.matcher(url).replaceAll("$2$3"))
+				.filter(smart -> !smart.isEmpty())
+				.orElse(".");
+	}
 
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,8 +101,8 @@ public final class Markdown {
 
 				.set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
 
-				.set(SmartLinks, mark.get(SmartLinks.getName(), Boolean::parseBoolean))
-				.set(ExternalLinks, mark.get(ExternalLinks.getName(), Boolean::parseBoolean));
+				.set(SmartLinks, mark.option(SmartLinks.getName(), Boolean::parseBoolean))
+				.set(ExternalLinks, mark.option(ExternalLinks.getName(), Boolean::parseBoolean));
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2020 Metreeca srl
+ * Copyright © 2019-2022 Metreeca srl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@ package com.metreeca.mark.steps;
 
 import org.junit.jupiter.api.Test;
 
-import static com.metreeca.mark.steps.LinkRewriterExtension.plain;
-import static com.metreeca.mark.steps.LinkRewriterExtension.smart;
+import static com.metreeca.mark.steps.Markdown.plain;
+import static com.metreeca.mark.steps.Markdown.smart;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-final class LinkRewriterExtensionTest {
+final class MarkdownTest {
 
 	@Test void testPlainRewriting() {
 
