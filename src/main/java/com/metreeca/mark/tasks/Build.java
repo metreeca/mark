@@ -80,9 +80,9 @@ public final class Build implements Task {
 
                                 "[%s](%s)", result.group(1), base.startsWith("http")
 
-                                        ? (base+"/"+result.group(2))
+                                        ? format(base.endsWith("/") ? "%s%s" : "%s/%s", base, result.group(2))
                                         .replace("/./", "/")
-                                        .replace("//", "/")
+
                                         .replace(".md", ".html")
                                         .replace("/index.html", "/")
 
