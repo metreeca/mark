@@ -231,6 +231,17 @@
 
                 </configuration>
 
+                <executions>
+                    <execution>
+
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>build</goal>
+                        </goals>
+
+                    </execution>
+                </executions>
+
             </plugin>
 
         </plugins>

@@ -44,12 +44,9 @@
             <header>
                 <a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(./index.svg)"></a><span><button title="Scroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)">A minimalist Maven plugin for static site generation</button></span><label for="toggle"></label>
             </header>
-            <section><p>0.8.5 replaced<br/>
-                0.8.5 escaped</p>
-                <p><a href="samples/">relative</a></p>
-                <p>
-                    <a href="https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/" target="_blank"><img src="https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg" alt="Maven Central" target="_blank"/></a>
-                </p>
+            <section><p>
+                <a href="https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/" target="_blank"><img src="https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg" alt="Maven Central" target="_blank"/></a>
+            </p>
                 <h1 id="metreecamark">Metreeca/Mark</h1>
                 <p>Metreeca/Mark is a minimalist Maven plugin for static site generation. It is tightly integrated in the
                     build process and
@@ -59,8 +56,7 @@
                 <h1 id="usage">Usage</h1>
                 <h2 id="configure-the-plugin">Configure the plugin</h2>
                 <p>Add the plugin to your build configuration as:</p>
-                <pre><code class="language-xml">
-&lt;build&gt;
+                <pre><code class="language-xml">&lt;build&gt;
 
     &lt;plugins&gt;
 
@@ -75,6 +71,7 @@
                 &lt;source&gt;src/docs&lt;/source&gt;
                 &lt;target&gt;target/docs&lt;/target&gt;
                 &lt;layout&gt;layouts/default.pug&lt;/layout&gt;
+
                 &lt;readme&gt;true&lt;/readme&gt;
 
                 &lt;options&gt; &lt;!-- pipeline specific options --&gt;
@@ -84,7 +81,7 @@
             &lt;/configuration&gt;
 
             &lt;executions&gt;
-                &lt;execution&gt; &lt;!-- example --&gt;
+                &lt;execution&gt;
 
                     &lt;goals&gt;
                         &lt;goal&gt;clean&lt;/goal&gt; &lt;!-- by default in the pre-clean phase--&gt;
@@ -130,7 +127,10 @@
                         <tr>
                             <td><code>readme</code></td>
                             <td><code>false</code></td>
-                            <td>generates a <code>README.md</code> file in the base project folder from <code>${source}/index.md</code>
+                            <td>generates a <code>README.md</code> file in the base project folder from <code>${source}/index.md</code><br/>relative
+                                links are rewritten to <code>${project.distributionManagement.site.url}</code>, if
+                                defined in <code>pom.xml</code>, or to the original location under the
+                                <code>target</code> folder, otherwise
                             </td>
                         </tr>
                     </tbody>

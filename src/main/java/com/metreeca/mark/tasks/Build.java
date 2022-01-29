@@ -40,7 +40,9 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
  */
 public final class Build implements Task {
 
-    private static final Pattern ExpressionPattern=Pattern.compile("(?!\\\\)\\$\\{(\\w+(?:\\.\\w+)*)}");
+    private static final String SiteURL="project.distributionManagement.site.url";
+
+    private static final Pattern ExpressionPattern=Pattern.compile("(?<!\\\\)\\$\\{(\\w+(?:\\.\\w+)*)}");
     private static final Pattern RelativePattern=Pattern.compile("\\[([^]\\[]*)]\\((?!\\w+:)([^)]+)\\)");
     private static final Pattern EscapePattern=Pattern.compile("\\\\\\$");
     private static final Pattern DollarPattern=Pattern.compile("\\$");
@@ -59,8 +61,7 @@ public final class Build implements Task {
                 final Path index=entry.getKey();
                 final Path readme=entry.getValue();
 
-                final String base=mark
-                        .global(String.class, "project.distributionManagement.site.url")
+                final String base=mark.global(String.class, SiteURL)
                         .orElseGet(() -> readme.getParent().relativize(mark.target()).toString());
 
                 final String text=Optional.of(Files.readString(index, UTF_8))
@@ -72,6 +73,11 @@ public final class Build implements Task {
                                         DollarPattern.matcher(result.group()).replaceAll("\\\\\\$")
                                 )
                         ))
+
+
+                        // remove expression escapes
+
+                        .map(s -> EscapePattern.matcher(s).replaceAll("\\$"))
 
                         // relocate relative links
 
@@ -88,11 +94,6 @@ public final class Build implements Task {
                                         : Paths.get(base, result.group(2)).normalize())
 
                         ))
-
-
-                        // remove expression escapes
-
-                        .map(s -> EscapePattern.matcher(s).replaceAll("\\$"))
 
                         .orElseThrow();
 

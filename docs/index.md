@@ -1,8 +1,3 @@
-${project.version} replaced  
-\${project.version} escaped
-
-[relative](samples/index.md)
-
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
 # Metreeca/Mark
@@ -17,8 +12,7 @@ template and let the generator take care of the details…
 
 Add the plugin to your build configuration as:
 
-```xml
-
+```xml 
 <build>
 
     <plugins>
@@ -34,6 +28,7 @@ Add the plugin to your build configuration as:
                 <source>src/docs</source>
                 <target>target/docs</target>
                 <layout>layouts/default.pug</layout>
+
                 <readme>true</readme>
 
                 <options> <!-- pipeline specific options -->
@@ -43,7 +38,7 @@ Add the plugin to your build configuration as:
             </configuration>
 
             <executions>
-                <execution> <!-- example -->
+                <execution>
 
                     <goals>
                         <goal>clean</goal> <!-- by default in the pre-clean phase-->
@@ -67,7 +62,7 @@ The following optional configuration parameters are available:
 | `source`  | `./docs`    | the source folder for the site                         |
 | `target`  | `\${source}`| the target folder for the generated site<br/>defaults to in-place generation|
 | `layout`  |  | the path of default page template relative to `\${source}`<br/>defaults to a bundled docs layout |
-| `readme`  | `false`  | generates a `README.md` file in the base project folder from `\${source}/index.md` |
+| `readme`  | `false`  | generates a `README.md` file in the base project folder from `\${source}/index.md`<br/>relative links are rewritten to `\${project.distributionManagement.site.url}`, if defined in `pom.xml`, or to the original location under the `target` folder, otherwise |
 
 ## Define a template
 
