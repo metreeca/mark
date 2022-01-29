@@ -17,11 +17,18 @@
 package com.metreeca.mark;
 
 import org.apache.maven.plugin.logging.Log;
+import org.jetbrains.annotations.Nullable;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import static java.util.Arrays.stream;
 
 /**
  * Site generation options.
@@ -75,28 +82,59 @@ public interface Opts {
             throw new NullPointerException("null path");
         }
 
-        final String[] steps=path.split("\\.");
 
-        if ( steps.length == 0 ) { return Optional.empty(); } else {
+        final BiFunction<Object, String, Object> getter=(bean, property) -> {
+            try {
 
-            Map<?, ?> map=global();
+                return stream(Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors())
 
-            for (int i=0; i < steps.length-1; i++) {
+                        .filter(descriptor -> descriptor.getName().equals(property))
 
-                final String step=steps[i];
+                        .map(descriptor -> {
+                            try {
 
-                map=Optional.ofNullable(map.get(step))
-                        .filter(Map.class::isInstance)
-                        .map(Map.class::cast)
-                        .orElseGet(Map::of);
+                                return descriptor.getReadMethod().invoke(bean);
+
+                            } catch ( final IllegalAccessException|InvocationTargetException e ) {
+
+                                return null;
+
+                            }
+
+                        })
+
+                        .findFirst()
+                        .orElse(null);
+
+            } catch ( final IntrospectionException e ) {
+
+                return null;
 
             }
 
-            return Optional.ofNullable(map.get(steps[steps.length-1]))
-                    .filter(type::isInstance)
-                    .map(type::cast);
+        };
+
+
+        @Nullable Object value=global();
+
+        for (final String step : path.split("\\.")) {
+
+            if ( value instanceof Map ) {
+
+                value=((Map<?, ?>)value).get(step);
+
+            } else if ( value != null ) {
+
+                value=getter.apply(value, step);
+
+            }
 
         }
+
+        return Optional.ofNullable(value)
+                .filter(type::isInstance)
+                .map(type::cast);
+
     }
 
 

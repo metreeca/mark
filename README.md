@@ -1,6 +1,7 @@
-${project.version} replaced ${project.version} escaped
+0.8.5 replaced  
+\0.8.5 escaped
 
-[relative](docs/samples/index.md)
+[relative](https://metreeca.github.io/mark-maven-plugin/samples/)
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
@@ -26,7 +27,7 @@ Add the plugin to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>0.8.5</version>
 
             <configuration> <!-- optional -->
 
@@ -73,7 +74,7 @@ The following optional configuration parameters are available:
 > :information_source:
 >
 > If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default [bundled docs layout](docs/samples/index.md) ;-)
+> folder to use the default [bundled docs layout](https://metreeca.github.io/mark-maven-plugin/samples/) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -129,7 +130,7 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 title: Lorem Ipsum
 ---
 
-Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
+Lorem ipsum `\0.8.5` dolor sit amet, consectetur adipiscing elit…
 ```
 
 All the properties available to templates (with the obvious exception of `page.body`) are also available for
@@ -159,7 +160,8 @@ mvn mark:clean # by default in the pre-clean phase
 mvn mark:build # by default in the pre-site phase
 ```
 
-- supported files in the `source` folder are processed by the matching [file pipeline](docs/#file-pipelines)
+- supported files in the `source` folder are processed by the
+  matching [file pipeline](https://metreeca.github.io/mark-maven-plugin/#file-pipelines)
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder

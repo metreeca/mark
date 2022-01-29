@@ -1,4 +1,5 @@
-${project.version} replaced \${project.version} escaped
+${project.version} replaced  
+\${project.version} escaped
 
 [relative](samples/index.md)
 
