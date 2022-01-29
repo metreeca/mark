@@ -36,6 +36,9 @@ import java.util.regex.Pattern;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
+/**
+ * Pug template evaluation.
+ */
 public final class Pug {
 
 	private static final Pattern ExpressionPattern=Pattern.compile("\\\\?\\$\\{([.\\w]+)}");

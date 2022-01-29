@@ -48,6 +48,9 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 
+/**
+ * Markdown to HTML conversion.
+ */
 public final class Markdown {
 
 	public static final DataKey<Boolean> SmartLinks=new DataKey<>("markdown-smart-links", false);

@@ -27,6 +27,9 @@ import java.util.Set;
 import static com.metreeca.mark.steps.Markdown.plain;
 import static com.metreeca.mark.steps.Markdown.smart;
 
+/**
+ * Flexmark link rewriting extension.
+ */
 final class LinkRewriterExtension implements HtmlRenderer.HtmlRendererExtension {
 
 	static LinkRewriterExtension create() {
