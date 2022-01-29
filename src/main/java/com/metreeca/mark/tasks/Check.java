@@ -53,7 +53,8 @@ import static java.util.stream.Collectors.toSet;
  */
 public final class Check implements Task {
 
-    private static final Pattern URLPattern=Pattern.compile("^\\w+:.*$");
+    private static final Pattern AbsolutePattern=Pattern.compile("^\\w+:.*$");
+    private static final Pattern AnchoredAssetPattern=Pattern.compile("(?!\\.x?html)(\\.\\w+)#.*$");
 
 
     @Override public void exec(final Mark mark) {
@@ -71,10 +72,14 @@ public final class Check implements Task {
 
                     .flatMap(path -> Stream.concat(
 
+                            // self link (used to list all known files)
+
                             Stream.of(entry(
                                     target.relativize(path).toString(),
                                     target.relativize(path).toString()
                             )),
+
+                            // html links
 
                             path.toString().endsWith(".html")
 
@@ -99,7 +104,7 @@ public final class Check implements Task {
 
             final Set<String> external=links.stream() // verified external link targets
                     .map(Entry::getValue)
-                    .filter(URLPattern.asPredicate())
+                    .filter(AbsolutePattern.asPredicate())
 
                     // !!! external links
 
@@ -157,19 +162,27 @@ public final class Check implements Task {
 
         return parse(path).map(document -> Stream.concat(
 
-                nodes(document, "//@id|//html:a/@name") // anchors self links
-                        .map(Node::getTextContent)
+                nodes(document, "//@id|//html:a/@name").map(Node::getTextContent) // internal anchor links
+
                         .map(anchor -> self+"#"+anchor)
+
                         .map(anchor -> entry(anchor, anchor)),
 
-                nodes(document, "//@href|//@src") // actual links
-                        .map(Node::getTextContent)
-                        .map(link -> URLPattern.matcher(link).matches() ? link
+                nodes(document, "//@href|//@src").map(Node::getTextContent) // external links
+
+                        // normalize links
+
+                        .map(link -> AbsolutePattern.matcher(link).matches() ? link
                                 : link.startsWith("//") ? "http:"+link
                                 : link.startsWith("#") ? self+link
                                 : link.startsWith("/") ? Paths.get(".", clean(link)).normalize().toString()
                                 : base.relativize(path.resolveSibling(clean(link))).normalize().toString()
                         )
+
+                        // ignore anchors on asset files
+
+                        .map(link -> AnchoredAssetPattern.matcher(link).replaceAll("$1"))
+
                         .map(link -> entry(self, link))
 
         ));

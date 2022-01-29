@@ -36,16 +36,15 @@
                 <a href="#define-a-template">Define a template</a></h2><h2><a href="#create-site-content">Create site
                 content</a></h2><h1><a href="#maven-goals">Maven Goals</a></h1><h2><a href="#clean">Clean</a></h2><h2>
                 <a href="#build">Build</a></h2><h2><a href="#watch">Watch</a></h2><h2><a href="#serve">Serve</a></h2><h1>
-                <a href="#file-formats">File Formats</a></h1><h2><a href="#markdown">Markdown</a></h2><h2>
-                <a href="#cssless">CSS/Less</a></h2><h1><a href="#support">Support</a></h1><h1>
+                <a href="#file-pipelines">File Pipelines</a></h1><h2><a href="#markdown">Markdown</a></h2><h2>
+                <a href="#lesscss">Less/CSS</a></h2><h1><a href="#support">Support</a></h1><h1>
                 <a href="#license">License</a></h1></section>
         </nav>
         <main>
             <header>
                 <a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(./index.svg)"></a><span><button title="Scroll to Top" onclick="document.querySelector('main').scrollTo(0, 0)">A minimalist Maven plugin for static site generation</button></span><label for="toggle"></label>
             </header>
-            <section><p>0.8.5 replaced
-                0.8.5 escaped</p>
+            <section><p>0.8.5 replaced 0.8.5 escaped</p>
                 <p><a href="samples/">relative</a></p>
                 <p>
                     <a href="https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/" target="_blank"><img src="https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg" alt="Maven Central" target="_blank"/></a>
@@ -266,10 +265,8 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                 <pre><code class="language-shell">mvn mark:build # by default in the pre-site phase
 </code></pre>
                 <ul>
-                    <li>files matching one of the <a href="#file-formats">supported file extensions</a> in the <code>source</code>
-                        folder are processed by the
-                        corresponding pipeline
-                    </li>
+                    <li>supported files in the <code>source</code> folder are processed by the matching
+                        <a href="#file-pipelines">file pipeline</a></li>
                     <li>templates (that is, files with the same extensions as the default template specified by the
                         <code>layout</code> parameter) are
                         ignored
@@ -305,10 +302,10 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                     <li>on supported systems, the served site is automatically opened in the default user browser</li>
                     <li>pages are automatically reloaded on updates</li>
                 </ul>
-                <h1 id="file-formats">File Formats</h1>
+                <h1 id="file-pipelines">File Pipelines</h1>
                 <h2 id="markdown">Markdown</h2>
-                <p><code>.md</code> files under the <code>source</code> folder are converted to <code>.html</code> files
-                    at the same relative path under the <code>target</code> folder,
+                <p>Converts <code>.md</code> files under the <code>source</code> folder to <code>.html</code> files at
+                    the same relative path under the <code>target</code> folder,
                     using the default Pug template specified by the <code>layout</code> parameter or by the
                     <code>layout</code> front-matter property; links to
                     other <code>.md</code> files are converted to the corresponding <code>.html</code> file.</p>
@@ -333,10 +330,10 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                         </tr>
                     </tbody>
                 </table>
-                <h2 id="cssless">CSS/Less</h2>
-                <p><code>.css</code> and <code>.less</code> files under the source folder are converted to minified
-                    <code>.css</code> files at the same relative path under
-                    the target.</p>
+                <h2 id="lesscss">Less/CSS</h2>
+                <p>Converts <code>.less</code> and <code>.css</code> files under the <code>source</code> folder to
+                    minified <code>.css</code> files at the same relative path under
+                    the <code>target</code> folder.</p>
                 <h1 id="support">Support</h1>
                 <ul>
                     <li>open an <a href="https://github.com/metreeca/mark/issues" target="_blank">issue</a> to report a
