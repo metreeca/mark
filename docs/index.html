@@ -31,14 +31,15 @@
             <header>
                 <a href="https://www.metreeca.com/" title="Metreeca" style="background-image: url(./index.svg)"></a><span><a href=".">Metreeca/Mark</a></span><label for="toggle"></label>
             </header>
-            <section><a href="https://github.com/metreeca/mark">v0.8.3</a><h1><a href="#metreecamark">Metreeca/Mark</a>
+            <section><a href="https://github.com/metreeca/mark">v0.8.5</a><h1><a href="#metreecamark">Metreeca/Mark</a>
             </h1><h1><a href="#usage">Usage</a></h1><h2><a href="#configure-the-plugin">Configure the plugin</a></h2><h2>
                 <a href="#define-a-template">Define a template</a></h2><h2><a href="#create-site-content">Create site
                 content</a></h2><h1><a href="#maven-goals">Maven Goals</a></h1><h2><a href="#clean-site">Clean site</a>
-            </h2><h2><a href="#generate-site">Generate site</a></h2><h2><a href="#check-links">Check links</a></h2><h2>
+            </h2><h2><a href="#build-site">Build site</a></h2><h2><a href="#check-links">Check links</a></h2><h2>
                 <a href="#watch-site-sources">Watch site sources</a></h2><h2><a href="#serve-generated-site">Serve
-                generated site</a></h2><h1><a href="#support">Support</a></h1><h1><a href="#license">License</a></h1>
-            </section>
+                generated site</a></h2><h1><a href="#file-formats">File Formats</a></h1><h2>
+                <a href="#markdown">Markdown</a></h2><h2><a href="#cssless">CSS/Less</a></h2><h1><a href="#support">Support</a>
+            </h1><h1><a href="#license">License</a></h1></section>
         </nav>
         <main>
             <header>
@@ -65,7 +66,7 @@
 
             &lt;groupId&gt;com.metreeca&lt;/groupId&gt;
             &lt;artifactId&gt;mark-maven-plugin&lt;/artifactId&gt;
-            &lt;version&gt;0.8.3&lt;/version&gt;
+            &lt;version&gt;0.8.5&lt;/version&gt;
 
             &lt;configuration&gt; &lt;!-- optional --&gt;
 
@@ -260,12 +261,13 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                 <ul>
                     <li>the <code>target</code> folder is deleted</li>
                 </ul>
-                <h2 id="generate-site">Generate site</h2>
+                <h2 id="build-site">Build site</h2>
                 <pre><code class="language-shell">mvn mark:build # by default in the pre-site phase
 </code></pre>
                 <ul>
-                    <li>files matching one of the following files extensions in the <code>source</code> folder are
-                        processed by the corresponding pipeline
+                    <li>files matching one of the <a href="#file-formats">supported file extensions</a> in the <code>source</code>
+                        folder are processed by the
+                        corresponding pipeline
                     </li>
                     <li>templates (that is, files with the same extensions as the default template specified by the
                         <code>layout</code> parameter) are
@@ -280,42 +282,13 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                         <img src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png?v7" alt="emoji places:warning" height="20" width="20" align="absmiddle"/>
                     </p>
                     <p>When generating sites in-place, files converted without altering the file extension (for instance,
-                        <code>css</code> › <code>.css</code>) &gt; are silently ignored.</p>
+                        <code>.css</code> › <code>.css</code>) are silently ignored.</p>
                 </blockquote>
-                <p><strong>Markdown</strong> / <code>.md</code> files under the <code>source</code> folder are converted
-                    to <code>.html</code> files at the same relative path under
-                    the <code>target</code> folder, using the default Pug template specified by the <code>layout</code>
-                    parameter or by the <code>layout</code> front-matter
-                    property; links to other <code>.md</code> files are converted to the corresponding <code>.html</code>
-                    file.</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>option</th>
-                            <th>default</th>
-                            <th>behaviour</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>markdown-smart-links</code></td>
-                            <td><code>false</code></td>
-                            <td>removes <code>.html</code> and <code>index.html</code> suffixes from links</td>
-                        </tr>
-                        <tr>
-                            <td><code>markdown-external-links</code></td>
-                            <td><code>false</code></td>
-                            <td>opens external links in a <code>_blank</code> target</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p><strong>CSS/Less</strong> / <code>.css</code> and <code>.less</code> files under the source folder are
-                    converted to minified <code>.css</code> files at the same
-                    relative path under the target.</p>
                 <h2 id="check-links">Check links</h2>
                 <pre><code class="language-shell">mvn mark:check # by default in the post-site phase
 </code></pre>
                 <ul>
+                    <li>the site is generated as described above</li>
                     <li>HTML files under the <code>target</code> folder are scanned and dangling links reported</li>
                 </ul>
                 <h2 id="watch-site-sources">Watch site sources</h2>
@@ -337,6 +310,38 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                     <li>on supported systems, the served site is automatically opened in the default user browser</li>
                     <li>pages are automatically reloaded on updates</li>
                 </ul>
+                <h1 id="file-formats">File Formats</h1>
+                <h2 id="markdown">Markdown</h2>
+                <p><code>.md</code> files under the <code>source</code> folder are converted to <code>.html</code> files
+                    at the same relative path under the <code>target</code> folder,
+                    using the default Pug template specified by the <code>layout</code> parameter or by the
+                    <code>layout</code> front-matter property; links to
+                    other <code>.md</code> files are converted to the corresponding <code>.html</code> file.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>option</th>
+                            <th>default</th>
+                            <th>behaviour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>markdown-smart-links</code></td>
+                            <td><code>false</code></td>
+                            <td>removes <code>.html</code> and <code>index.html</code> suffixes from links</td>
+                        </tr>
+                        <tr>
+                            <td><code>markdown-external-links</code></td>
+                            <td><code>false</code></td>
+                            <td>opens external links in a <code>_blank</code> target</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h2 id="cssless">CSS/Less</h2>
+                <p><code>.css</code> and <code>.less</code> files under the source folder are converted to minified
+                    <code>.css</code> files at the same relative path under
+                    the target.</p>
                 <h1 id="support">Support</h1>
                 <ul>
                     <li>open an <a href="https://github.com/metreeca/mark/issues" target="_blank">issue</a> to report a

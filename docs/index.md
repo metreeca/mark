@@ -150,13 +150,14 @@ mvn mark:clean # by default in the pre-clean phase
 
 - the `target` folder is deleted
 
-## Generate site
+## Build site
 
 ```shell
 mvn mark:build # by default in the pre-site phase
 ```
 
-- files matching one of the following files extensions in the `source` folder are processed by the corresponding pipeline
+- files matching one of the [supported file extensions](#file-formats) in the `source` folder are processed by the
+  corresponding pipeline
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
@@ -164,19 +165,7 @@ mvn mark:build # by default in the pre-site phase
 > :warning:
 >
 > When generating sites in-place, files converted without altering the file extension (for instance,
-> `css` › `.css`) > are silently ignored.
-
-**Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
-the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
-property; links to other `.md` files are converted to the corresponding `.html` file.
-
-| option                    | default | behaviour                                            |
-| ------------------------- | ------- | ---------------------------------------------------- |
-| `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
-| `markdown-external-links` | `false` | opens external links in a `_blank` target             |
-
-**CSS/Less** /  `.css` and `.less` files under the source folder are converted to minified `.css` files at the same
-relative path under the target.
+> `.css` › `.css`) are silently ignored.
 
 ## Check links
 
@@ -184,6 +173,7 @@ relative path under the target.
 mvn mark:check # by default in the post-site phase
 ```
 
+- the site is generated as described above
 - HTML files under the `target` folder are scanned and dangling links reported
 
 ## Watch site sources
@@ -206,6 +196,24 @@ mvn mark:serve
 - the generated site is served on an embedded HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates
+
+# File Formats
+
+## Markdown
+
+`.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder,
+using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to
+other `.md` files are converted to the corresponding `.html` file.
+
+| option                    | default | behaviour                                            |
+| ------------------------- | ------- | ---------------------------------------------------- |
+| `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
+| `markdown-external-links` | `false` | opens external links in a `_blank` target            |
+
+## CSS/Less
+
+`.css` and `.less` files under the source folder are converted to minified `.css` files at the same relative path under
+the target.
 
 # Support
 
