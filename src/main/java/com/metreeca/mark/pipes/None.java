@@ -26,50 +26,56 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+/**
+ * Leftover processing pipe.
+ *
+ * <p>Identifies previously processed removed files in the {@code source} folders and removes corresponding leftover
+ * files in the {@code target} folder.</p>
+ */
 public final class None implements Pipe {
 
-	private static String basename(final Path path) { // !!!
+    private static String basename(final Path path) { // !!!
 
-		final String filename=path.toString();
-		final int dot=filename.lastIndexOf('.');
+        final String filename=path.toString();
+        final int dot=filename.lastIndexOf('.');
 
-		return dot < 0 ? filename : filename.substring(0, dot);
-	}
-
-
-	public None(final Mark mark) {
-
-		if ( mark == null ) {
-			throw new NullPointerException("null mark");
-		}
-
-	}
+        return dot < 0 ? filename : filename.substring(0, dot);
+    }
 
 
-	@Override public Optional<File> process(final Path source) {
-		return Optional.of(source)
-				.filter(path -> !Files.exists(path))
-				.map(path -> new File(path, Map.of(), (target, model) -> {
-					try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
+    public None(final Mark mark) {
 
-						files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {
-							try {
+        if ( mark == null ) {
+            throw new NullPointerException("null mark");
+        }
 
-								Files.delete(file);
+    }
 
-							} catch ( final IOException e ) {
 
-								throw new UncheckedIOException(e);
+    @Override public Optional<File> process(final Path source) {
+        return Optional.of(source)
+                .filter(path -> !Files.exists(path))
+                .map(path -> new File(path, Map.of(), (target, model) -> {
+                    try ( final Stream<Path> files=Files.walk(target.getParent()) ) {
 
-							}
-						});
+                        files.filter(file -> basename(path).equals(basename(file))).forEach(file -> {
+                            try {
 
-					} catch ( final IOException e ) {
+                                Files.delete(file);
 
-						throw new UncheckedIOException(e);
+                            } catch ( final IOException e ) {
 
-					}
-				}));
-	}
+                                throw new UncheckedIOException(e);
+
+                            }
+                        });
+
+                    } catch ( final IOException e ) {
+
+                        throw new UncheckedIOException(e);
+
+                    }
+                }));
+    }
 
 }

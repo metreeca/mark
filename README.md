@@ -1,3 +1,7 @@
+${project.version} replaced ${project.version} escaped
+
+[relative](docs/samples/index.md)
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
 # Metreeca/Mark
@@ -43,7 +47,6 @@ Add the plugin to your build configuration as:
                     <goals>
                         <goal>clean</goal> <!-- by default in the pre-clean phase-->
                         <goal>build</goal> <!-- by default in the pre-site phase-->
-                        <goal>check</goal> <!-- by default in the post-site phase-->
                     </goals>
 
                 </execution>

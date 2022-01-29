@@ -63,7 +63,6 @@ public final class Build implements Task {
                         .global(String.class, "project.distributionManagement.site.url")
                         .orElseGet(() -> readme.getParent().relativize(mark.target()).toString());
 
-
                 final String text=Optional.of(Files.readString(index, UTF_8))
 
                         // replace ${*} variables

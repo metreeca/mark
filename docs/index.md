@@ -1,3 +1,7 @@
+${project.version} replaced \${project.version} escaped
+
+[relative](samples/index.md)
+
 [![Maven Central](https://img.shields.io/maven-central/v/com.metreeca/mark-maven-plugin.svg)](https://search.maven.org/artifact/com.metreeca/mark-maven-plugin/)
 
 # Metreeca/Mark
@@ -155,8 +159,7 @@ mvn mark:clean # by default in the pre-clean phase
 mvn mark:build # by default in the pre-site phase
 ```
 
-- files matching one of the [supported file extensions](#file-formats) in the `source` folder are processed by the
-  corresponding pipeline
+- supported files in the `source` folder are processed by the matching [file pipeline](#file-pipelines)
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
@@ -188,11 +191,11 @@ mvn mark:serve
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates
 
-# File Formats
+# File Pipelines
 
 ## Markdown
 
-`.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder,
+Converts `.md` files under the `source` folder to `.html` files at the same relative path under the `target` folder,
 using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to
 other `.md` files are converted to the corresponding `.html` file.
 
@@ -201,10 +204,10 @@ other `.md` files are converted to the corresponding `.html` file.
 | `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
 | `markdown-external-links` | `false` | opens external links in a `_blank` target            |
 
-## CSS/Less
+## Less/CSS
 
-`.css` and `.less` files under the source folder are converted to minified `.css` files at the same relative path under
-the target.
+Converts `.less` and `.css` files under the `source` folder to minified `.css` files at the same relative path under
+the `target` folder.
 
 # Support
 

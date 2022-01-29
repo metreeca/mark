@@ -29,37 +29,42 @@ import static com.inet.lib.less.Less.compile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-
+/**
+ * Less/CSS processing pipe.
+ *
+ * <p>Converts {@code .less} and {@code .css} files under the {@code source} folder to minified {@code .css} files at
+ * the same relative path under the {@code target} folder.</p>
+ */
 public final class Less implements Pipe {
 
-	private final Mark mark;
+    private final Mark mark;
 
 
-	public Less(final Mark mark) {
+    public Less(final Mark mark) {
 
-		if ( mark == null ) {
-			throw new NullPointerException("null mark");
-		}
+        if ( mark == null ) {
+            throw new NullPointerException("null mark");
+        }
 
-		this.mark=mark;
-	}
+        this.mark=mark;
+    }
 
 
-	@Override public Optional<File> process(final Path source) {
-		return mark.target(source, ".css", ".css", ".less").map(target ->
-				new File(target, Map.of(), (path, model) -> {
-					try {
+    @Override public Optional<File> process(final Path source) {
+        return mark.target(source, ".css", ".css", ".less").map(target ->
+                new File(target, Map.of(), (path, model) -> {
+                    try {
 
-						final String less=Files.readString(source);
-						final String css=compile(path.toUri().toURL(), less, true);
+                        final String less=Files.readString(source);
+                        final String css=compile(path.toUri().toURL(), less, true);
 
-						Files.write(path, css.getBytes(UTF_8));
+                        Files.write(path, css.getBytes(UTF_8));
 
-					} catch ( final IOException e ) {
-						throw new UncheckedIOException(e);
-					}
-				})
-		);
-	}
+                    } catch ( final IOException e ) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+        );
+    }
 
 }

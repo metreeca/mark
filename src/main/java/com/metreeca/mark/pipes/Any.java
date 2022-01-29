@@ -28,6 +28,12 @@ import java.util.Optional;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
+/**
+ * Generic processing pipe.
+ *
+ * <p>Transfers generic files under the {@code source} folder to verbatim copies at the same relative path under the
+ * {@code target} folder.</p>
+ */
 public final class Any implements Pipe {
 
 	public Any(final Mark mark) {
