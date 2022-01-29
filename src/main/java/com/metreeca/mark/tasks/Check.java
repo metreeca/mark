@@ -36,6 +36,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.*;
 
+import static com.metreeca.rest.Xtream.decode;
 import static com.metreeca.rest.handlers.Publisher.variants;
 import static com.metreeca.xml.formats.HTMLFormat.html;
 
@@ -183,7 +184,7 @@ public final class Check implements Task {
 
                         .map(link -> AnchoredAssetPattern.matcher(link).replaceAll("$1"))
 
-                        .map(link -> entry(self, link))
+                        .map(link -> entry(self, decode(link)))
 
         ));
     }
