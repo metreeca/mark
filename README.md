@@ -22,7 +22,7 @@ Add the plugin to your build configuration as:
 
             <groupId>com.metreeca</groupId>
             <artifactId>mark-maven-plugin</artifactId>
-            <version>0.8.3</version>
+            <version>${project.version}</version>
 
             <configuration> <!-- optional -->
 
@@ -70,7 +70,7 @@ The following optional configuration parameters are available:
 > :information_source:
 >
 > If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default [bundled docs layout](https://metreeca.github.io/mark/samples/) ;-)
+> folder to use the default [bundled docs layout](docs/samples/index.md) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -126,7 +126,7 @@ Define site pages as `.md` files under the `source` folder, for instance as:
 title: Lorem Ipsum
 ---
 
-Lorem ipsum `\0.8.3` dolor sit amet, consectetur adipiscing elit…
+Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
 ```
 
 All the properties available to templates (with the obvious exception of `page.body`) are also available for
@@ -142,7 +142,7 @@ to the path of the required template, relative to the plugin `layout` parameter.
 
 # Maven Goals
 
-## Clean site
+## Clean
 
 ```shell
 mvn mark:clean # by default in the pre-clean phase
@@ -150,43 +150,25 @@ mvn mark:clean # by default in the pre-clean phase
 
 - the `target` folder is deleted
 
-## Generate site
+## Build
 
 ```shell
 mvn mark:build # by default in the pre-site phase
 ```
 
-- files matching one of the following files extensions in the `source` folder are processed by the corresponding pipeline
+- files matching one of the [supported file extensions](docs/#file-formats) in the `source` folder are processed by the
+  corresponding pipeline
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
+- HTML files under the `target` folder are scanned and dangling links reported
 
 > :warning:
 >
 > When generating sites in-place, files converted without altering the file extension (for instance,
-> `css` › `.css`) > are silently ignored.
+> `.css` › `.css`) are silently ignored.
 
-**Markdown** / `.md` files under the `source` folder are converted to `.html` files at the same relative path under
-the `target` folder, using the default Pug template specified by the `layout` parameter or by the `layout` front-matter
-property; links to other `.md` files are converted to the corresponding `.html` file.
-
-| option                    | default | behaviour                                            |
-| ------------------------- | ------- | ---------------------------------------------------- |
-| `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
-| `markdown-external-links` | `false` | opens external links in a `_blank` target             |
-
-**CSS/Less** /  `.css` and `.less` files under the source folder are converted to minified `.css` files at the same
-relative path under the target.
-
-## Check links
-
-```shell
-mvn mark:check # by default in the post-site phase
-```
-
-- HTML files under the `target` folder are scanned and dangling links reported
-
-## Watch site sources
+## Watch
 
 ```shell
 mvn mark:watch
@@ -196,7 +178,7 @@ mvn mark:watch
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are
   regenerated as required; if a template is modified, the whole site is regenerated
 
-## Serve generated site
+## Serve
 
 ```shell
 mvn mark:serve
@@ -206,6 +188,24 @@ mvn mark:serve
 - the generated site is served on an embedded HTTP server for testing purposes
 - on supported systems, the served site is automatically opened in the default user browser
 - pages are automatically reloaded on updates
+
+# File Formats
+
+## Markdown
+
+`.md` files under the `source` folder are converted to `.html` files at the same relative path under the `target` folder,
+using the default Pug template specified by the `layout` parameter or by the `layout` front-matter property; links to
+other `.md` files are converted to the corresponding `.html` file.
+
+| option                    | default | behaviour                                            |
+| ------------------------- | ------- | ---------------------------------------------------- |
+| `markdown-smart-links`    | `false` | removes `.html` and `index.html` suffixes from links |
+| `markdown-external-links` | `false` | opens external links in a `_blank` target            |
+
+## CSS/Less
+
+`.css` and `.less` files under the source folder are converted to minified `.css` files at the same relative path under
+the target.
 
 # Support
 

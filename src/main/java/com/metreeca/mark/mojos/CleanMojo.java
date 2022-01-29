@@ -23,6 +23,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 
 import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_CLEAN;
 
+/**
+ * Clean site goal.
+ */
 @Mojo(name="clean", defaultPhase=PRE_CLEAN)
 public class CleanMojo extends MarkMojo {
 

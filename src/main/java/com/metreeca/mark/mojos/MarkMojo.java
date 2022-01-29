@@ -28,6 +28,9 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Base site goal.
+ */
 public abstract class MarkMojo extends AbstractMojo implements Opts {
 
     @Parameter(defaultValue="${project}", readonly=true)

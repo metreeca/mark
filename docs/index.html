@@ -34,12 +34,11 @@
             <section><a href="https://github.com/metreeca/mark">v0.8.5</a><h1><a href="#metreecamark">Metreeca/Mark</a>
             </h1><h1><a href="#usage">Usage</a></h1><h2><a href="#configure-the-plugin">Configure the plugin</a></h2><h2>
                 <a href="#define-a-template">Define a template</a></h2><h2><a href="#create-site-content">Create site
-                content</a></h2><h1><a href="#maven-goals">Maven Goals</a></h1><h2><a href="#clean-site">Clean site</a>
-            </h2><h2><a href="#build-site">Build site</a></h2><h2><a href="#check-links">Check links</a></h2><h2>
-                <a href="#watch-site-sources">Watch site sources</a></h2><h2><a href="#serve-generated-site">Serve
-                generated site</a></h2><h1><a href="#file-formats">File Formats</a></h1><h2>
-                <a href="#markdown">Markdown</a></h2><h2><a href="#cssless">CSS/Less</a></h2><h1><a href="#support">Support</a>
-            </h1><h1><a href="#license">License</a></h1></section>
+                content</a></h2><h1><a href="#maven-goals">Maven Goals</a></h1><h2><a href="#clean">Clean</a></h2><h2>
+                <a href="#build">Build</a></h2><h2><a href="#watch">Watch</a></h2><h2><a href="#serve">Serve</a></h2><h1>
+                <a href="#file-formats">File Formats</a></h1><h2><a href="#markdown">Markdown</a></h2><h2>
+                <a href="#cssless">CSS/Less</a></h2><h1><a href="#support">Support</a></h1><h1>
+                <a href="#license">License</a></h1></section>
         </nav>
         <main>
             <header>
@@ -255,13 +254,13 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                             syntax</a>.</p>
                 </blockquote>
                 <h1 id="maven-goals">Maven Goals</h1>
-                <h2 id="clean-site">Clean site</h2>
+                <h2 id="clean">Clean</h2>
                 <pre><code class="language-shell">mvn mark:clean # by default in the pre-clean phase
 </code></pre>
                 <ul>
                     <li>the <code>target</code> folder is deleted</li>
                 </ul>
-                <h2 id="build-site">Build site</h2>
+                <h2 id="build">Build</h2>
                 <pre><code class="language-shell">mvn mark:build # by default in the pre-site phase
 </code></pre>
                 <ul>
@@ -276,6 +275,7 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                     <li>everything else under the <code>source</code> folder is copied verbatim to the same relative path
                         under the <code>target</code> folder
                     </li>
+                    <li>HTML files under the <code>target</code> folder are scanned and dangling links reported</li>
                 </ul>
                 <blockquote>
                     <p>
@@ -284,14 +284,7 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                     <p>When generating sites in-place, files converted without altering the file extension (for instance,
                         <code>.css</code> › <code>.css</code>) are silently ignored.</p>
                 </blockquote>
-                <h2 id="check-links">Check links</h2>
-                <pre><code class="language-shell">mvn mark:check # by default in the post-site phase
-</code></pre>
-                <ul>
-                    <li>the site is generated as described above</li>
-                    <li>HTML files under the <code>target</code> folder are scanned and dangling links reported</li>
-                </ul>
-                <h2 id="watch-site-sources">Watch site sources</h2>
+                <h2 id="watch">Watch</h2>
                 <pre><code class="language-shell">mvn mark:watch
 </code></pre>
                 <ul>
@@ -301,7 +294,7 @@ Lorem ipsum `${project.version}` dolor sit amet, consectetur adipiscing elit…
                         regenerated as required; if a template is modified, the whole site is regenerated
                     </li>
                 </ul>
-                <h2 id="serve-generated-site">Serve generated site</h2>
+                <h2 id="serve">Serve</h2>
                 <pre><code class="language-shell">mvn mark:serve
 </code></pre>
                 <ul>

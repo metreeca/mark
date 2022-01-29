@@ -19,201 +19,222 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.metreeca</groupId>
-		<artifactId>metreeca-root</artifactId>
-		<version>1.0.0</version>
-	</parent>
+    <parent>
+        <groupId>com.metreeca</groupId>
+        <artifactId>metreeca-root</artifactId>
+        <version>1.0.0</version>
+    </parent>
 
-	<artifactId>mark-maven-plugin</artifactId>
-	<version>0.8.4</version>
-	<packaging>maven-plugin</packaging>
+    <artifactId>mark-maven-plugin</artifactId>
+    <version>${revision}</version>
+    <packaging>maven-plugin</packaging>
 
-	<name>Metreeca/Mark</name>
-	<description>A minimalist Maven plugin for static site generation</description>
-	<url>https://github.com/metreeca/mark</url>
-	<inceptionYear>2019</inceptionYear>
+    <name>Metreeca/Mark</name>
+    <description>A minimalist Maven plugin for static site generation</description>
+    <url>https://github.com/metreeca/mark</url>
+    <inceptionYear>2019</inceptionYear>
 
-	<scm>
-		<connection>scm:git:git@github.com:metreeca/mark.git</connection>
-		<developerConnection>scm:git:git@github.com:metreeca/mark.git</developerConnection>
-		<url>https://github.com/metreeca/mark</url>
-	</scm>
+    <properties>
 
-	<issueManagement>
-		<system>GitHub</system>
-		<url>https://github.com/metreeca/mark/issues</url>
-	</issueManagement>
+        <revision>0.8.5</revision>
 
-	<distributionManagement>
+    </properties>
 
-		<site>
-			<url>https://metreeca.github.io/${project.artifactId}</url>
-		</site>
+    <scm>
+        <connection>scm:git:git@github.com:metreeca/mark.git</connection>
+        <developerConnection>scm:git:git@github.com:metreeca/mark.git</developerConnection>
+        <url>https://github.com/metreeca/mark</url>
+    </scm>
 
-	</distributionManagement>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/metreeca/mark/issues</url>
+    </issueManagement>
 
-	<dependencyManagement>
-		<dependencies>
+    <distributionManagement>
 
-			<dependency>
-				<groupId>com.metreeca</groupId>
-				<artifactId>metreeca-base</artifactId>
-				<version>1.0.2</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+        <site>
+            <url>https://metreeca.github.io/${project.artifactId}</url>
+        </site>
 
-			<dependency> <!-- https://github.com/vsch/flexmark-java -->
-				<groupId>com.vladsch.flexmark</groupId>
-				<artifactId>flexmark-all</artifactId>
-				<version>0.62.2</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+    </distributionManagement>
 
-		</dependencies>
-	</dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
 
-	<dependencies>
+            <dependency>
+                <groupId>com.metreeca</groupId>
+                <artifactId>metreeca-base</artifactId>
+                <version>1.0.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-project</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
-		</dependency>
+            <dependency> <!-- https://github.com/vsch/flexmark-java -->
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-all</artifactId>
+                <version>0.62.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
-		<dependency> <!-- https://maven.apache.org/ref/3.8.4/maven-plugin-api/ -->
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>3.8.1</version>
-			<scope>provided</scope>
-		</dependency>
+        </dependencies>
+    </dependencyManagement>
 
-		<dependency> <!-- https://maven.apache.org/plugin-tools/maven-plugin-annotations/ -->
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.6.4</version>
-			<scope>provided</scope>
-		</dependency>
+    <dependencies>
 
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-project</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-jse</artifactId>
-		</dependency>
+        <dependency> <!-- https://maven.apache.org/ref/3.8.4/maven-plugin-api/ -->
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.8.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.metreeca</groupId>
-			<artifactId>metreeca-xml</artifactId>
-		</dependency>
+        <dependency> <!-- https://maven.apache.org/plugin-tools/maven-plugin-annotations/ -->
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.6.4</version>
+            <scope>provided</scope>
+        </dependency>
 
 
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-admonition</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-jse</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-autolink</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-definition</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-emoji</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-toc</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vladsch.flexmark</groupId>
-			<artifactId>flexmark-ext-yaml-front-matter</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.metreeca</groupId>
+            <artifactId>metreeca-xml</artifactId>
+        </dependency>
 
 
-		<dependency> <!-- https://github.com/neuland/pug4j -->
-			<groupId>de.neuland-bfi</groupId>
-			<artifactId>pug4j</artifactId>
-			<version>2.0.4</version>
-		</dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-admonition</artifactId>
+        </dependency>
 
-		<dependency> <!-- https://github.com/i-net-software/jlessc -->
-			<groupId>de.inetsoftware</groupId>
-			<artifactId>jlessc</artifactId>
-			<version>1.10</version>
-		</dependency>
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-autolink</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-definition</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-emoji</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-toc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-ext-yaml-front-matter</artifactId>
+        </dependency>
 
 
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency> <!-- https://github.com/neuland/pug4j -->
+            <groupId>de.neuland-bfi</groupId>
+            <artifactId>pug4j</artifactId>
+            <version>2.0.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency> <!-- https://github.com/i-net-software/jlessc -->
+            <groupId>de.inetsoftware</groupId>
+            <artifactId>jlessc</artifactId>
+            <version>1.10</version>
+        </dependency>
 
-	</dependencies>
 
-	<build>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<plugins>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-			<plugin> <!-- https://maven.apache.org/plugin-tools/maven-plugin-plugin/ -->
+    </dependencies>
 
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.6.4</version>
+    <build>
 
-				<configuration>
-					<goalPrefix>mark</goalPrefix>
-				</configuration>
+        <plugins>
 
-				<executions>
+            <plugin> <!-- https://maven.apache.org/plugin-tools/maven-plugin-plugin/ -->
 
-					<execution>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.6.4</version>
 
-						<id>default-descriptor</id>
-						<phase>process-classes</phase>
+                <executions>
 
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
+                    <execution>
 
-					</execution>
+                        <id>default-descriptor</id>
+                        <phase>process-classes</phase>
 
-					<execution>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
 
-						<id>help-descriptor</id>
-						<phase>process-classes</phase>
+                    </execution>
 
-						<goals>
-							<goal>helpmojo</goal>
-						</goals>
+                    <execution>
 
-					</execution>
+                        <id>help-descriptor</id>
+                        <phase>process-classes</phase>
 
-				</executions>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
 
-			</plugin>
+                    </execution>
 
-		</plugins>
+                </executions>
 
-	</build>
+            </plugin>
+
+            <plugin>
+
+                <groupId>com.metreeca</groupId>
+                <artifactId>mark-maven-plugin</artifactId>
+                <version>${project.version}</version>
+
+                <configuration>
+
+                    <readme>true</readme>
+
+                    <options>
+                        <markdown-smart-links>true</markdown-smart-links>
+                        <markdown-external-links>true</markdown-external-links>
+                    </options>
+
+                </configuration>
+
+            </plugin>
+
+        </plugins>
+
+    </build>
 
 </project>

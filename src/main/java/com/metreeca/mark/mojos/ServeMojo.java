@@ -21,6 +21,9 @@ import com.metreeca.mark.tasks.*;
 
 import org.apache.maven.plugins.annotations.Mojo;
 
+/**
+ * Serve site goal.
+ */
 @Mojo(name="serve")
 public final class ServeMojo extends MarkMojo {
 

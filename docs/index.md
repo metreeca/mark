@@ -43,7 +43,6 @@ Add the plugin to your build configuration as:
                     <goals>
                         <goal>clean</goal> <!-- by default in the pre-clean phase-->
                         <goal>build</goal> <!-- by default in the pre-site phase-->
-                        <goal>check</goal> <!-- by default in the post-site phase-->
                     </goals>
 
                 </execution>
@@ -142,7 +141,7 @@ to the path of the required template, relative to the plugin `layout` parameter.
 
 # Maven Goals
 
-## Clean site
+## Clean
 
 ```shell
 mvn mark:clean # by default in the pre-clean phase
@@ -150,7 +149,7 @@ mvn mark:clean # by default in the pre-clean phase
 
 - the `target` folder is deleted
 
-## Build site
+## Build
 
 ```shell
 mvn mark:build # by default in the pre-site phase
@@ -161,22 +160,14 @@ mvn mark:build # by default in the pre-site phase
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
+- HTML files under the `target` folder are scanned and dangling links reported
 
 > :warning:
 >
 > When generating sites in-place, files converted without altering the file extension (for instance,
 > `.css` › `.css`) are silently ignored.
 
-## Check links
-
-```shell
-mvn mark:check # by default in the post-site phase
-```
-
-- the site is generated as described above
-- HTML files under the `target` folder are scanned and dangling links reported
-
-## Watch site sources
+## Watch
 
 ```shell
 mvn mark:watch
@@ -186,7 +177,7 @@ mvn mark:watch
 - on file updates and additions under the `source` folder, the corresponding files under the `target` folder are
   regenerated as required; if a template is modified, the whole site is regenerated
 
-## Serve generated site
+## Serve
 
 ```shell
 mvn mark:serve
