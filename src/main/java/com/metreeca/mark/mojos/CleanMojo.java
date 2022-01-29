@@ -27,7 +27,8 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_CLEAN;
 public class CleanMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(this).exec(new Clean());
+		new Mark(this)
+				.exec(new Clean());
 	}
 
 }

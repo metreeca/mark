@@ -17,6 +17,7 @@
 package com.metreeca.mark.mojos;
 
 import com.metreeca.mark.Mark;
+import com.metreeca.mark.tasks.Build;
 import com.metreeca.mark.tasks.Check;
 
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,7 +28,9 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.POST_SITE;
 public class CheckMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(this).exec(new Check());
+		new Mark(this)
+				.exec(new Build())
+				.exec(new Check());
 	}
 
 }

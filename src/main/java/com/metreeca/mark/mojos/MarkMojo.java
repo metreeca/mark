@@ -30,8 +30,8 @@ import java.util.function.Function;
 
 public abstract class MarkMojo extends AbstractMojo implements Opts {
 
-	@Parameter(defaultValue="${project}", readonly=true)
-	private MavenProject project;
+    @Parameter(defaultValue="${project}", readonly=true)
+    private MavenProject project;
 
 
     @Parameter(defaultValue="${project.basedir}/docs/", property="mark.source")
@@ -77,6 +77,6 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
     }
 
 
-	@Override public Log logger() { return getLog(); }
+    @Override public Log logger() { return getLog(); }
 
 }

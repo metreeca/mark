@@ -27,7 +27,8 @@ import static org.apache.maven.plugins.annotations.LifecyclePhase.PRE_SITE;
 public class BuildMojo extends MarkMojo {
 
 	@Override public void execute() {
-		new Mark(this).exec(new Build());
+		new Mark(this)
+				.exec(new Build());
 	}
 
 }
