@@ -56,7 +56,7 @@
     <distributionManagement>
 
         <site>
-            <url>https://metreeca.github.io/${project.artifactId}</url>
+            <url>https://metreeca.github.io/mark/</url>
         </site>
 
     </distributionManagement>

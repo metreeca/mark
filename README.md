@@ -69,7 +69,7 @@ The following optional configuration parameters are available:
 > :information_source:
 >
 > If you feel lazy, just omit the `layout` parameter and place an `index.svg` icon in the source
-> folder to use the default [bundled docs layout](https://metreeca.github.io/mark-maven-plugin/samples/) ;-)
+> folder to use the default [bundled docs layout](https://metreeca.github.io/mark/samples/) ;-)
 
 Define a default Pug template under the `source` folder at the relative path specified by the `layout` parameter, for
 instance:
@@ -156,7 +156,7 @@ mvn mark:build # by default in the pre-site phase
 ```
 
 - supported files in the `source` folder are processed by the
-  matching [file pipeline](https://metreeca.github.io/mark-maven-plugin/#file-pipelines)
+  matching [file pipeline](https://metreeca.github.io/mark/#file-pipelines)
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
