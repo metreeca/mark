@@ -38,7 +38,7 @@
 
     <properties>
 
-        <revision>0.8.5</revision>
+        <revision>0.8.6</revision>
 
     </properties>
 
@@ -214,38 +214,53 @@
 
             </plugin>
 
-            <plugin>
-
-                <groupId>com.metreeca</groupId>
-                <artifactId>mark-maven-plugin</artifactId>
-                <version>${project.version}</version>
-
-                <configuration>
-
-                    <readme>true</readme>
-
-                    <options>
-                        <markdown-smart-links>true</markdown-smart-links>
-                        <markdown-external-links>true</markdown-external-links>
-                    </options>
-
-                </configuration>
-
-                <executions>
-                    <execution>
-
-                        <goals>
-                            <goal>clean</goal>
-                            <goal>build</goal>
-                        </goals>
-
-                    </execution>
-                </executions>
-
-            </plugin>
-
         </plugins>
 
     </build>
+
+    <profiles>
+
+        <profile>
+
+            <id>release</id>
+
+            <build>
+                <plugins>
+
+                    <plugin>
+
+                        <groupId>com.metreeca</groupId>
+                        <artifactId>mark-maven-plugin</artifactId>
+                        <version>${project.version}</version>
+
+                        <configuration>
+
+                            <readme>true</readme>
+
+                            <options>
+                                <markdown-smart-links>true</markdown-smart-links>
+                                <markdown-external-links>true</markdown-external-links>
+                            </options>
+
+                        </configuration>
+
+                        <executions>
+                            <execution>
+
+                                <goals>
+                                    <goal>clean</goal>
+                                    <goal>build</goal>
+                                </goals>
+
+                            </execution>
+                        </executions>
+
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 
 </project>
