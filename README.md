@@ -155,8 +155,7 @@ mvn mark:clean # by default in the pre-clean phase
 mvn mark:build # by default in the pre-site phase
 ```
 
-- supported files in the `source` folder are processed by the
-  matching [file pipeline](https://metreeca.github.io/mark/#file-pipelines)
+- supported files in the `source` folder are processed by the matching [file pipeline](https://metreeca.github.io/mark/#file-pipelines)
 - templates (that is, files with the same extensions as the default template specified by the `layout` parameter) are
   ignored
 - everything else under the `source` folder is copied verbatim to the same relative path under the `target` folder
