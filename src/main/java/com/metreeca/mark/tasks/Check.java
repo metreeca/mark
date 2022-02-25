@@ -18,6 +18,7 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 import com.metreeca.rest.Either;
+import com.metreeca.rest.Xtream;
 
 import org.apache.maven.plugin.logging.Log;
 import org.w3c.dom.*;
@@ -36,15 +37,14 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.*;
 
-import static com.metreeca.rest.Xtream.decode;
 import static com.metreeca.rest.handlers.Publisher.variants;
 import static com.metreeca.xml.formats.HTMLFormat.html;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.net.URLDecoder.decode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Map.entry;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -67,7 +67,7 @@ public final class Check implements Task {
 
             final long start=currentTimeMillis();
 
-            final List<Entry<String, String>> links=walk
+            final Set<Entry<String, String>> links=walk
 
                     .filter(Files::isRegularFile)
 
@@ -96,8 +96,7 @@ public final class Check implements Task {
 
                     ))
 
-                    .distinct()
-                    .collect(toList());
+                    .collect(toSet());
 
             final Set<String> internal=links.stream() // verified internal link targets
                     .map(Entry::getKey)
@@ -130,7 +129,7 @@ public final class Check implements Task {
 
             final long broken=links.stream()
 
-                    .filter(link -> variants(link.getValue()).noneMatch(internal::contains))
+                    .filter(link -> variants(decode(link.getValue(), UTF_8)).noneMatch(internal::contains))
                     .filter(link -> Stream.of(link.getValue()).noneMatch(external::contains))
 
                     .peek(link -> logger.warn(format("%s ~› %s", link.getKey(), link.getValue())))
@@ -184,7 +183,7 @@ public final class Check implements Task {
 
                         .map(link -> AnchoredAssetPattern.matcher(link).replaceAll("$1"))
 
-                        .map(link -> entry(self, decode(link)))
+                        .map(link -> entry(self, Xtream.decode(link)))
 
         ));
     }
