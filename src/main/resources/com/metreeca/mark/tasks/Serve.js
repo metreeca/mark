@@ -19,10 +19,6 @@
 	const styles=resources("link[rel=stylesheet]");
 	const scripts=resources("script");
 
-	console.log(styles);
-	console.log(scripts);
-
-
 	function resources(selector) {
 		return Array.from(document.querySelectorAll(selector))
 			.map(style => style.href || style.src)
