@@ -23,12 +23,12 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static java.util.Arrays.stream;
+import static java.util.function.Predicate.not;
 
 /**
  * Site generation options.
@@ -103,6 +103,7 @@ public interface Opts {
 
                         })
 
+                        .filter(not(Objects::isNull))
                         .findFirst()
                         .orElse(null);
 
