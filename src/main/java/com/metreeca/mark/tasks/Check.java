@@ -16,9 +16,9 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.core.Identifiers;
 import com.metreeca.mark.*;
 import com.metreeca.rest.Either;
-import com.metreeca.rest.Xtream;
 
 import org.apache.maven.plugin.logging.Log;
 import org.w3c.dom.*;
@@ -183,7 +183,7 @@ public final class Check implements Task {
 
                         .map(link -> AnchoredAssetPattern.matcher(link).replaceAll("$1"))
 
-                        .map(link -> entry(self, Xtream.decode(link)))
+                        .map(link -> entry(self, Identifiers.decode(link)))
 
         ));
     }

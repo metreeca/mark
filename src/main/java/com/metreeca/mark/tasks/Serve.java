@@ -18,7 +18,8 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.jse.JSEServer;
 import com.metreeca.mark.*;
-import com.metreeca.rest.*;
+import com.metreeca.rest.Request;
+import com.metreeca.rest.Response;
 import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
@@ -59,212 +60,241 @@ import static java.util.Objects.requireNonNull;
  */
 public final class Serve implements Task {
 
-	private static final String ReloadQueue="/~";
-	private static final String ReloadScript="/~script";
+    private static final String ReloadQueue="/~";
+    private static final String ReloadScript="/~script";
 
-	private static final String ReloadSrc=Serve.class.getSimpleName()+".js";
-	private static final String ReloadTag=format("<script type=\"text/javascript\" src=\"%s\"></script>", ReloadScript);
+    private static final String ReloadSrc=Serve.class.getSimpleName()+".js";
+    private static final String ReloadTag=format("<script type=\"text/javascript\" src=\"%s\"></script>", ReloadScript);
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public static void main(final String... args) {
+        new Serve().serve(new Opts() {
 
-	private final InetSocketAddress address=new InetSocketAddress("localhost", 2020);
+            @Override public Path source() {
+                return Paths.get("docs");
+            }
 
-	private final BlockingDeque<String> updates=new LinkedBlockingDeque<>();
+            @Override public Path target() {
+                return Paths.get("docs");
+            }
 
+            @Override public Path layout() {
+                return null;
+            }
 
-	@Override public void exec(final Mark mark) {
-		watch(mark);
-		serve(mark);
-	}
+            @Override public boolean readme() {
+                return false;
+            }
 
+            @Override public Map<String, Object> global() {
+                return Map.of();
+            }
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            @Override public <V> V option(final String option, final Function<String, V> mapper) {
+                return null;
+            }
 
-	private void watch(final Mark mark) {
+            @Override public Log logger() {
+                return null;
+            }
 
-		final Path root=Paths.get("/");
+        });
+    }
 
-		final Thread daemon=new Thread(() -> mark.watch((kind, target) -> updates.offer(root
 
-				.resolve(mark.target().relativize(target))
-				.toString()
-				.replace("/index.html", "/")
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		)));
+    private final InetSocketAddress address=new InetSocketAddress("localhost", 2020);
 
-		daemon.setDaemon(true);
-		daemon.start();
-	}
+    private final BlockingDeque<String> updates=new LinkedBlockingDeque<>();
 
-	private void serve(final Opts mark) {
 
-		final Thread daemon=new Thread(() -> {
-			try {
+    @Override public void exec(final Mark mark) {
+        watch(mark);
+        serve(mark);
+    }
 
-				new JSEServer()
 
-						.address(address)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-						.delegate(context -> context
+    private void watch(final Mark mark) {
 
-								.set(logger(), () -> new MavenLogger(mark.logger()))
+        final Path root=Paths.get("/");
 
-								.get(() -> server().wrap(router()
+        final Thread daemon=new Thread(() -> mark.watch((kind, target) -> updates.offer(root
 
-										.path(ReloadQueue, router()
-												.get(this::queue)
-										)
+                .resolve(mark.target().relativize(target))
+                .toString()
+                .replace("/index.html", "/")
 
-										.path(ReloadScript, router()
-												.get(this::script)
-										)
+        )));
 
-										.path("/*", router()
-												.get(publisher(mark.target())
-														.with(postprocessor(this::rewrite))
-												)
-										)
+        daemon.setDaemon(true);
+        daemon.start();
+    }
 
-								))
-						)
+    private void serve(final Opts mark) {
 
-						.start();
+        final Thread daemon=new Thread(() -> {
+            try {
 
-				if ( Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) ) {
-					Desktop.getDesktop().browse(URI.create(format(
-							"http://%s:%d/", address.getHostString(), address.getPort()
-					)));
-				}
+                new JSEServer()
 
+                        .address(address)
 
-			} catch ( final IOException e ) {
-				throw new UncheckedIOException(e);
-			}
+                        .delegate(context -> context
 
-		});
+                                .set(logger(), () -> new MavenLogger(mark.logger()))
 
-		daemon.setDaemon(true);
-		daemon.start();
-	}
+                                .get(() -> server().wrap(router()
 
+                                        .path(ReloadQueue, router()
+                                                .get(this::queue)
+                                        )
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                        .path(ReloadScript, router()
+                                                .get(this::script)
+                                        )
 
-	private Future<Response> queue(final Request request) {
-		return request.reply(response -> {
+                                        .path("/*", router()
+                                                .get(publisher(mark.target())
+                                                        .with(postprocessor(this::rewrite))
+                                                )
+                                        )
 
-			try {
+                                ))
+                        )
 
-				final Collection<String> batch=new HashSet<>(Set.of(updates.take()));
+                        .start();
 
-				updates.drainTo(batch);
+                if ( Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE) ) {
+                    Desktop.getDesktop().browse(URI.create(format(
+                            "http://%s:%d/", address.getHostString(), address.getPort()
+                    )));
+                }
 
-				return response.status(OK)
-						.header("Content-Type", "application/json")
-						.body(text(), Json.createArrayBuilder(batch).build().toString());
 
-			} catch ( final InterruptedException e ) {
+            } catch ( final IOException e ) {
+                throw new UncheckedIOException(e);
+            }
 
-				return response.status(OK);
+        });
 
-			}
+        daemon.setDaemon(true);
+        daemon.start();
+    }
 
-		});
-	}
 
-	private Future<Response> script(final Request request) {
-		return request.reply(response -> {
-			try ( final InputStream script=requireNonNull(getClass().getResourceAsStream(ReloadSrc)) ) {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				return response.status(OK)
-						.header("Content-Type", "text/javascript")
-						.body(data(), script.readAllBytes());
+    private Response queue(final Request request) {
+        try {
 
-			} catch ( final IOException e ) {
+            final Collection<String> batch=new HashSet<>(Set.of(updates.take()));
 
-				throw new UncheckedIOException(e);
+            updates.drainTo(batch);
 
-			}
-		});
-	}
+            return request.reply(OK)
+                    .header("Content-Type", "application/json")
+                    .body(text(), Json.createArrayBuilder(batch).build().toString());
 
+        } catch ( final InterruptedException e ) {
 
-	private Response rewrite(final Response response) {
-		if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
+            return request.reply(OK);
 
-			return response.body(output()).fold(e -> response, target -> {
+        }
+    }
 
-				final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
+    private Response script(final Request request) {
+        try ( final InputStream script=requireNonNull(getClass().getResourceAsStream(ReloadSrc)) ) {
 
-				target.accept(buffer);
+            return request.reply(OK)
+                    .header("Content-Type", "text/javascript")
+                    .body(data(), script.readAllBytes());
 
-				final Charset charset=Charset.forName(response.charset());
+        } catch ( final IOException e ) {
 
-				final byte[] body=buffer.toString(charset)
-						.replace("</head>", format("%s</head>", ReloadTag))
-						.getBytes(charset);
+            throw new UncheckedIOException(e);
 
-				return response
-						.header("Content-Length", String.valueOf(body.length))
-						.body(output(), output -> {
-							try {
-								output.write(body);
-							} catch ( final IOException e ) {
-								throw new UncheckedIOException(e);
-							}
-						});
+        }
+    }
 
-			});
 
-		} else {
+    private Response rewrite(final Response response) {
+        if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
 
-			return response;
+            return response.body(output()).fold(e -> response, target -> {
 
-		}
-	}
+                final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
 
+                target.accept(buffer);
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                final Charset charset=Charset.forName(response.charset());
 
-	private static final class MavenLogger extends Logger {
+                final byte[] body=buffer.toString(charset)
+                        .replace("</head>", format("%s</head>", ReloadTag))
+                        .getBytes(charset);
 
-		private final Log logger;
+                return response
+                        .header("Content-Length", String.valueOf(body.length))
+                        .body(output(), output -> {
+                            try {
+                                output.write(body);
+                            } catch ( final IOException e ) {
+                                throw new UncheckedIOException(e);
+                            }
+                        });
 
+            });
 
-		private MavenLogger(final Log logger) {
-			this.logger=logger;
-		}
+        } else {
 
+            return response;
 
-		@Override public Logger entry(
-				final Level level, final Object source,
-				final Supplier<String> message, final Throwable cause
-		) {
+        }
+    }
 
-			if ( cause == null ) {
 
-				final Consumer<String> sink=(level == Level.error) ? logger::error
-						: (level == Level.warning) ? logger::warn
-						: (level == Level.info) ? logger::info
-						: logger::debug;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-				sink.accept(message.get());
+    private static final class MavenLogger extends Logger {
 
+        private final Log logger;
 
-			} else {
 
-				final BiConsumer<String, Throwable> sink=(level == Level.error) ? logger::error
-						: (level == Level.warning) ? logger::warn
-						: (level == Level.info) ? logger::info
-						: logger::debug;
+        private MavenLogger(final Log logger) {
+            this.logger=logger;
+        }
 
-				sink.accept(message.get(), cause);
 
-			}
+        @Override public Logger entry(
+                final Level level, final Object source,
+                final Supplier<String> message, final Throwable cause
+        ) {
 
-			return this;
-		}
-	}
+            if ( cause == null ) {
+
+                final Consumer<String> sink=(level == Level.error) ? logger::error
+                        : (level == Level.warning) ? logger::warn
+                        : (level == Level.info) ? logger::info
+                        : logger::debug;
+
+                sink.accept(message.get());
+
+
+            } else {
+
+                final BiConsumer<String, Throwable> sink=(level == Level.error) ? logger::error
+                        : (level == Level.warning) ? logger::warn
+                        : (level == Level.info) ? logger::info
+                        : logger::debug;
+
+                sink.accept(message.get(), cause);
+
+            }
+
+            return this;
+        }
+    }
 
 }
