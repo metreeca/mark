@@ -18,8 +18,7 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.jse.JSEServer;
 import com.metreeca.mark.*;
-import com.metreeca.rest.Request;
-import com.metreeca.rest.Response;
+import com.metreeca.rest.*;
 import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
@@ -38,6 +37,7 @@ import java.util.function.*;
 
 import javax.json.Json;
 
+import static com.metreeca.rest.MessageException.status;
 import static com.metreeca.rest.Response.OK;
 import static com.metreeca.rest.Wrapper.postprocessor;
 import static com.metreeca.rest.formats.DataFormat.data;
@@ -187,30 +187,39 @@ public final class Serve implements Task {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Response queue(final Request request) {
+    private com.metreeca.rest.Future<Response> queue(final Request request) {
         try {
 
             final Collection<String> batch=new HashSet<>(Set.of(updates.take()));
 
             updates.drainTo(batch);
 
-            return request.reply(OK)
+            return request.reply(response -> response.status(OK)
                     .header("Content-Type", "application/json")
-                    .body(text(), Json.createArrayBuilder(batch).build().toString());
+                    .body(text(), Json.createArrayBuilder(batch).build().toString())
+            );
 
         } catch ( final InterruptedException e ) {
 
-            return request.reply(OK);
+            return request.reply(status(OK));
 
         }
     }
 
-    private Response script(final Request request) {
+    private Future<Response> script(final Request request) {
         try ( final InputStream script=requireNonNull(getClass().getResourceAsStream(ReloadSrc)) ) {
 
-            return request.reply(OK)
-                    .header("Content-Type", "text/javascript")
-                    .body(data(), script.readAllBytes());
+            return request.reply(response -> {
+                try {
+                    return response.status(OK)
+                            .header("Content-Type", "text/javascript")
+                            .body(data(), script.readAllBytes());
+                } catch ( final IOException e ) {
+
+                    throw new UncheckedIOException(e);
+
+                }
+            });
 
         } catch ( final IOException e ) {
 
