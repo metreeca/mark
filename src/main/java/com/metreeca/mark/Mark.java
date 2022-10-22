@@ -142,12 +142,12 @@ public final class Mark implements Opts {
             );
         }
 
-        if ( !bundled && !Files.exists(layout) ) {
+        if ( !bundled && !Files.exists(source.resolve(layout)) ) {
             throw new IllegalArgumentException(format("missing layout ‹%s›", local(layout)));
         }
 
-        if ( !bundled && !Files.isRegularFile(layout) ) {
-            throw new IllegalArgumentException(format("layout path ‹%s› is not a folder", local(layout)));
+        if ( !bundled && !Files.isRegularFile(source.resolve(layout)) ) {
+            throw new IllegalArgumentException(format("layout path ‹%s› is not a file", local(layout)));
         }
 
 
