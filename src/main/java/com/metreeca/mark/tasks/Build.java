@@ -18,7 +18,8 @@ package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
@@ -105,23 +105,6 @@ public final class Build implements Task {
 
         });
 
-        // copy bundled assets to target folder
-
-        mark.assets().forEach((path, resource) -> {
-
-            final Path target=mark.target().resolve(path);
-
-            try ( final InputStream input=resource.toUri().toURL().openStream() ) {
-
-                Files.createDirectories(target.getParent());
-                Files.copy(input, target, REPLACE_EXISTING);
-
-            } catch ( final IOException e ) {
-                throw new UncheckedIOException(e);
-            }
-
-        });
-
         // process resources
 
         try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
@@ -137,6 +120,21 @@ public final class Build implements Task {
         } catch ( final IOException e ) {
             throw new UncheckedIOException(e);
         }
+
+        // copy bundled assets to target folder
+
+        try ( final Stream<Path> assets=mark.assets().values().stream() ) {
+
+            final long start=currentTimeMillis();
+            final long count=mark.process(assets).size();
+            final long stop=currentTimeMillis();
+
+            if ( count > 0 ) {
+                mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
+            }
+
+        }
+
     }
 
 }
