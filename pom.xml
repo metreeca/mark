@@ -102,7 +102,7 @@
             <dependency> <!-- https://github.com/vsch/flexmark-java -->
                 <groupId>com.vladsch.flexmark</groupId>
                 <artifactId>flexmark-all</artifactId>
-                <version>0.62.2</version>
+                <version>0.64.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -112,24 +112,24 @@
 
     <dependencies>
 
-        <dependency>
+        <dependency> <!-- https://maven.apache.org/maven-core/ -->
             <groupId>org.apache.maven</groupId>
-            <artifactId>maven-project</artifactId>
-            <version>2.2.1</version>
+            <artifactId>maven-core</artifactId>
+            <version>3.8.7</version>
             <scope>provided</scope>
         </dependency>
 
-        <dependency> <!-- https://maven.apache.org/ref/3.8.4/maven-plugin-api/ -->
+        <dependency> <!-- https://maven.apache.org/maven-plugin-api/ -->
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>3.8.1</version>
+            <version>3.8.7</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency> <!-- https://maven.apache.org/plugin-tools/maven-plugin-annotations/ -->
             <groupId>org.apache.maven.plugin-tools</groupId>
             <artifactId>maven-plugin-annotations</artifactId>
-            <version>3.6.4</version>
+            <version>3.7.1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -189,15 +189,17 @@
         </dependency>
 
 
-        <dependency>
+        <dependency> <!-- https://search.maven.org/artifact/org.junit.jupiter/junit-jupiter -->
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
 
-        <dependency>
+        <dependency> <!-- https://search.maven.org/artifact/org.assertj/assertj-core -->
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
 
