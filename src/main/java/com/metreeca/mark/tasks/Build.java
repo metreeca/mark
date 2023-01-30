@@ -114,6 +114,7 @@ public final class Build implements Task {
 
             try ( final InputStream resource=url.openStream() ) {
 
+                Files.createDirectories(source.getParent());
                 Files.copy(resource, source, REPLACE_EXISTING);
 
             } catch ( final IOException e ) {
