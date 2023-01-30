@@ -64,6 +64,8 @@ public final class Mark implements Opts {
 
     private static final Path Layout=Paths.get("index.pug");
 
+    private static final Path Bundle=asset(".");
+
     private static final Map<Path, Path> Assets=Stream.of(
 
             "index.js",
@@ -71,12 +73,15 @@ public final class Mark implements Opts {
             "index.pug",
             "index.svg"
 
-    ).collect(toMap(Paths::get, asset -> {
+    ).collect(toMap(Paths::get, Mark::asset));
+
+
+    private static Path asset(final String path) {
         try {
 
             final URL url=requireNonNull(
-                    Mark.class.getResource(format("files/%s", asset)),
-                    format("missing asset ‹%s›", asset)
+                    Mark.class.getResource(format("files/%s", path)),
+                    format("missing asset ‹%s›", path)
             );
 
             return Paths.get(url.toURI())
@@ -88,7 +93,7 @@ public final class Mark implements Opts {
             throw new RuntimeException("unable to retrieve asset path", e);
 
         }
-    }));
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -592,7 +597,9 @@ public final class Mark implements Opts {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Path relative(final Path path) {
-        return source.relativize(source.resolve(path)).normalize();
+        return path.startsWith(Bundle)
+                ? Bundle.relativize(path).normalize()
+                : source.relativize(source.resolve(path)).normalize();
     }
 
     private Path source(final Path path) {
@@ -601,7 +608,7 @@ public final class Mark implements Opts {
 
         if ( exists(absolute) ) { // regular source file
 
-            if ( !absolute.startsWith(source) ) {
+            if ( !absolute.startsWith(source) && !absolute.startsWith(Bundle) ) {
                 throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
             }
 
