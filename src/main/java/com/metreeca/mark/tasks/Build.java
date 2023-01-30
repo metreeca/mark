@@ -107,14 +107,14 @@ public final class Build implements Task {
 
         // copy bundled assets to target folder
 
-        mark.assets().forEach((path, url) -> {
+        mark.assets().forEach((path, resource) -> {
 
             final Path target=mark.target().resolve(path);
 
-            try ( final InputStream resource=url.openStream() ) {
+            try ( final InputStream input=resource.toUri().toURL().openStream() ) {
 
                 Files.createDirectories(target.getParent());
-                Files.copy(resource, target, REPLACE_EXISTING);
+                Files.copy(input, target, REPLACE_EXISTING);
 
             } catch ( final IOException e ) {
                 throw new UncheckedIOException(e);

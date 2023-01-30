@@ -65,19 +65,29 @@ public final class Mark implements Opts {
 
     private static final Path Layout=Paths.get("index.pug");
 
-    private static final Map<Path, URL> Assets=Stream.of(
+    private static final Map<Path, Path> Assets=Stream.of(
 
             "index.js",
             "index.less",
             "index.pug",
             "index.svg"
 
-    ).collect(toMap(Paths::get, asset -> requireNonNull(
+    ).collect(toMap(Paths::get, asset -> {
+        try {
 
-            Mark.class.getResource(format("files/%s", asset)),
-            format("missing asset ‹%s›", asset)
+            final URL url=requireNonNull(
+                    Mark.class.getResource(format("files/%s", asset)),
+                    format("missing asset ‹%s›", asset)
+            );
 
-    )));
+            return Paths.get(url.toURI());
+
+        } catch ( final URISyntaxException e ) {
+
+            throw new RuntimeException("unable to retrieve asset path", e);
+
+        }
+    }));
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -302,7 +312,7 @@ public final class Mark implements Opts {
         }
     }
 
-    public Map<Path, URL> assets() {
+    public Map<Path, Path> assets() {
         return bundled ? Assets : Map.of();
     }
 
@@ -599,17 +609,11 @@ public final class Mark implements Opts {
 
         } else { // look for bundled asset
 
-            final URL fallback=Assets.get(path);
+            final Path fallback=Assets.get(path);
 
             if ( fallback != null ) {
 
-                try {
-
-                    return Paths.get(fallback.toURI());
-
-                } catch ( final URISyntaxException e ) {
-                    throw new RuntimeException("unable to retrieve asset path", e);
-                }
+                return fallback;
 
             } else {
 

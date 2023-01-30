@@ -42,13 +42,13 @@ public final class Clean implements Task {
 
             try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
 
-                // delete generated files
+                // delete generated files // !!! actually generated?
 
                 mark.scan(sources).forEach(file -> delete(target.resolve(file.path())));
 
-                // delete bundled assets
+                // delete bundled assets // !!! actually bundled?
 
-                mark.assets().forEach((path, url) -> delete(target.resolve(path)));
+                mark.assets().forEach((path, resource) -> delete(target.resolve(path)));
 
             } catch ( final IOException e ) {
                 throw new UncheckedIOException(e);
