@@ -117,7 +117,7 @@ public final class Mark implements Opts {
 
         this.source=_source.toAbsolutePath().normalize();
         this.target=_target.equals(Base) ? source : _target.toAbsolutePath().normalize();
-        this.layout=_target.equals(Base) ? Layout : source.relativize(source.resolve(_layout)).normalize();
+        this.layout=_layout.equals(Base) ? Layout : source.relativize(source.resolve(_layout)).normalize();
 
         this.readme=opts.readme();
         this.inplace=target.equals(source);
@@ -235,7 +235,8 @@ public final class Mark implements Opts {
             throw new NullPointerException("null name");
         }
 
-        return source(name.isEmpty() || name.equals(template) ? layout // ;( handle extension-only paths…
+        return source(name.isEmpty() || name.equals(template)
+                ? layout // ;( handle extension-only paths…
                 : layout.resolveSibling(name.contains(".") ? name : name+template)
         );
     }
