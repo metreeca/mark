@@ -66,7 +66,10 @@ public final class Mark implements Opts {
 
     private static final Map<Path, URL> Assets=Stream.of(
 
-            "index.js", "index.less", "index.pug", "index.svg"
+            "index.js",
+            "index.less",
+            "index.pug",
+            "index.svg"
 
     ).collect(toMap(Paths::get, asset -> requireNonNull(
 
@@ -462,6 +465,7 @@ public final class Mark implements Opts {
 
                 .filter(Objects::nonNull)
                 .filter(Files::isRegularFile)
+                .filter(not(path -> path.getFileName().toString().startsWith(".")))
 
                 .map(this::source)
                 .map(this::scan).flatMap(Optional::stream)
