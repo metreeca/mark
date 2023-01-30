@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Roboto:300|Roboto+Condensed:300,700|Roboto+Mono:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,500|Roboto+Mono:400);
 
 html {
 
     --color: #000;
     --background-color: #FFF;
+
+    --light: #999;
+
+    --base: 300;
+    --bold: 500;
 
 }
 
@@ -28,18 +33,16 @@ html {
 
 html {
     font-family: Roboto, Helvetica, Arial, sans-serif;
-    font-weight: 300;
-    line-height: 1.3;
-}
-
-header, footer, nav, h1, h2, h3, dt, th, a, strong, small {
-    font-family: "Roboto Condensed", Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    font-weight: var(--base);
+    line-height: 1.4;
 }
 
 code, code[class*=language-], pre[class*=language-] {
     font-family: "Roboto Mono", monospace;
+    font-size: 0.9em;
     font-weight: 400;
-    line-height: inherit;
+    line-height: 1.25;
     letter-spacing: -0.01em;
     color: #333;
 }
@@ -146,10 +149,16 @@ html {
                 box-shadow: 0 0 0.75rem 0.75rem var(--background-color);
                 overflow: hidden;
 
+                text-transform: lowercase;
+
                 white-space: nowrap;
                 font-size: 1.5rem;
 
                 background-color: inherit;
+
+                & a, & a:visited {
+                    color: inherit;
+                }
 
                 & > * {
 
@@ -160,22 +169,13 @@ html {
 
                 }
 
-                & > a {
-
-                    display: block;
-
-                    width: 1em;
-                    height: 1em;
-
-                    background-position-x: center;
-                    background-size: contain;
-                    background-repeat: no-repeat;
-
-                }
-
                 & > span {
                     flex-shrink: 1;
                     flex-grow: 1;
+                }
+
+                & > :last-child {
+                    margin-left: auto;
                 }
 
             }
@@ -191,6 +191,10 @@ html {
             }
 
             & > footer {
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
 
                 flex-shrink: 0;
 
@@ -210,16 +214,38 @@ html {
 
         & > nav {
 
+            & a, & a:visited {
+                color: inherit;
+            }
+
+            & > header {
+                transform: scale(1.05);
+                transform-origin: bottom right;
+            }
+
             & > section {
 
                 a, a:visited {
                     font-weight: inherit;
                 }
 
+                & > * {
+                    display: block;
+                    margin-left: auto;
+                }
+
+                & > button {
+                    max-width: 15em;
+                    margin-bottom: 1em;
+                    white-space: normal;
+                    text-align: inherit;
+                    color: var(--light);
+                }
+
                 & > a, & > a:visited {
                     display: block;
                     margin-bottom: 1em;
-                    font-weight: 700;
+                    font-weight: var(--bold);
                     color: #BBB;
                 }
 
@@ -230,15 +256,15 @@ html {
                     margin: 0;
                     border: none;
                     font-size: inherit;
-                    font-weight: 300;
+                    font-weight: var(--base);
                 }
 
                 & > h1 {
-                    font-weight: 700;
+                    font-weight: var(--bold);
                 }
 
                 & > h1 + h1 {
-                    margin-top: 0.1em;
+                    margin-top: 0.25em;
                 }
 
                 & > h1 + h2 {
@@ -255,6 +281,11 @@ html {
 
             }
 
+            & > footer {
+                justify-content: right;
+                font-size: 1.25em;
+            }
+
         }
 
         & > main {
@@ -265,36 +296,18 @@ html {
 
             & > header {
 
-                & > span {
+                & a:not(.active) {
+                    color: var(--light);
+                }
 
-                    & > a:not(:last-child)::after {
-                        content: '›';
-                        margin: 0.25em;
+                & > nav {
+
+                    & > a + a {
+                        margin-left: 0.75em;
                     }
 
-                    & > button {
-
-                        position: relative;
-                        display: inline-block;
-
-                        font-weight: 300;
-                        color: #999;
-
-                        /* min-width: 100%; */
-                        /* animation: 5s linear 0s infinite move; */
-                    }
-
-                    @keyframes move {
-                        0%,
-                        10% {
-                            transform: translateX(0%);
-                            left: 0;
-                        }
-                        90%,
-                        100% {
-                            transform: translateX(-100%);
-                            left: 100%;
-                        }
+                    & + a {
+                        font-size: 0.75em;
                     }
 
                 }
@@ -479,7 +492,7 @@ h2,
 h3 {
     clear: both;
     margin-bottom: 0.5em;
-    font-weight: 300;
+    font-weight: var(--bold);
     color: #333;
 }
 
@@ -504,7 +517,6 @@ h2 {
 }
 
 h3 {
-    font-weight: 700;
     font-size: 100%;
 }
 
@@ -540,16 +552,16 @@ li {
 
 dt {
 
-    font-weight: 700;
+    font-weight: var(--bold);
     font-size: 95%;
     color: #333;
 
-    * + & {
+    & > * + & {
         margin-top: 1em;
     }
 
-    * {
-        font-weight: 700;
+    & > * {
+        font-weight: inherit;
     }
 
 }
@@ -582,25 +594,22 @@ td {
 
 th {
     white-space: pre;
-    font-weight: 700;
+    font-weight: var(--bold);
 }
 
-pre {
+pre, pre[class*=language-] {
     position: relative;
     overflow: auto;
-    padding: 0.5em 0.75em;
+    padding: 0.75em 1em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
     border-style: dotted;
     border-radius: 0.25em;
     white-space: pre-wrap;
     text-align: left;
-    tab-size: 4;
+    tab-size: 2;
     font-size: 85%;
     background-color: #F0F0F0;
-}
-
-pre {
-    margin-top: 1.5em;
-    margin-bottom: 1.5em;
 }
 
 pre + pre,
@@ -670,7 +679,7 @@ a, a:visited {
 
     white-space: nowrap;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: var(--bold);
     color: #678;
     cursor: pointer;
 
@@ -687,6 +696,14 @@ a, a:visited {
 a:hover, button:active {
     color: #C30 !important;
     border-color: #C30 !important;
+}
+
+a.logo {
+    display: block;
+    width: 1em;
+    height: 1em;
+    background-size: cover;
+    background-position: center;
 }
 
 a[target=_blank]:after { // external link
@@ -707,7 +724,7 @@ em {
 
 strong {
     color: #333;
-    font-weight: 700;
+    font-weight: var(--bold);
 }
 
 abbr {
@@ -849,7 +866,7 @@ select {
 
     html {
 
-        font-size: 14pt;
+        font-size: 12pt;
 
         & > body {
 
@@ -868,7 +885,7 @@ select {
 @media screen and (min-width: 1280px) {
 
     html {
-        font-size: 15pt;
+        font-size: 14pt;
     }
 
 }

@@ -32,6 +32,7 @@ final class MarkRunner {
             project.setGroupId("com.metreeca");
             project.setArtifactId("metreeca-sample");
             project.setVersion("1.2.3");
+            project.setUrl("https://example.org/");
 
             project.setName("Metreeca/Sample");
             project.setDescription("A sample project for Metreeca/Mark");

@@ -1,6 +1,5 @@
 ---
 title: "Samples"
-trail: "Context"
 ---
 
 **Table of Contents**

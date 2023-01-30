@@ -16,55 +16,72 @@
 
 (function (window) {
 
+    //// browser-specific css selectors (eg html[data-useragent*='MSIE 10.0']) /////////////////////////////////////////
 
-	//// browser-specific css selectors (eg html[data-useragent*='MSIE 10.0']) /////////////////////////////////////////
-
-	document.documentElement.setAttribute("data-useragent", navigator.userAgent);
-
-
-	//// Side Toggling /////////////////////////////////////////////////////////////////////////////////////////////////
-
-	window.addEventListener("hashchange", function () {
-		window.document.getElementById("toggle").checked=false;
-	});
+    document.documentElement.setAttribute("data-useragent", navigator.userAgent);
 
 
-	//// ;) ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //// Section Activity //////////////////////////////////////////////////////////////////////////////////////////////
 
-	window.addEventListener("load", function () {
+    window.addEventListener("load", function () {
 
-		(function (a) {
+        document.querySelectorAll("body > main > header > nav > a").forEach(a => {
 
-			for (var i=0; i < a.length; ++i) {
-				a[i]=255-a[i];
-			}
+            const href=a.href.replace(/(?:(?<=\/)index)?\.html$/, "");
 
-			var b=String.fromCharCode.apply(String, a);
-			var c=b.substr(0, 7);
-			var d=b.substr(7);
+            a.classList.toggle("active",
+                location.href === href || href.endsWith("/") && location.href.startsWith(href)
+            );
 
-			var _=document.querySelectorAll("main a");
+        });
 
-			for (var i=0; i < _.length; ++i) {
 
-				var e=(_[i].getAttribute("href") || "").match(/^#@([-\w]+)(.*)$/);
+    });
 
-				if (e) {
 
-					var f=e[1] || "";
-					var g=e[2] || "";
+    //// Side Toggling /////////////////////////////////////////////////////////////////////////////////////////////////
 
-					_[i].setAttribute("href", c+f+d+g);
+    window.addEventListener("hashchange", function () {
+        window.document.getElementById("toggle").checked=false;
+    });
 
-					if (_[i].childNodes.length === 0) {
-						_[i].appendChild(document.createTextNode(f+d));
-					}
 
-				}
-			}
+    //// ;) ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		})([146, 158, 150, 147, 139, 144, 197, 191, 146, 154, 139, 141, 154, 154, 156, 158, 209, 156, 144, 146]);
+    window.addEventListener("load", function () {
 
-	});
+        (function (a) {
+
+            for (var i=0; i < a.length; ++i) {
+                a[i]=255-a[i];
+            }
+
+            var b=String.fromCharCode.apply(String, a);
+            var c=b.substr(0, 7);
+            var d=b.substr(7);
+
+            var _=document.querySelectorAll("main a");
+
+            for (var i=0; i < _.length; ++i) {
+
+                var e=(_[i].getAttribute("href") || "").match(/^#@([-\w]+)(.*)$/);
+
+                if (e) {
+
+                    var f=e[1] || "";
+                    var g=e[2] || "";
+
+                    _[i].setAttribute("href", c+f+d+g);
+
+                    if (_[i].childNodes.length === 0) {
+                        _[i].appendChild(document.createTextNode(f+d));
+                    }
+
+                }
+            }
+
+        })([146, 158, 150, 147, 139, 144, 197, 191, 146, 154, 139, 141, 154, 154, 156, 158, 209, 156, 144, 146]);
+
+    });
 
 })(window);
