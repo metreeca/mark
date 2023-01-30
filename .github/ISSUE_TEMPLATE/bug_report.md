@@ -1,39 +1,40 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+name: "Bug Report"
+about: "Create a report to help us improve"
+title: "What's wrong with metreeca/mark?"
+labels: "Issue"
+assignees: ""
 ---
 
-**Environment**
+**environment**
 
-- metreeca/mark: version
-- maven: version
-- operating system: name/version
-- java VM: vendor/version
+- metreeca/mark: *version*
+- maven: *version*
+- operating system: *name/version*
+- java vm: *vendor/version*
 
-**Description**
 
-A clear and concise description of what the bug is.
+**steps to reproduce**
 
-**How To Reproduce**
+1. …
+2. …
 
-- Step to reproduce the behaviour;
-- …
 
-**Expected Behaviour**
+**expected behaviour**
 
-A clear and concise description of what you expected to happen.
+*What did you expect to happen?*
 
-**Actual Behaviour**
 
-A clear and concise description of what actually happens
+**actual behaviour**
 
-**Workarounds**
+*What did actually happen?*
 
-Share any workaround you found for the bug.
 
-**Notes**
+**workarounds**
 
-Additional observations and any other context about the bug.
+*Did you find any workaround for the bug?*
+
+
+**notes**
+
+*Would you share any observation or additional context about the bug?*
