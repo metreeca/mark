@@ -16,10 +16,15 @@
 
 package com.metreeca.mark.tasks;
 
+import com.metreeca.core.services.Logger;
+import com.metreeca.core.toolkits.Resources;
+import com.metreeca.http.Request;
+import com.metreeca.http.Response;
+import com.metreeca.http.codecs.Data;
+import com.metreeca.http.handlers.*;
 import com.metreeca.jse.JSEServer;
+import com.metreeca.json.codecs.JSON;
 import com.metreeca.mark.*;
-import com.metreeca.rest.*;
-import com.metreeca.rest.services.Logger;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -27,7 +32,6 @@ import java.awt.Desktop;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -37,19 +41,11 @@ import java.util.function.*;
 
 import javax.json.Json;
 
-import static com.metreeca.rest.MessageException.status;
-import static com.metreeca.rest.Response.OK;
-import static com.metreeca.rest.Wrapper.postprocessor;
-import static com.metreeca.rest.formats.DataFormat.data;
-import static com.metreeca.rest.formats.OutputFormat.output;
-import static com.metreeca.rest.formats.TextFormat.text;
-import static com.metreeca.rest.handlers.Publisher.publisher;
-import static com.metreeca.rest.handlers.Router.router;
-import static com.metreeca.rest.services.Logger.logger;
-import static com.metreeca.rest.wrappers.Server.server;
+import static com.metreeca.core.services.Logger.logger;
+import static com.metreeca.http.Handler.handler;
+import static com.metreeca.http.Response.OK;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Site serving task.
@@ -63,23 +59,22 @@ public final class Serve implements Task {
     private static final String ReloadQueue="/~";
     private static final String ReloadScript="/~script";
 
-    private static final String ReloadSrc=Serve.class.getSimpleName()+".js";
     private static final String ReloadTag=format("<script type=\"text/javascript\" src=\"%s\"></script>", ReloadScript);
 
 
     public static void main(final String... args) {
-        new Serve().serve(new Opts() {
+        new Serve().exec(new Mark(new Opts() {
 
             @Override public Path source() {
                 return Paths.get("docs");
             }
 
             @Override public Path target() {
-                return Paths.get("docs");
+                return Paths.get("");
             }
 
             @Override public Path layout() {
-                return null;
+                return Paths.get("");
             }
 
             @Override public boolean readme() {
@@ -98,7 +93,7 @@ public final class Serve implements Task {
                 return null;
             }
 
-        });
+        }));
     }
 
 
@@ -146,23 +141,27 @@ public final class Serve implements Task {
 
                                 .set(logger(), () -> new MavenLogger(mark.logger()))
 
-                                .get(() -> server().wrap(router()
+                                .get(() -> new Router()
 
-                                        .path(ReloadQueue, router()
+                                        .path(ReloadQueue, new Worker()
                                                 .get(this::queue)
                                         )
 
-                                        .path(ReloadScript, router()
+                                        .path(ReloadScript, new Worker()
                                                 .get(this::script)
                                         )
 
-                                        .path("/*", router()
-                                                .get(publisher(mark.target())
-                                                        .with(postprocessor(this::rewrite))
-                                                )
-                                        )
+                                        .path("/*", new Worker()
+                                                .get(handler(
 
-                                ))
+                                                        this::rewrite,
+
+                                                        new Publisher()
+                                                                .assets(mark.target())
+
+                                                ))
+                                        )
+                                )
                         )
 
                         .start();
@@ -187,66 +186,45 @@ public final class Serve implements Task {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private com.metreeca.rest.Future<Response> queue(final Request request) {
+    private Response queue(final Request request, final Function<Request, Response> forward) {
         try {
 
             final Collection<String> batch=new HashSet<>(Set.of(updates.take()));
 
             updates.drainTo(batch);
 
-            return request.reply(response -> response.status(OK)
-                    .header("Content-Type", "application/json")
-                    .body(text(), Json.createArrayBuilder(batch).build().toString())
-            );
+            return request.reply(OK)
+                    .body(new JSON(), Json.createArrayBuilder(batch).build());
 
         } catch ( final InterruptedException e ) {
 
-            return request.reply(status(OK));
+            return request.reply(OK);
 
         }
     }
 
-    private Future<Response> script(final Request request) {
-        try ( final InputStream script=requireNonNull(getClass().getResourceAsStream(ReloadSrc)) ) {
-
-            return request.reply(response -> {
-                try {
-                    return response.status(OK)
-                            .header("Content-Type", "text/javascript")
-                            .body(data(), script.readAllBytes());
-                } catch ( final IOException e ) {
-
-                    throw new UncheckedIOException(e);
-
-                }
-            });
-
-        } catch ( final IOException e ) {
-
-            throw new UncheckedIOException(e);
-
-        }
+    private Response script(final Request request, final Function<Request, Response> forward) {
+        return request.reply(OK)
+                .header("Content-Type", "text/javascript")
+                .body(new Data(), Resources.data(Serve.class, ".js"));
     }
 
 
-    private Response rewrite(final Response response) {
-        if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
-
-            return response.body(output()).fold(e -> response, target -> {
+    private Response rewrite(final Request request, final Function<Request, Response> forward) {
+        return forward.apply(request).map(response -> {
+            if ( response.header("Content-Type").filter(mime -> mime.startsWith("text/html")).isPresent() ) {
 
                 final ByteArrayOutputStream buffer=new ByteArrayOutputStream(1000);
 
-                target.accept(buffer);
+                response.output().accept(buffer);
 
-                final Charset charset=Charset.forName(response.charset());
-
-                final byte[] body=buffer.toString(charset)
+                final byte[] body=buffer.toString(response.charset())
                         .replace("</head>", format("%s</head>", ReloadTag))
-                        .getBytes(charset);
+                        .getBytes(response.charset());
 
                 return response
                         .header("Content-Length", String.valueOf(body.length))
-                        .body(output(), output -> {
+                        .output(output -> {
                             try {
                                 output.write(body);
                             } catch ( final IOException e ) {
@@ -254,13 +232,13 @@ public final class Serve implements Task {
                             }
                         });
 
-            });
+            } else {
 
-        } else {
+                return response;
 
-            return response;
+            }
 
-        }
+        });
     }
 
 

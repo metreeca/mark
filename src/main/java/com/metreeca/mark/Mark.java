@@ -57,7 +57,6 @@ public final class Mark implements Opts {
 
     private static final String Date=ISO_LOCAL_DATE.format(LocalDate.now());
 
-    private static final Pattern IndexPattern=Pattern.compile("^[^.]*");
     private static final Pattern MessagePattern=Pattern.compile("\n\\s*");
 
 

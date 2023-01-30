@@ -17,7 +17,6 @@
 package com.metreeca.mark.tasks;
 
 import com.metreeca.mark.*;
-import com.metreeca.rest.Either;
 
 import org.apache.maven.plugin.logging.Log;
 import org.w3c.dom.*;
@@ -33,11 +32,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.transform.TransformerException;
 import javax.xml.xpath.*;
 
-import static com.metreeca.rest.handlers.Publisher.variants;
-import static com.metreeca.xml.formats.HTMLFormat.html;
+import static com.metreeca.http.handlers.Publisher.variants;
+import static com.metreeca.xml.codecs.HTML.html;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
@@ -82,14 +80,9 @@ public final class Check implements Task {
                             // html links
 
                             path.toString().endsWith(".html")
+                                    ? scan(target, path)
 
-                                    ? scan(target, path).fold(error -> {
-
-                                mark.logger().warn(format("%s / %s", path, error.getMessage()));
-
-                                return Stream.empty();
-
-                            })
+                                    // !!! mark.logger().warn(format("%s / %s", path, error.getMessage()));
 
                                     : Stream.empty()
 
@@ -155,11 +148,13 @@ public final class Check implements Task {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Either<TransformerException, Stream<Entry<String, String>>> scan(final Path base, final Path path) {
+    private Stream<Entry<String, String>> scan(final Path base, final Path path) {
 
         final String self=base.relativize(path).toString();
 
-        return parse(path).map(document -> Stream.concat(
+        final Document document=parse(path);
+
+        return Stream.concat(
 
                 nodes(document, "//@id|//html:a/@name").map(Node::getTextContent) // internal anchor links
 
@@ -182,9 +177,9 @@ public final class Check implements Task {
 
                         .map(link -> AnchoredAssetPattern.matcher(link).replaceAll("$1"))
 
-                        .map(link -> entry(self, decode(link)))
+                        .map(link -> entry(self, decode(link, UTF_8)))
 
-        ));
+        );
     }
 
 
@@ -208,10 +203,10 @@ public final class Check implements Task {
     }
 
 
-    private Either<TransformerException, Document> parse(final Path path) {
+    private Document parse(final Path path) {
         try ( final InputStream stream=Files.newInputStream(path) ) {
 
-            return html(stream, UTF_8.name(), path.toString());
+            return html(stream, UTF_8, path.toString());
 
         } catch ( final IOException e ) {
 
@@ -284,9 +279,7 @@ public final class Check implements Task {
 
         } else {
 
-            new URL(url); // only well-formedness tests
-
-            return true;
+            return !new URL(url).toString().isEmpty(); // only well-formedness tests;
 
         }
 
