@@ -97,7 +97,6 @@ public final class Build implements Task {
 
                         .orElseThrow();
 
-
                 Files.write(readme, List.of(text), CREATE, TRUNCATE_EXISTING);
 
             } catch ( final IOException e ) {
@@ -106,16 +105,16 @@ public final class Build implements Task {
 
         });
 
-        // copy bundled assets to source folder
+        // copy bundled assets to target folder
 
         mark.assets().forEach((path, url) -> {
 
-            final Path source=mark.source().resolve(path);
+            final Path target=mark.target().resolve(path);
 
             try ( final InputStream resource=url.openStream() ) {
 
-                Files.createDirectories(source.getParent());
-                Files.copy(resource, source, REPLACE_EXISTING);
+                Files.createDirectories(target.getParent());
+                Files.copy(resource, target, REPLACE_EXISTING);
 
             } catch ( final IOException e ) {
                 throw new UncheckedIOException(e);

@@ -22,6 +22,7 @@ import org.apache.maven.plugin.logging.Log;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.*;
 import java.time.LocalDate;
@@ -584,19 +585,40 @@ public final class Mark implements Opts {
 
         final Path absolute=source.resolve(path).toAbsolutePath().normalize();
 
-        if ( !absolute.startsWith(source) ) {
-            throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
+        if ( Files.exists(absolute) ) { // regular source file
+
+            if ( !absolute.startsWith(source) ) {
+                throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
+            }
+
+            if ( !Files.isRegularFile(absolute) ) {
+                throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
+            }
+
+            return absolute;
+
+        } else { // look for bundled asset
+
+            final URL fallback=Assets.get(path);
+
+            if ( fallback != null ) {
+
+                try {
+
+                    return Paths.get(fallback.toURI());
+
+                } catch ( final URISyntaxException e ) {
+                    throw new RuntimeException("unable to retrieve asset path", e);
+                }
+
+            } else {
+
+                throw new IllegalArgumentException(format("missing resource ‹%s›", local(path)));
+
+            }
+
         }
 
-        if ( !Files.exists(absolute) ) {
-            throw new IllegalArgumentException(format("missing resource ‹%s›", local(path)));
-        }
-
-        if ( !Files.isRegularFile(absolute) ) {
-            throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
-        }
-
-        return absolute;
     }
 
     private Path target(final Path path) {

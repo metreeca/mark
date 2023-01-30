@@ -27,7 +27,16 @@ final class MarkRunner {
     static void execute(final MarkMojo mojo) {
         try {
 
-            mojo.setProject(new MavenProject());
+            final MavenProject project=new MavenProject();
+
+            project.setGroupId("com.metreeca");
+            project.setArtifactId("metreeca-sample");
+            project.setVersion("1.2.3");
+
+            project.setName("Metreeca/Sample");
+            project.setDescription("A sample project for Metreeca/Mark");
+
+            mojo.setProject(project);
 
             mojo.setSource("docs");
             mojo.setTarget("target/docs");
