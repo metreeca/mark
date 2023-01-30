@@ -70,7 +70,7 @@ html(lang="en")
 				if label
 					button(title="Scroll to Top" onclick="document.querySelector('main').scrollTo(0, 0); location.hash=''") #{label}
 
-                for heading in page.headings
+				for heading in page.headings
 					#{"h"+heading.level}
 						a(href="#"+heading.id) #{heading.text}
 

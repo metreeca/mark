@@ -16,12 +16,12 @@
 
 package com.metreeca.mark.mojos;
 
-import static com.metreeca.mark.mojos.MarkRunner.execute;
+import static com.metreeca.mark.mojos.MarkTask.execute;
 
-public final class WatchRunner {
+public final class WatchTask {
 
     public static void main(final String... args) { execute(new WatchMojo()); }
 
-    private WatchRunner() { }
+    private WatchTask() { }
 
 }

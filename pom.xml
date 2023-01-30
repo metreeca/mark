@@ -55,7 +55,7 @@
 
     <properties>
 
-        <revision>0.0.0-SNAPSHOT</revision>
+        <revision>0.0-SNAPSHOT</revision>
         <timestamp>${maven.build.timestamp}</timestamp>
 
         <maven.version>3.6</maven.version>
@@ -85,6 +85,16 @@
         <site>
             <url>https://metreeca.github.io/mark/</url>
         </site>
+
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
 
     </distributionManagement>
 
@@ -450,9 +460,9 @@
                             </execution>
                         </executions>
 
-                        <dependencies> <!-- !!! https://issues.sonatype.org/browse/NEXUS-26993 -->
+                        <dependencies>
 
-                            <dependency>
+                            <dependency>  <!-- !!! https://issues.sonatype.org/browse/NEXUS-26993 -->
                                 <groupId>com.thoughtworks.xstream</groupId>
                                 <artifactId>xstream</artifactId>
                                 <version>1.4.15</version>

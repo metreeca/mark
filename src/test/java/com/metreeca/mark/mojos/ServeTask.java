@@ -16,12 +16,12 @@
 
 package com.metreeca.mark.mojos;
 
-import static com.metreeca.mark.mojos.MarkRunner.execute;
+import static com.metreeca.mark.mojos.MarkTask.execute;
 
-public final class ServeRunner {
+public final class ServeTask {
 
     public static void main(final String... args) { execute(new ServeMojo()); }
 
-    private ServeRunner() { }
+    private ServeTask() { }
 
 }

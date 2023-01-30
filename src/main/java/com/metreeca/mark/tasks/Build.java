@@ -114,7 +114,7 @@ public final class Build implements Task {
             final long stop=currentTimeMillis();
 
             if ( count > 0 ) {
-                mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
+                mark.logger().info(format("processed ‹%,d› assets in ‹%,.3f› s", count, (stop-start)/1000.0f));
             }
 
         }

@@ -20,9 +20,7 @@ import com.metreeca.mark.pipes.*;
 
 import org.apache.maven.plugin.logging.Log;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URISyntaxException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.*;
 import java.time.LocalDate;
@@ -41,6 +39,7 @@ import static java.util.Arrays.asList;
 import static java.util.Locale.ROOT;
 import static java.util.Map.entry;
 import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -62,34 +61,48 @@ public final class Mark implements Opts {
 
     //// Bundled Layout ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static final Path bundle=asset(".");
+    private static final Path cache=Paths.get(System.getProperty("java.io.tmpdir"), "mark-bundle");
+
     private static final Path index=Paths.get("index.pug");
+    private static final Path bundle=asset(index.getFileName()).getParent();
 
-    private static final Map<Path, Path> assets=Stream.of(
+    private static final Map<Path, Path> assets=Stream
 
-            "index.pug",
-            "index.js",
-            "index.less",
-            "index.svg"
+            .of(
+                    "index.pug",
+                    "index.js",
+                    "index.less",
+                    "index.svg"
+            )
 
-    ).collect(toMap(Paths::get, Mark::asset));
+            .map(Paths::get)
+            .collect(toMap(identity(), Mark::asset));
 
 
-    private static Path asset(final String path) {
+    private static Path asset(final Path path) {
+
+        final URL url=requireNonNull(
+                Mark.class.getResource(Paths.get("files").resolve(path).toString()),
+                format("missing asset ‹%s›", path)
+        );
+
         try {
 
-            final URL url=requireNonNull(
-                    Mark.class.getResource(format("files/%s", path)),
-                    format("missing asset ‹%s›", path)
-            );
+            final Path asset=cache.resolve(path);
 
-            return Paths.get(url.toURI())
+            if ( !exists(asset) || !isRegularFile(asset) ) {
+                try ( final InputStream inputStream=url.openStream() ) {
+                    createDirectories(asset.getParent());
+                    copy(inputStream, asset);
+                }
+            }
+
+            return asset
                     .toAbsolutePath()
                     .normalize();
 
-        } catch ( final URISyntaxException e ) {
-
-            throw new RuntimeException("unable to retrieve asset path", e);
+        } catch ( final IOException e ) {
+            throw new UncheckedIOException(e);
 
         }
     }

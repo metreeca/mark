@@ -22,7 +22,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
-final class MarkRunner {
+final class MarkTask {
 
     static void execute(final MarkMojo mojo) {
         try {
@@ -54,6 +54,6 @@ final class MarkRunner {
         }
     }
 
-    private MarkRunner() { }
+    private MarkTask() { }
 
 }
