@@ -34,8 +34,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static java.nio.file.Files.isDirectory;
-import static java.nio.file.Files.isHidden;
+import static java.nio.file.Files.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.util.Arrays.asList;
@@ -80,7 +79,9 @@ public final class Mark implements Opts {
                     format("missing asset ‹%s›", asset)
             );
 
-            return Paths.get(url.toURI());
+            return Paths.get(url.toURI())
+                    .toAbsolutePath()
+                    .normalize();
 
         } catch ( final URISyntaxException e ) {
 
@@ -110,7 +111,10 @@ public final class Mark implements Opts {
 
 
     private final Collection<Function<Mark, Pipe>> pipes=asList(
-            None::new, Md::new, Less::new, Any::new
+            None::new,
+            Md::new,
+            Less::new,
+            Any::new
     );
 
 
@@ -137,7 +141,7 @@ public final class Mark implements Opts {
         this.inplace=target.equals(source);
         this.bundled=layout.equals(Layout);
 
-        if ( !Files.exists(source) ) {
+        if ( !exists(source) ) {
             throw new IllegalArgumentException(format("missing source folder ‹%s›", local(source)));
         }
 
@@ -145,7 +149,7 @@ public final class Mark implements Opts {
             throw new IllegalArgumentException(format("source path ‹%s› is not a folder", local(source)));
         }
 
-        if ( Files.exists(target) && !isDirectory(target) ) {
+        if ( exists(target) && !isDirectory(target) ) {
             throw new IllegalArgumentException(format("target path ‹%s› is not a folder", local(target)));
         }
 
@@ -155,11 +159,11 @@ public final class Mark implements Opts {
             );
         }
 
-        if ( !bundled && !Files.exists(source.resolve(layout)) ) {
+        if ( !bundled && !exists(source.resolve(layout)) ) {
             throw new IllegalArgumentException(format("missing layout ‹%s›", local(layout)));
         }
 
-        if ( !bundled && !Files.isRegularFile(source.resolve(layout)) ) {
+        if ( !bundled && !isRegularFile(source.resolve(layout)) ) {
             throw new IllegalArgumentException(format("layout path ‹%s› is not a file", local(layout)));
         }
 
@@ -299,7 +303,7 @@ public final class Mark implements Opts {
 
             final Path index=source.resolve("index.md").normalize();
 
-            if ( !Files.exists(index) ) {
+            if ( !exists(index) ) {
                 logger.error(format("missing index file <%s>", relative(index)));
             }
 
@@ -377,7 +381,7 @@ public final class Mark implements Opts {
                     }
                 };
 
-                try ( final Stream<Path> sources=Files.walk(source) ) {
+                try ( final Stream<Path> sources=walk(source) ) {
                     sources.filter(Files::isDirectory).forEach(register); // register existing folders
                 }
 
@@ -397,7 +401,7 @@ public final class Mark implements Opts {
 
                             register.accept(path);
 
-                        } else if ( kind.equals(ENTRY_DELETE) || Files.isRegularFile(path) ) {
+                        } else if ( kind.equals(ENTRY_DELETE) || isRegularFile(path) ) {
 
                             action.accept(kind, path);
 
@@ -479,7 +483,8 @@ public final class Mark implements Opts {
                 .filter(not(path -> path.getFileName().toString().startsWith(".")))
 
                 .map(this::source)
-                .map(this::scan).flatMap(Optional::stream)
+                .map(this::scan)
+                .flatMap(Optional::stream)
                 .map(this::extend)
 
                 .collect(toList());
@@ -491,7 +496,7 @@ public final class Mark implements Opts {
     private Optional<File> scan(final Path source) {
         try {
 
-            return isDirectory(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes.stream()
+            return !isRegularFile(source) || isHidden(source) || isLayout(source) ? Optional.empty() : pipes.stream()
 
                     .map(factory -> factory.apply(this))
 
@@ -499,8 +504,7 @@ public final class Mark implements Opts {
                         try {
 
                             return pipe.process(source).filter(not(file ->
-                                            inplace && file.path().equals(source) //
-                                    // prevent overwriting
+                                    inplace && file.path().equals(source) // prevent overwriting
                             ));
 
 
@@ -573,7 +577,7 @@ public final class Mark implements Opts {
 
             final Path path=target(relative);
 
-            Files.createDirectories(path.getParent());
+            createDirectories(path.getParent());
 
             file.process().accept(path, model);
 
@@ -595,13 +599,13 @@ public final class Mark implements Opts {
 
         final Path absolute=source.resolve(path).toAbsolutePath().normalize();
 
-        if ( Files.exists(absolute) ) { // regular source file
+        if ( exists(absolute) ) { // regular source file
 
             if ( !absolute.startsWith(source) ) {
                 throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
             }
 
-            if ( !Files.isRegularFile(absolute) ) {
+            if ( !isRegularFile(absolute) ) {
                 throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
             }
 
@@ -633,7 +637,7 @@ public final class Mark implements Opts {
             throw new IllegalArgumentException(format("resource ‹%s› outside target folder", local(path)));
         }
 
-        if ( Files.exists(absolute) && !Files.isRegularFile(absolute) ) {
+        if ( exists(absolute) && !isRegularFile(absolute) ) {
             throw new IllegalArgumentException(format("resource is not a regular file ‹%s›", local(path)));
         }
 
