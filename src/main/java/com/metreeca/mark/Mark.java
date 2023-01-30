@@ -62,15 +62,14 @@ public final class Mark implements Opts {
 
     //// Bundled Layout ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static final Path Layout=Paths.get("index.pug");
+    private static final Path bundle=asset(".");
+    private static final Path index=Paths.get("index.pug");
 
-    private static final Path Bundle=asset(".");
+    private static final Map<Path, Path> assets=Stream.of(
 
-    private static final Map<Path, Path> Assets=Stream.of(
-
+            "index.pug",
             "index.js",
             "index.less",
-            "index.pug",
             "index.svg"
 
     ).collect(toMap(Paths::get, Mark::asset));
@@ -140,11 +139,11 @@ public final class Mark implements Opts {
 
         this.source=_source.toAbsolutePath().normalize();
         this.target=_target.equals(Base) ? source : _target.toAbsolutePath().normalize();
-        this.layout=_layout.equals(Base) ? Layout : source.relativize(source.resolve(_layout)).normalize();
+        this.layout=_layout.equals(Base) ? index : source.relativize(source.resolve(_layout)).normalize();
 
         this.readme=opts.readme();
         this.inplace=target.equals(source);
-        this.bundled=layout.equals(Layout);
+        this.bundled=layout.equals(index);
 
         if ( !exists(source) ) {
             throw new IllegalArgumentException(format("missing source folder ‹%s›", local(source)));
@@ -322,7 +321,7 @@ public final class Mark implements Opts {
     }
 
     public Map<Path, Path> assets() {
-        return bundled ? Assets : Map.of();
+        return bundled ? assets : Map.of();
     }
 
 
@@ -597,8 +596,8 @@ public final class Mark implements Opts {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private Path relative(final Path path) {
-        return path.startsWith(Bundle)
-                ? Bundle.relativize(path).normalize()
+        return path.startsWith(bundle)
+                ? bundle.relativize(path).normalize()
                 : source.relativize(source.resolve(path)).normalize();
     }
 
@@ -608,7 +607,7 @@ public final class Mark implements Opts {
 
         if ( exists(absolute) ) { // regular source file
 
-            if ( !absolute.startsWith(source) && !absolute.startsWith(Bundle) ) {
+            if ( !absolute.startsWith(source) && !absolute.startsWith(bundle) ) {
                 throw new IllegalArgumentException(format("resource ‹%s› outside source folder", local(path)));
             }
 
@@ -620,7 +619,7 @@ public final class Mark implements Opts {
 
         } else { // look for bundled asset
 
-            final Path fallback=Assets.get(path);
+            final Path fallback=assets.get(path);
 
             if ( fallback != null ) {
 
