@@ -32,7 +32,6 @@ import java.awt.Desktop;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.BlockingDeque;
@@ -62,41 +61,6 @@ public final class Serve implements Task {
     private static final String ReloadTag=format("<script type=\"text/javascript\" src=\"%s\"></script>", ReloadScript);
 
 
-    public static void main(final String... args) {
-        new Serve().exec(new Mark(new Opts() {
-
-            @Override public Path source() {
-                return Paths.get("docs");
-            }
-
-            @Override public Path target() {
-                return Paths.get("");
-            }
-
-            @Override public Path layout() {
-                return Paths.get("");
-            }
-
-            @Override public boolean readme() {
-                return false;
-            }
-
-            @Override public Map<String, Object> global() {
-                return Map.of();
-            }
-
-            @Override public <V> V option(final String option, final Function<String, V> mapper) {
-                return null;
-            }
-
-            @Override public Log logger() {
-                return null;
-            }
-
-        }));
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private final InetSocketAddress address=new InetSocketAddress("localhost", 2020);
@@ -105,30 +69,14 @@ public final class Serve implements Task {
 
 
     @Override public void exec(final Mark mark) {
-        watch(mark);
-        serve(mark);
-    }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void watch(final Mark mark) {
-
-        final Path root=Paths.get("/");
-
-        final Thread daemon=new Thread(() -> mark.watch((kind, target) -> updates.offer(root
-
+        mark.watch((kind, target) -> updates.offer(Paths
+                .get("/")
                 .resolve(mark.target().relativize(target))
                 .toString()
                 .replace("/index.html", "/")
 
-        )));
-
-        daemon.setDaemon(true);
-        daemon.start();
-    }
-
-    private void serve(final Opts mark) {
+        ));
 
         final Thread daemon=new Thread(() -> {
             try {
@@ -137,7 +85,7 @@ public final class Serve implements Task {
 
                         .address(address)
 
-                        .delegate(context -> context
+                        .delegate(locator -> locator
 
                                 .set(logger(), () -> new MavenLogger(mark.logger()))
 

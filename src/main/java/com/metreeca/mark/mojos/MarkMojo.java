@@ -33,21 +33,21 @@ import java.util.function.Function;
  */
 public abstract class MarkMojo extends AbstractMojo implements Opts {
 
-    @Parameter(defaultValue="${project}", readonly=true)
+    @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
 
 
-    @Parameter(defaultValue="${project.basedir}/docs/", property="mark.source")
+    @Parameter(defaultValue = "${project.basedir}/docs/", property = "mark.source")
     private String source;
 
-    @Parameter(defaultValue="", property="mark.target")
+    @Parameter(defaultValue = "", property = "mark.target")
     private String target;
 
-    @Parameter(defaultValue="", property="mark.layout")
+    @Parameter(defaultValue = "", property = "mark.layout")
     private String layout;
 
 
-    @Parameter(defaultValue="false", property="mark.readme")
+    @Parameter(defaultValue = "false", property = "mark.readme")
     private boolean readme;
 
 
@@ -81,5 +81,32 @@ public abstract class MarkMojo extends AbstractMojo implements Opts {
 
 
     @Override public Log logger() { return getLog(); }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void setProject(final MavenProject project) {
+        this.project=project;
+    }
+
+    void setSource(final String source) {
+        this.source=source;
+    }
+
+    void setTarget(final String target) {
+        this.target=target;
+    }
+
+    void setLayout(final String layout) {
+        this.layout=layout;
+    }
+
+    void setReadme(final boolean readme) {
+        this.readme=readme;
+    }
+
+    void setOptions(final Map<String, String> options) {
+        this.options=options;
+    }
 
 }

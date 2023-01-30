@@ -29,7 +29,7 @@ public final class File {
 
 	private final Path path;
 	private final Map<String, Object> model;
-	private final BiConsumer<Path, Map<String, Object>> render;
+	private final BiConsumer<Path, Map<String, Object>> processor;
 
 
 	/**
@@ -38,7 +38,8 @@ public final class File {
 	 * @param processor
 	 */
 	public File(final Path path, final Map<String, Object> model,
-			final BiConsumer<Path, Map<String, Object>> processor) {
+			final BiConsumer<Path, Map<String, Object>> processor
+	) {
 
 		if ( path == null ) {
 			throw new NullPointerException("null path");
@@ -54,7 +55,7 @@ public final class File {
 
 		this.path=path;
 		this.model=unmodifiableMap(model);
-		this.render=processor;
+		this.processor=processor;
 	}
 
 
@@ -67,7 +68,7 @@ public final class File {
 	}
 
 	public BiConsumer<Path, Map<String, Object>> process() {
-		return render;
+		return processor;
 	}
 
 }
