@@ -102,10 +102,13 @@ public final class Markdown {
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
 				.set(HtmlRenderer.HEADER_ID_GENERATOR_RESOLVE_DUPES, true)
 
-				.set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
+				.set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB);
 
-				.set(SmartLinks, mark.option(SmartLinks.getName(), Boolean::parseBoolean))
-				.set(ExternalLinks, mark.option(ExternalLinks.getName(), Boolean::parseBoolean));
+		Optional.ofNullable(mark.option(SmartLinks.getName(), Boolean::parseBoolean))
+				.ifPresent(option -> options.set(SmartLinks, option));
+
+		Optional.ofNullable(mark.option(ExternalLinks.getName(), Boolean::parseBoolean))
+				.ifPresent(option -> options.set(ExternalLinks, option));
 
 		this.parsers=Parser.builder(options);
 		this.renderers=HtmlRenderer.builder(options);
