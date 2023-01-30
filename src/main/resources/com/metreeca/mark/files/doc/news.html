@@ -1,0 +1,156 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright © 2019-2023 Metreeca srl
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>oroboro &gt;
+            news</title>
+        <link rel="stylesheet" type="text/css" href="style/default.css">
+    </head>
+    <body><a name="@top"></a>
+        <div class="header links">
+            <address><a href="http://www.oroboro.net/">oroboro</a></address>
+            <ul>
+                <li><a href="about.html">about</a></li>
+                <li><a href="tutorial.html">tutorial</a></li>
+                <li><a href="handbook.html">handbook</a></li>
+                <li><a href="api/index.html">api</a></li>
+                <li><a href="http://code.google.com/p/oroboro/downloads/list">downloads</a></li>
+                <li><a href="http://groups.google.com/group/oroboro-discuss">forum</a></li>
+                <li class="version"><a href="news.html#2011.03.10">v0.6 / 20110310</a></li>
+            </ul>
+        </div>
+        <div class="toc links"></div>
+        <div class="contents"><!--[if lt IE 8]>
+            <div class="note">Best viewed with <a
+                    href="http://www.microsoft.com/windows/internet-explorer/"
+            >Internet Explorer 8+</a>
+            </div>
+            <![endif]--><h1 class="side"><a name="2011.03.10"></a><strong>2011.03.10</strong></h1><p><strong>Version 0.6
+                Released</strong></p><p>This version refactors the abstract I/O framework and extends it with generalized
+                support for decoding from XML transform sources and encoding to XML transform results. It also addresses
+                residual conformance issues in the core RDF model and in URI-handling classes. A few incompatible changes
+                were introduced in the API, most notably the <code>net.oroboro.ttl</code> package was renamed to <code>net.oroboro.txt</code>
+                to reflect its actual content. Other noteworthy changes include:</p>
+            <dl>
+                <dt>Model</dt>
+            </dl>
+            <ul>
+                <li>Cleaned up and extended Node constructors and accessors.</li>
+                <li>Upgraded blank node identifiers to UUIDs.</li>
+                <li>Implemented <a href="api/net/oroboro/Graph.html#strict()">strict RDF</a> graph view.</li>
+                <li>Downgraded the return value of Graph.size() to an estimate.</li>
+                <li>Fixed canonicalization of RDF URI references.</li>
+                <li>Fixed Unicode normalization of RDF literals.</li>
+            </ul>
+            <dl>
+                <dt> Catalog</dt>
+            </dl>
+            <ul>
+                <li>Decoupled URI qualification, compaction and formatting in Catalog.</li>
+                <li>Added support for (safe) CURIEs in Catalog.compact()/.expand().</li>
+            </ul>
+            <dl>
+                <dt>Codecs</dt>
+            </dl>
+            <ul>
+                <li>Made encoders ignore generalized edges.</li>
+                <li>Migrated TTL/RDFEncoder to breadth-first subjects ordering.</li>
+            </ul>
+            <dl>
+                <dt>Datalog</dt>
+            </dl>
+            <ul>
+                <li>Added support for single quote strings.</li>
+                <li>Implemented item concatenation in sequence expressions.</li>
+                <li>Extended the runtime library with blank node constructors and additional XPath&nbsp;2.0 functions
+                    (boolean, lang, uri-to-iri, iri-to-uri, escape-html-uri, exists, empty, distinct-values).
+                </li>
+                <li>Fixed sequence to atomic unwrapping: now rejects non-singleton sequences.</li>
+                <li>Fixed XPath logical operators: now correctly handle sequence operands.</li>
+                <li>Fixed XSDString.promote(): now accepts tagged literals.</li>
+            </ul>
+            <h1 class="side"><a name="2011.02.10"></a><strong>2011.02.10</strong></h1><p><strong>Version 0.5
+                Released</strong></p><p>This release expands and consolidates the runtime support for core XSD datatypes
+                and related XPath 2.0 functions and operators. XSD constructor, casting and promotion methods were
+                reviewed and completed. XPath functions for numerics and strings were implemented and aggregate functions
+                were aligned to the XPath specs. The reference documentation was reorganized and extended with a
+                <a href="library.html">quick reference</a> for the runtime library. Other noteworthy changes include:</p>
+            <ul>
+                <li>Made all XSD-related classes stictfp.</li>
+                <li>Added support for constructors, casts and promotions for custom datatypes.</li>
+                <li>Simplified the syntax for invoking aggregate functions in Datalog.</li>
+                <li>Added support for comments in JSONReader.</li>
+            </ul>
+            <h1 class="side"><a name="2010.12.07"></a><strong>2010.12.07</strong></h1><p><strong>Version
+                0.4</strong><strong> Released</strong></p><p>This release consolidates the Datalog language: Datalog and
+                Turtle decoders were decoupled and the Datalog grammar overhauled and simplified. The tutorial was
+                aligned to the updated grammar, which introduces some incompatible changes, to make naming and precedence
+                rules more consistent: most notably, the <code>select</code> clause and sequence modifiers were renamed
+                and clause labeling redefined to avoid ambiguities.</p><p>The package hierarchy was also simplified by
+                merging the Datalog support package into the core model and reorganizing I/O adapters into four packages
+                dedicated respectively to SAX-based transcribers, generic, Turtle and XML-based codecs. </p><p>Other
+                noteworthy changes include:</p>
+            <ul>
+                <li>Implemented <code>expand</code> and <code>create</code> queries (akin to SPARQL's
+                    <code>describe</code> and <code>construct</code>).
+                </li>
+                <li>Implemented the <code>exists</code> connective (akin to SPARQL's pattern)</li>
+                <li>Extended the XPath library implementation.</li>
+                <li>Fixed handling of unbound named variables in templates.</li>
+            </ul>
+            <h1 class="side"><a name="2010.11.17"></a><strong>2010.11.17</strong></h1><p><strong>Version
+                0.3</strong><strong> Released</strong></p><p>This release introduces Datalog-based
+                <a href="handbook.html#Reasoners">OWL reasoning</a> support: the <a href="handbook.html#OWL RL">OWL RL
+                    reasoner</a> implements the full OWL 2 RL/RDF rules axiomatization, while the
+                <a href="handbook.html#OWL%20Base">OWL Base reasoner</a> implements a basic axiomatization limited to
+                class/property hierarchies, transitive and symmetric properties and equality. Other noteworthy changes
+                include:</p>
+            <ul>
+                <li>Added graph updating to Engine.select()/verify().</li>
+                <li>Implemented Morpher.verify().</li>
+                <li>Added support for multi-origin programs in Morpher.select()/update().</li>
+                <li>Added output flushing to encoders.</li>
+                <li>Fixed Query.subjects().</li>
+                <li>Fixed handling of lists in Datalog clause templates.</li>
+                <li>Fixed handling of URI references in lists in Turtle and RDF encoders.</li>
+                <li>Fixed handling of default namespaces in RDF encoder.</li>
+            </ul>
+            <h1 class="side"><a name="2010.10.29"></a><strong>2010.10.29</strong></h1><p><strong>Version
+                0.2</strong><strong> Released</strong></p><p>This release improves the usability of the command-line
+                shell and extends its features. Constraints verification is now supported and the conversion/scripting
+                mode is fully functional and documented. Other noteworthy changes include:</p>
+            <ul>
+                <li>Added content-based format-guessing to AnyDecoder.</li>
+                <li>Improved catalog sharing and merging: default and duplicated namespace prefixes are now handled more
+                    intuitively.
+                </li>
+                <li>Implemented Datalog conditional expressions and substring functions.</li>
+                <li>Laid down support for custom type promotion and casting.</li>
+            </ul>
+            <h1 class="side"><a name="2010.10.11"></a><strong>2010.10.1</strong><strong>1</strong></h1><p><strong>Version
+                0.1 Released</strong></p><p>This is the initial public release. The code is fairly stable and reasonably
+                tested, even if some changes in the package structure and in the API should be expected until the first
+                release in the 1.x series. The Datalog engine is being actively improved, with the goal of formally
+                supporting OWL RL reasoning in the upcoming releases.</p></div>
+        <div class="footer links">
+            <a class="side" href="http://www.linkedin.com/in/alessandrobollini"><img src="http://www.linkedin.com/img/webpromo/btn_in_20x15.png" width="16" height="12" alt="Alessandro Bollini's LinkedIn profile"></a>
+            <div>Copyright &copy; 2010-2011 Alessandro Bollini</div>
+        </div>
+    </body>
+</html>

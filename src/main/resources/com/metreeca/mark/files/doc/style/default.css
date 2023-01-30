@@ -1,0 +1,141 @@
+/*
+ * Copyright © 2019-2023 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url("html.css");
+@import url("layout.css");
+
+body {
+    max-width: 50em;
+    margin-left: 12pc;
+    margin-right: 8pc;
+    padding-left: 1.5pc;
+    border-left-style: solid;
+    font-size: 3.75mm;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    line-height: 1.4;
+}
+
+.side, .toc, .header address {
+    float: left;
+    clear: left;
+    width: 10pc;
+    margin: 0 0 0 -12.5pc;
+    padding: 0;
+    text-align: right;
+}
+
+h1.side {
+    border: none;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+h1.side + * {
+    margin-top: 0;
+}
+
+.header {
+    padding-top: 3ex;
+    padding-bottom: 4ex;
+    font-weight: bold;
+}
+
+.header * {
+    margin: 0;
+    padding: 0;
+}
+
+.header address a {
+    color: #000;
+}
+
+.header li {
+    display: inline;
+    margin-left: 0;
+    margin-right: 1em;
+    list-style-type: none;
+}
+
+.header li.selected a {
+    color: #000;
+}
+
+.header .version {
+    float: right;
+    margin: 0;
+}
+
+.header .version a {
+    font-size: 90%;
+}
+
+.links a {
+    color: #999;
+    text-decoration: none;
+}
+
+.links a:hover {
+    color: #000;
+    text-decoration: underline;
+}
+
+.toc .title {
+    margin-top: .5ex;
+    color: #999;
+    font-size: 110%;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+.toc h1, .toc h2, .toc h3 {
+    margin: 0;
+    border: none;
+    font-size: 100%;
+    line-height: 120%;
+}
+
+.toc h1 {
+    margin-top: 1.5ex;
+    margin-bottom: .75ex;
+}
+
+.toc h1 a {
+    color: #000;
+    font-weight: bold;
+}
+
+.toc h2 a {
+    color: #666;
+    font-weight: normal;
+}
+
+.toc h3 {
+    display: none;
+}
+
+.footer {
+    padding-bottom: .5ex;
+    color: #666;
+    text-transform: lowercase;
+    font-size: 90%;
+}
+
+.footer img {
+    position: relative;
+    top: 1px;
+    display: inline;
+    margin: 0;
+}

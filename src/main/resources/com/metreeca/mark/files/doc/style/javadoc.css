@@ -1,0 +1,150 @@
+/*
+ * Copyright © 2019-2023 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+body {
+    max-width: 60em;
+    color: #000;
+    background-color: #FFF;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 4mm;
+}
+
+h1 {
+    font-size: 140%
+}
+
+h2 {
+    font-size: 120%
+}
+
+h2 {
+    font-size: 110%
+}
+
+hr {
+    border: none;
+    border-bottom: solid 1px #CCC;
+}
+
+code, pre {
+    font-family: Monaco, "Andale Mono", monospace;
+    font-size: 80%;
+}
+
+a, a:visited {
+    color: #036;
+}
+
+table {
+    border-color: #999;
+    border-collapse: collapse;
+}
+
+table td, table th {
+    border-width: 1px;
+    border-color: #999;
+}
+
+table th {
+    font-weight: bold;
+    font-size: 80%;
+}
+
+p.note {
+    width: 100%;
+    margin-top: 1.5ex;
+    padding: 1.5ex 1em;
+    border-style: dotted;
+    border-width: 1px;
+    border-color: #F96;
+    font-style: italic;
+    background-color: #F8F8F8;
+}
+
+.version {
+    padding-top: .3ex;
+    font-size: 90%;
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Table colors */
+
+.TableHeadingColor {
+    background: #DDD;
+    color: #000;
+}
+
+.TableSubHeadingColor {
+    background: #EEE;
+    color: #000;
+}
+
+.TableRowColor {
+    background: #FFF;
+    color: #000
+}
+
+/* Font used in left-hand frame lists */
+
+.FrameTitleFont {
+    font-size: 100%;
+}
+
+.FrameHeadingFont {
+    font-size: 85%;
+}
+
+.FrameItemFont {
+    font-size: 85%;
+}
+
+/* Navigation bar fonts and colors */
+
+.NavBarCell1 a, .NavBarCell2 a, .NavBarCell3Rev a {
+    text-decoration: none;
+}
+
+.NavBarCell1 {
+    background-color: #FFF;
+    padding: .25ex 0;
+}
+
+.NavBarCell1Rev {
+    padding: .25ex 0;
+}
+
+.NavBarFont1 {
+    color: #999;
+    font-weight: bold;
+    padding: 0 .25em;
+}
+
+a .NavBarFont1 {
+    color: #036;
+}
+
+.NavBarFont1Rev {
+    color: #FFF;
+    background-color: #999;
+    padding: 0 .25em;
+}
+
+.NavBarCell2 {
+}
+
+.NavBarCell3 {
+}

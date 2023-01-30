@@ -1,0 +1,1276 @@
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright © 2019-2023 Metreeca srl
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>oroboro &gt;
+            vocabulary</title>
+        <link rel="stylesheet" type="text/css" href="style/vocabulary.css">
+        <link rel="stylesheet" type="text/css" href="style/default.css">
+    </head>
+    <body><a name="@top"></a>
+        <div class="header links">
+            <address><a href="http://www.oroboro.net/">oroboro</a></address>
+            <ul>
+                <li><a href="about.html">about</a></li>
+                <li><a href="tutorial.html">tutorial</a></li>
+                <li><a href="handbook.html">handbook</a></li>
+                <li><a href="api/index.html">api</a></li>
+                <li><a href="http://code.google.com/p/oroboro/downloads/list">downloads</a></li>
+                <li><a href="http://groups.google.com/group/oroboro-discuss">forum</a></li>
+                <li class="version"><a href="news.html#2011.03.10">v0.6 / 20110310</a></li>
+            </ul>
+        </div>
+        <div class="toc links">
+            <div class="title">vocabulary</div>
+            <h1><a href="#Classes">Classes</a></h1><h2 style="text-transform: none;">
+            <a href="#N65678" title="http://oroboro.net/schema/datalog#Assertion">Assertion</a></h2>
+            <h2 style="text-transform: none;">
+                <a href="#N65687" title="http://oroboro.net/schema/datalog#Assume">Assume</a></h2>
+            <h2 style="text-transform: none;"><a href="#N65708" title="http://oroboro.net/schema/datalog#Atom">Atom</a>
+            </h2><h2 style="text-transform: none;"><a href="#N65757" title="http://oroboro.net/schema/datalog#Atoms">Atoms</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></h2>
+            <h2 style="text-transform: none;">
+                <a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></h2>
+            <h2 style="text-transform: none;"><a href="#N65876" title="http://oroboro.net/schema/datalog#Conjunction">Conjunction</a>
+            </h2><h2 style="text-transform: none;"><a href="#N65885" title="http://oroboro.net/schema/datalog#Create">Create</a>
+        </h2><h2 style="text-transform: none;"><a href="#N65906" title="http://oroboro.net/schema/datalog#Disjunction">Disjunction</a>
+        </h2><h2 style="text-transform: none;"><a href="#N65915" title="http://oroboro.net/schema/datalog#Disposition">Disposition</a>
+        </h2><h2 style="text-transform: none;"><a href="#N65953" title="http://oroboro.net/schema/datalog#Evaluation">Evaluation</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66004" title="http://oroboro.net/schema/datalog#Exclusion">Exclusion</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N66013" title="http://oroboro.net/schema/datalog#Expand">Expand</a></h2>
+            <h2 style="text-transform: none;"><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a>
+            </h2><h2 style="text-transform: none;">
+            <a href="#N66039" title="http://oroboro.net/schema/datalog#Expressions">Expressions</a></h2>
+            <h2 style="text-transform: none;">
+                <a href="#N66072" title="http://oroboro.net/schema/datalog#Filter">Filter</a></h2>
+            <h2 style="text-transform: none;"><a href="#N66123" title="http://oroboro.net/schema/datalog#Implication">Implication</a>
+            </h2><h2 style="text-transform: none;"><a href="#N66132" title="http://oroboro.net/schema/datalog#Insert">Insert</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N66153" title="http://oroboro.net/schema/datalog#Lookup">Lookup</a></h2>
+            <h2 style="text-transform: none;"><a href="#N66174" title="http://oroboro.net/schema/datalog#Negation">Negation</a>
+            </h2><h2 style="text-transform: none;"><a href="#N66183" title="http://oroboro.net/schema/datalog#Option">Option</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66197" title="http://oroboro.net/schema/datalog#Patterns">Patterns</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66230" title="http://oroboro.net/schema/datalog#Primary">Primary</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66239" title="http://oroboro.net/schema/datalog#Projection">Projection</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66277" title="http://oroboro.net/schema/datalog#Reduction">Reduction</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N66286" title="http://oroboro.net/schema/datalog#Remove">Remove</a></h2>
+            <h2 style="text-transform: none;"><a href="#N66307" title="http://oroboro.net/schema/datalog#Resource">Resource</a>
+            </h2><h2 style="text-transform: none;"><a href="#N66312" title="http://oroboro.net/schema/datalog#Section">Section</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66379" title="http://oroboro.net/schema/datalog#Sequence">Sequence</a>
+        </h2><h2 style="text-transform: none;"><a href="#N66446" title="http://oroboro.net/schema/datalog#Terminal">Terminal</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N66468" title="http://oroboro.net/schema/datalog#Theory">Theory</a></h2>
+            <h2 style="text-transform: none;"><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a>
+            </h2><h2 style="text-transform: none;"><a href="#N66515" title="http://oroboro.net/schema/datalog#Verify">Verify</a>
+        </h2><h1><a href="#Object Properties">Properties</a></h1><h2 style="text-transform: none;">
+            <a href="#N65579" title="http://oroboro.net/schema/datalog#expression">expression</a></h2>
+            <h2 style="text-transform: none;"><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a>
+            </h2><h2 style="text-transform: none;"><a href="#N65631" title="http://oroboro.net/schema/datalog#length">length</a>
+        </h2><h2 style="text-transform: none;"><a href="#N65636" title="http://oroboro.net/schema/datalog#name">name</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N65589" title="http://oroboro.net/schema/datalog#object">object</a></h2>
+            <h2 style="text-transform: none;">
+                <a href="#N65646" title="http://oroboro.net/schema/datalog#offset">offset</a></h2>
+            <h2 style="text-transform: none;">
+                <a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a></h2>
+            <h2 style="text-transform: none;"><a href="#N65599" title="http://oroboro.net/schema/datalog#patterns">patterns</a>
+            </h2><h2 style="text-transform: none;"><a href="#N65604" title="http://oroboro.net/schema/datalog#predicate">predicate</a>
+        </h2><h2 style="text-transform: none;"><a href="#N65609" title="http://oroboro.net/schema/datalog#subject">subject</a>
+        </h2><h2 style="text-transform: none;">
+            <a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a></h2></div>
+        <div class="contents"><!--[if lt IE 8]>
+            <div class="note">Best viewed with <a
+                    href="http://www.microsoft.com/windows/internet-explorer/"
+            >Internet Explorer 8+</a>
+            </div>
+            <![endif]--><!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright © 2010-2011 Alessandro Bollini.
+
+  This file is part of the Oroboro RDF processing framework.
+
+  Oroboro is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published
+  by the Free Software Foundation, either version 3 of the License,
+  or (at your option) any later version.
+
+  Oroboro is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty
+  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Oroboro. If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+            <div>
+
+                <h1>Introduction</h1>
+
+                <div class="note">Work in progress. Likely to change in future releases.
+                </div>
+
+                <p>This reference defines the RDF vocabulary for the machine-readable syntax
+                    of the Datalog-like language supported by the Oroboro Java RDF
+                    processing framework.
+                </p>
+
+            </div>
+            <table class="outline">
+                <tr>
+                    <td colspan="2"><h1><a name="Prefixes"></a>Prefixes</h1>
+                        <table class="code layout">
+                            <tr>
+                                <th></th>
+                                <td><a href="http://oroboro.net/schema/datalog#">http://oroboro.net/schema/datalog#</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>owl</th>
+                                <td><a href="http://www.w3.org/2002/07/owl#">http://www.w3.org/2002/07/owl#</a></td>
+                            </tr>
+                            <tr>
+                                <th>rdf</th>
+                                <td><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#">http://www.w3.org/1999/02/22-rdf-syntax-ns#</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>rdfs</th>
+                                <td>
+                                    <a href="http://www.w3.org/2000/01/rdf-schema#">http://www.w3.org/2000/01/rdf-schema#</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><h1><a name="Classes"></a>Classes</h1>
+                        <div class="tree code">
+                            <div class="node">
+                                <span class="label"><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></span>
+                                <div class="children">
+                                    <div class="node">
+                                        <span class="label"><a href="#N65687" title="http://oroboro.net/schema/datalog#Assume">Assume</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N65885" title="http://oroboro.net/schema/datalog#Create">Create</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66013" title="http://oroboro.net/schema/datalog#Expand">Expand</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66132" title="http://oroboro.net/schema/datalog#Insert">Insert</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66153" title="http://oroboro.net/schema/datalog#Lookup">Lookup</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66286" title="http://oroboro.net/schema/datalog#Remove">Remove</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66515" title="http://oroboro.net/schema/datalog#Verify">Verify</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a></span>
+                                <div class="children">
+                                    <div class="node">
+                                        <span class="label"><a href="#N65953" title="http://oroboro.net/schema/datalog#Evaluation">Evaluation</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66379" title="http://oroboro.net/schema/datalog#Sequence">Sequence</a></span>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66446" title="http://oroboro.net/schema/datalog#Terminal">Terminal</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a></span>
+                                <div class="children">
+                                    <div class="node">
+                                        <span class="label"><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></span>
+                                        <div class="children">
+                                            <div class="node">
+                                                <span class="label"><a href="#N65876" title="http://oroboro.net/schema/datalog#Conjunction">Conjunction</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N65906" title="http://oroboro.net/schema/datalog#Disjunction">Disjunction</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66004" title="http://oroboro.net/schema/datalog#Exclusion">Exclusion</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66123" title="http://oroboro.net/schema/datalog#Implication">Implication</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66230" title="http://oroboro.net/schema/datalog#Primary">Primary</a></span>
+                                        <div class="children">
+                                            <div class="node">
+                                                <span class="label"><a href="#N65708" title="http://oroboro.net/schema/datalog#Atom">Atom</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66072" title="http://oroboro.net/schema/datalog#Filter">Filter</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="node">
+                                        <span class="label"><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></span>
+                                        <div class="children">
+                                            <div class="node">
+                                                <span class="label"><a href="#N65678" title="http://oroboro.net/schema/datalog#Assertion">Assertion</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N65915" title="http://oroboro.net/schema/datalog#Disposition">Disposition</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66174" title="http://oroboro.net/schema/datalog#Negation">Negation</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66183" title="http://oroboro.net/schema/datalog#Option">Option</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66239" title="http://oroboro.net/schema/datalog#Projection">Projection</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66277" title="http://oroboro.net/schema/datalog#Reduction">Reduction</a></span>
+                                            </div>
+                                            <div class="node">
+                                                <span class="label"><a href="#N66312" title="http://oroboro.net/schema/datalog#Section">Section</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N66307" title="http://oroboro.net/schema/datalog#Resource">Resource</a></span>
+                                <div class="children">
+                                    <div class="node">
+                                        <span class="label"><a href="#N66468" title="http://oroboro.net/schema/datalog#Theory">Theory</a></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><h1><a name="Object Properties"></a>Object Properties</h1>
+                        <div class="tree code">
+                            <div class="node">
+                                <span class="label"><a href="#N65579" title="http://oroboro.net/schema/datalog#expression">expression</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65589" title="http://oroboro.net/schema/datalog#object">object</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65599" title="http://oroboro.net/schema/datalog#patterns">patterns</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65604" title="http://oroboro.net/schema/datalog#predicate">predicate</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65609" title="http://oroboro.net/schema/datalog#subject">subject</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><h1><a name="Data Properties"></a>Data Properties</h1>
+                        <div class="tree code">
+                            <div class="node">
+                                <span class="label"><a href="#N65631" title="http://oroboro.net/schema/datalog#length">length</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65636" title="http://oroboro.net/schema/datalog#name">name</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65589" title="http://oroboro.net/schema/datalog#object">object</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65646" title="http://oroboro.net/schema/datalog#offset">offset</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65604" title="http://oroboro.net/schema/datalog#predicate">predicate</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65609" title="http://oroboro.net/schema/datalog#subject">subject</a></span>
+                            </div>
+                            <div class="node">
+                                <span class="label"><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65678" href="#@top"></a>Assertion</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Assertion</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65687" href="#@top"></a>Assume</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Assume</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65708" href="#@top"></a>Atom</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Atom</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66230" title="http://oroboro.net/schema/datalog#Primary">Primary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65757" href="#@top"></a>Atoms</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Atoms</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li>
+                                <a class="external" href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List" title="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">rdf:List</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65790" href="#@top"></a>Binary</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Binary</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65876" title="http://oroboro.net/schema/datalog#Conjunction">Conjunction</a>
+                            </li>
+                            <li><a href="#N65906" title="http://oroboro.net/schema/datalog#Disjunction">Disjunction</a>
+                            </li>
+                            <li><a href="#N66004" title="http://oroboro.net/schema/datalog#Exclusion">Exclusion</a></li>
+                            <li><a href="#N66123" title="http://oroboro.net/schema/datalog#Implication">Implication</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65599" title="http://oroboro.net/schema/datalog#patterns">patterns</a><span class="keyword"> only </span><a href="#N66197" title="http://oroboro.net/schema/datalog#Patterns">Patterns</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65599" title="http://oroboro.net/schema/datalog#patterns">patterns</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65828" href="#@top"></a>Clause</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Clause</td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65687" title="http://oroboro.net/schema/datalog#Assume">Assume</a></li>
+                            <li><a href="#N65885" title="http://oroboro.net/schema/datalog#Create">Create</a></li>
+                            <li><a href="#N66013" title="http://oroboro.net/schema/datalog#Expand">Expand</a></li>
+                            <li><a href="#N66132" title="http://oroboro.net/schema/datalog#Insert">Insert</a></li>
+                            <li><a href="#N66153" title="http://oroboro.net/schema/datalog#Lookup">Lookup</a></li>
+                            <li><a href="#N66286" title="http://oroboro.net/schema/datalog#Remove">Remove</a></li>
+                            <li><a href="#N66515" title="http://oroboro.net/schema/datalog#Verify">Verify</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> only </span><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> max </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65876" href="#@top"></a>Conjunction</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Conjunction</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65885" href="#@top"></a>Create</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Create</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65906" href="#@top"></a>Disjunction</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Disjunction</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65915" href="#@top"></a>Disposition</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Disposition</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a><span class="keyword"> only </span><a href="#N66039" title="http://oroboro.net/schema/datalog#Expressions">Expressions</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65953" href="#@top"></a>Evaluation</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Evaluation</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a><span class="keyword"> only </span><a href="#N66039" title="http://oroboro.net/schema/datalog#Expressions">Expressions</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65584" title="http://oroboro.net/schema/datalog#expressions">expressions</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66004" href="#@top"></a>Exclusion</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Exclusion</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66013" href="#@top"></a>Expand</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Expand</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65579" href="#@top"></a>expression</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#expression</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66034" href="#@top"></a>Expression</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Expression</td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65953" title="http://oroboro.net/schema/datalog#Evaluation">Evaluation</a>
+                            </li>
+                            <li><a href="#N66379" title="http://oroboro.net/schema/datalog#Sequence">Sequence</a></li>
+                            <li><a href="#N66446" title="http://oroboro.net/schema/datalog#Terminal">Terminal</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65584" href="#@top"></a>expressions</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#expressions</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66039" href="#@top"></a>Expressions</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Expressions</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li>
+                                <a class="external" href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List" title="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">rdf:List</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66072" href="#@top"></a>Filter</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Filter</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66230" title="http://oroboro.net/schema/datalog#Primary">Primary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65579" title="http://oroboro.net/schema/datalog#expression">expression</a><span class="keyword"> only </span><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65579" title="http://oroboro.net/schema/datalog#expression">expression</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66123" href="#@top"></a>Implication</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Implication</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66132" href="#@top"></a>Insert</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Insert</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65631" href="#@top"></a>length</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#length</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66153" href="#@top"></a>Lookup</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Lookup</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65636" href="#@top"></a>name</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#name</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66174" href="#@top"></a>Negation</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Negation</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65589" href="#@top"></a>object</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#object</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65641" href="#@top"></a>object</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#object</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65646" href="#@top"></a>offset</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#offset</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66183" href="#@top"></a>Option</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Option</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65594" href="#@top"></a>pattern</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#pattern</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66192" href="#@top"></a>Pattern</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Pattern</td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65790" title="http://oroboro.net/schema/datalog#Binary">Binary</a></li>
+                            <li><a href="#N66230" title="http://oroboro.net/schema/datalog#Primary">Primary</a></li>
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65599" href="#@top"></a>patterns</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#patterns</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66197" href="#@top"></a>Patterns</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Patterns</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li>
+                                <a class="external" href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List" title="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">rdf:List</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65604" href="#@top"></a>predicate</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#predicate</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65651" href="#@top"></a>predicate</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#predicate</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66230" href="#@top"></a>Primary</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Primary</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65708" title="http://oroboro.net/schema/datalog#Atom">Atom</a></li>
+                            <li><a href="#N66072" title="http://oroboro.net/schema/datalog#Filter">Filter</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66239" href="#@top"></a>Projection</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Projection</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a><span class="keyword"> only </span><a class="external" href="http://www.w3.org/1999/02/22-rdf-syntax-ns#List" title="http://www.w3.org/1999/02/22-rdf-syntax-ns#List">rdf:List</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66277" href="#@top"></a>Reduction</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Reduction</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66286" href="#@top"></a>Remove</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Remove</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66307" href="#@top"></a>Resource</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Resource</td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66468" title="http://oroboro.net/schema/datalog#Theory">Theory</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66312" href="#@top"></a>Section</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Section</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66477" title="http://oroboro.net/schema/datalog#Unary">Unary</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66379" href="#@top"></a>Sequence</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Sequence</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> only </span><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> max </span>1<span class="keyword">)</span>
+                        </div>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a><span class="keyword"> only </span><a href="#N66039" title="http://oroboro.net/schema/datalog#Expressions">Expressions</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65614" title="http://oroboro.net/schema/datalog#target">target</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65609" href="#@top"></a>subject</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#subject</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65656" href="#@top"></a>subject</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#subject</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65614" href="#@top"></a>target</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Object Properties">Object Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#target</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N65661" href="#@top"></a>target</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>role</th>
+                    <td><a href="#Data Properties">Data Property</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#target</td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66446" href="#@top"></a>Terminal</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Terminal</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66034" title="http://oroboro.net/schema/datalog#Expression">Expression</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66468" href="#@top"></a>Theory</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Theory</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66307" title="http://oroboro.net/schema/datalog#Resource">Resource</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66477" href="#@top"></a>Unary</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Unary</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>superclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65678" title="http://oroboro.net/schema/datalog#Assertion">Assertion</a></li>
+                            <li><a href="#N65915" title="http://oroboro.net/schema/datalog#Disposition">Disposition</a>
+                            </li>
+                            <li><a href="#N66174" title="http://oroboro.net/schema/datalog#Negation">Negation</a></li>
+                            <li><a href="#N66183" title="http://oroboro.net/schema/datalog#Option">Option</a></li>
+                            <li><a href="#N66239" title="http://oroboro.net/schema/datalog#Projection">Projection</a>
+                            </li>
+                            <li><a href="#N66277" title="http://oroboro.net/schema/datalog#Reduction">Reduction</a></li>
+                            <li><a href="#N66312" title="http://oroboro.net/schema/datalog#Section">Section</a></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>implies</th>
+                    <td>
+                        <div>
+                            <span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> only </span><a href="#N66192" title="http://oroboro.net/schema/datalog#Pattern">Pattern</a><span class="keyword">)</span><span class="keyword"> and </span><span class="keyword">(</span><a href="#N65594" title="http://oroboro.net/schema/datalog#pattern">pattern</a><span class="keyword"> exactly </span>1<span class="keyword">)</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <h1 style="text-transform: none;"><a class="bookmark" name="N66515" href="#@top"></a>Verify</h1>
+            <table class="entity layout">
+                <tr>
+                    <th>type</th>
+                    <td><a href="#Classes">Class</a></td>
+                </tr>
+                <tr>
+                    <th>identifier</th>
+                    <td>http://oroboro.net/schema/datalog#Verify</td>
+                </tr>
+                <tr>
+                    <th>subclass of</th>
+                    <td>
+                        <ul class="compact">
+                            <li><a href="#N65828" title="http://oroboro.net/schema/datalog#Clause">Clause</a></li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer links">
+            <a class="side" href="http://www.linkedin.com/in/alessandrobollini"><img src="http://www.linkedin.com/img/webpromo/btn_in_20x15.png" width="16" height="12" alt="Alessandro Bollini's LinkedIn profile"></a>
+            <div>Copyright &copy; 2010-2011 Alessandro Bollini</div>
+        </div>
+    </body>
+</html>
