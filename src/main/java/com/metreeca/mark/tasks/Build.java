@@ -105,6 +105,20 @@ public final class Build implements Task {
 
         });
 
+        // copy bundled assets to target folder
+
+        try ( final Stream<Path> assets=mark.assets().values().stream() ) {
+
+            final long start=currentTimeMillis();
+            final long count=mark.process(assets).size();
+            final long stop=currentTimeMillis();
+
+            if ( count > 0 ) {
+                mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
+            }
+
+        }
+
         // process resources
 
         try ( final Stream<Path> sources=Files.walk(mark.source()) ) {
@@ -119,20 +133,6 @@ public final class Build implements Task {
 
         } catch ( final IOException e ) {
             throw new UncheckedIOException(e);
-        }
-
-        // copy bundled assets to target folder
-
-        try ( final Stream<Path> assets=mark.assets().values().stream() ) {
-
-            final long start=currentTimeMillis();
-            final long count=mark.process(assets).size();
-            final long stop=currentTimeMillis();
-
-            if ( count > 0 ) {
-                mark.logger().info(format("processed ‹%,d› files in ‹%,.3f› s", count, (stop-start)/1000.0f));
-            }
-
         }
 
     }
