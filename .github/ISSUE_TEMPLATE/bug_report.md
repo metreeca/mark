@@ -9,9 +9,8 @@ assignees: ""
 **environment**
 
 - metreeca/mark: *version*
-- maven: *version*
 - operating system: *name/version*
-- java vm: *vendor/version*
+- browser: *vendor/version*
 
 
 **steps to reproduce**
@@ -38,3 +37,8 @@ assignees: ""
 **notes**
 
 *Would you share any observation or additional context about the bug?*
+
+
+**screenshots /recordings**
+
+*Are you able to document the issue with screenshot and/or recordings?*

@@ -1,0 +1,468 @@
+/*
+ * Copyright © 2020-2024 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,500|Roboto+Mono:400);
+
+:root {
+
+    --color: #000;
+    --color-light: #999;
+
+    --background-color: #FFF;
+    --background-color-code: #F8F8F8;
+
+    --border-style: solid;
+    --border-color: #CCC;
+    --border-width: 1px;
+
+    color: var(--color);
+    background-color: var(--background-color);
+
+}
+
+
+/**** Fonts ***********************************************************************************************************/
+
+html {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14pt;
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+code, pre[class*=language-] {
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.9em;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}
+
+
+/**** Reset ***********************************************************************************************************/
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;
+    margin: 0;
+    padding: 0;
+    outline-style: none;
+    border-style: none;
+    border-radius: 0;
+    border-width: var(--border-width);
+    border-color: var(--border-color);
+    overflow: visible;
+    font-family: inherit;
+    font-style: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    background-color: inherit;
+}
+
+*:first-child {
+    margin-top: 0;
+}
+
+*:last-child {
+    margin-bottom: 0;
+}
+
+[hidden] {
+    display: none;
+}
+
+
+/**** Layout **********************************************************************************************************/
+
+html, body, body > * {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+
+/**** Headers *********************************************************************************************************/
+
+h1,
+h2,
+h3 {
+
+    clear: both;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+
+}
+
+h1 {
+    padding-bottom: 0.2em;
+    border-bottom-style: solid;
+    font-size: 150%;
+}
+
+h2 {
+    padding-bottom: 0.2em;
+    border-bottom-style: dotted;
+    font-size: 110%;
+}
+
+h3 {
+    font-size: 100%;
+}
+
+
+/**** Blocks **********************************************************************************************************/
+
+p {
+    margin-top: 0.75em;
+}
+
+blockquote {
+
+    margin-top: 1.5em;
+    padding-left: 1em;
+    padding-right: 0.5em;
+    border-left: solid 0.5em #EEE;
+    font-style: italic;
+
+    & + & {
+        margin-top: 0.5em;
+    }
+
+}
+
+pre {
+
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    white-space: pre;
+
+    & > code.hljs {
+
+        display: block;
+        padding: 0.75em 1em;
+        border-style: dotted;
+        border-radius: 0.5em;
+        overflow: auto;
+
+        white-space: pre-wrap;
+        text-align: left;
+        tab-size: 2;
+
+        font-size: 0.85em;
+
+        background-color: var(--background-color-code);
+    }
+
+}
+
+hr {
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border-top-style: solid;
+}
+
+
+/**** Lists ***********************************************************************************************************/
+
+dl, ul, ol {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+li > dl, li > ul, li > ol,
+dd > dl, dd > ul, dd > ol {
+    margin-left: 1em;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+    padding-left: 1.25em;
+}
+
+ul {
+    list-style-type: square;
+}
+
+ul.contains-task-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+ol {
+    list-style-type: decimal;
+}
+
+li {
+
+    margin-top: 0.1em;
+
+    & > p:first-child {
+        display: inline;
+    }
+
+}
+
+dt {
+
+    font-weight: bold;
+    font-size: 95%;
+
+    & > * + & {
+        margin-top: 1em;
+    }
+
+    & > * {
+        font-weight: inherit;
+    }
+
+}
+
+dd {
+    margin-top: 0.5em;
+}
+
+
+/**** Tables **********************************************************************************************************/
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 95%;
+}
+
+table tr > th:last-child {
+    width: 100%;
+}
+
+tr:nth-child(odd) > td {
+    background-color: #F8F8F8;
+}
+
+th,
+td {
+    padding: 0.5em 0.5em;
+    border-bottom-style: solid;
+    vertical-align: baseline;
+    text-align: start;
+}
+
+th {
+    white-space: pre;
+    font-weight: bold;
+}
+
+
+/**** Images **********************************************************************************************************/
+
+img {
+
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5em auto;
+
+    cursor: pointer;
+
+    &[src$='#25'] {
+        width: 25%;
+    }
+
+    &[src$='#33'] {
+        width: 33%;
+    }
+
+    &[src$='#50'] {
+        width: 50%;
+    }
+
+    &[src$='#66'] {
+        width: 66%;
+    }
+
+    &[src$='#75'] {
+        width: 75%;
+    }
+
+    &[src$='#left'] {
+        float: left;
+        max-width: 33%;
+        margin: 0 1.5em 1.5em 0;
+    }
+
+    &[src$='#right'] {
+        float: right;
+        max-width: 33%;
+        margin: 0 0 1.5em 1.5em;
+    }
+
+    &[active] {
+
+        z-index: 1000;
+
+        position: fixed;
+        left: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        bottom: 0 !important;
+
+        object-fit: contain;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+
+        margin: 0 !important;
+        padding: 1em !important;
+
+        background-color: rgb(0, 0, 0, 0.3);
+
+    }
+
+}
+
+
+/**** Panels **********************************************************************************************************/
+
+blockquote:has(> p:first-child > em:first-child),
+blockquote:has(> p:first-child > strong:first-child) {
+
+    position: relative;
+
+    padding: 0.75em 1em 0.75em 2.75em;
+    border-radius: 0.25em;
+
+    border-left: none;
+    font-style: normal;
+
+    &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: '';
+        width: 1em;
+        height: 1em;
+        transform: scale(1.2) translate(0.75em, 0.75em);
+    }
+
+    & > p:first-child > em:first-child,
+    & > p:first-child > strong:first-child {
+        display: none;
+    }
+
+    &:has(> p:first-child > em:first-child) {
+
+        background-color: #EAF1FD;
+
+        &::before {
+            background-color: #3C78F4;
+            mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2IDUxMkEyNTYgMjU2IDAgMSAwIDI1NiAwYTI1NiAyNTYgMCAxIDAgMCA1MTJ6TTIxNiAzMzZoMjRWMjcySDIxNmMtMTMuMyAwLTI0LTEwLjctMjQtMjRzMTAuNy0yNCAyNC0yNGg0OGMxMy4zIDAgMjQgMTAuNyAyNCAyNHY4OGg4YzEzLjMgMCAyNCAxMC43IDI0IDI0cy0xMC43IDI0LTI0IDI0SDIxNmMtMTMuMyAwLTI0LTEwLjctMjQtMjRzMTAuNy0yNCAyNC0yNHptNDAtMjA4YTMyIDMyIDAgMSAxIDAgNjQgMzIgMzIgMCAxIDEgMC02NHoiLz48L3N2Zz4=");
+        }
+
+    }
+
+    &:has(> p:first-child > strong:first-child) {
+
+        background-color: #FEf7D9;
+
+        &::before {
+            background-color: #D6702F;
+            mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2IDMyYzE0LjIgMCAyNy4zIDcuNSAzNC41IDE5LjhsMjE2IDM2OGM3LjMgMTIuNCA3LjMgMjcuNyAuMiA0MC4xUzQ4Ni4zIDQ4MCA0NzIgNDgwSDQwYy0xNC4zIDAtMjcuNi03LjctMzQuNy0yMC4xcy03LTI3LjggLjItNDAuMWwyMTYtMzY4QzIyOC43IDM5LjUgMjQxLjggMzIgMjU2IDMyem0wIDEyOGMtMTMuMyAwLTI0IDEwLjctMjQgMjRWMjk2YzAgMTMuMyAxMC43IDI0IDI0IDI0czI0LTEwLjcgMjQtMjRWMTg0YzAtMTMuMy0xMC43LTI0LTI0LTI0em0zMiAyMjRhMzIgMzIgMCAxIDAgLTY0IDAgMzIgMzIgMCAxIDAgNjQgMHoiLz48L3N2Zz4=");
+        }
+
+    }
+
+}
+
+
+/**** Text ************************************************************************************************************/
+
+strong {
+    font-weight: bold;
+}
+
+em {
+    font-style: italic;
+}
+
+code:not(.hljs) {
+    padding: 0 0.3em;
+    border-radius: 0.25em;
+    white-space: nowrap;
+    background-color: var(--background-color-code);
+}
+
+abbr {
+    text-transform: none;
+    white-space: pre;
+}
+
+
+/**** Links ***********************************************************************************************************/
+
+a, a:visited {
+
+    text-decoration: none;
+    font-weight: bold;
+    color: #678;
+    cursor: pointer;
+
+    & > img:only-child {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+        vertical-align: middle;
+    }
+
+}
+
+a:hover, button:active {
+    color: #C30 !important;
+    border-color: #C30 !important;
+}
+
+a[href^=http]:not(:empty):not(:has(:only-child)):after { /* external link */
+    content: "⌝";
+    margin-left: 0.1em;
+    vertical-align: 5%;
+    font-size: 90%;
+}
+
+
+/**** Controls ********************************************************************************************************/
+
+button {
+    background-color: transparent;
+    cursor: pointer;
+}
+
+
+/**** Icons ***********************************************************************************************************/
+
+.lucide {
+    display: block;
+    width: 1em;
+    height: 1em;
+}

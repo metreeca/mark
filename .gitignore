@@ -1,10 +1,10 @@
 /.idea/
 /.vscode/
 
-/target/
-/mark-maven-plugin.*
+/node_modules/
+/dist/
 
-pom-flattened.xml
+/mark.*
 
 *~
 ~*
