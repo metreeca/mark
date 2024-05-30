@@ -2,8 +2,6 @@ Metreeca/Mark is a minimalist reader for static Markdown document sites. It does
 site layouts or release-time static site generation: just throw in a couple of Markdown pages and let the reader take
 care of the details…
 
-[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
-
 # Usage
 
 ## Create Content
@@ -43,16 +41,16 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-        <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
+        <link rel="home" href="/mark/"> <!-- define if deployed to a subfolder -->
 
         <link rel="icon" type="image/svg+xml"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.svg"/>
+                href="https://cdn.jsdelivr.net/gh/metreeca/mark/dist/index.svg">
 
         <link rel="stylesheet" type="text/css"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.css">
+                href="https://cdn.jsdelivr.net/gh/metreeca/mark/dist/index.css">
 
         <script type="module"
-                src="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.js"></script>
+                src="https://cdn.jsdelivr.net/gh/metreeca/mark/dist/index.js"></script>
 
     </head>
 
