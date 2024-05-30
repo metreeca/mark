@@ -1,27 +1,7 @@
 {
+  "private": true,
   "type": "module",
   "name": "@metreeca/mark",
-  "version": "0.10.3",
-  "description": "A minimalist markdown document reader.",
-  "keywords": [
-    "markdown",
-    "docs",
-    "gh-pages"
-  ],
-  "homepage": "https://github.com/metreeca/mark",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/metreeca/mark.git"
-  },
-  "bugs": {
-    "url": "https://github.com/metreeca/mark/issues"
-  },
-  "license": "Apache-2.0",
-  "author": {
-    "name": "Metreeca",
-    "email": "info@metreeca.com",
-    "url": "https://www.metreeca.com/"
-  },
   "scripts": {
     "clean": "rm -rf node_modules dist",
     "setup": "npm install",

@@ -20,6 +20,8 @@
 
     --color: #000;
     --color-light: #999;
+    --color-lite: #DE5100;
+    --color-dark: #3A4654;
 
     --background-color: #FFF;
     --background-color-code: #F8F8F8;
@@ -27,6 +29,8 @@
     --border-style: solid;
     --border-color: #CCC;
     --border-width: 1px;
+
+    --loader-size: 5vmin;
 
     color: var(--color);
     background-color: var(--background-color);
@@ -465,4 +469,52 @@ button {
     display: block;
     width: 1em;
     height: 1em;
+}
+
+
+/**** Loader ***********************************************************************************************************/
+
+body:empty {
+
+    animation: loader-rotate 2s infinite linear;
+
+    &::before,
+    &::after {
+        content: '';
+        display: inline-block;
+        position: absolute;
+        top: calc(50% - var(--loader-size) / 2);
+        width: var(--loader-size);
+        height: var(--loader-size);
+        border-radius: 100%;
+        animation: loader-bounce 2s infinite ease-in-out;
+    }
+
+    &::before {
+        right: calc(50% + 1px);
+        background-color: var(--color-lite);
+    }
+
+    &::after {
+        left: calc(50% + 1px);
+        background-color: var(--color-dark);
+        animation-delay: -1s;
+    }
+
+}
+
+
+@keyframes loader-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes loader-bounce {
+    0%, 100% {
+        transform: scale(0.5);
+    }
+    50% {
+        transform: scale(1.5);
+    }
 }
