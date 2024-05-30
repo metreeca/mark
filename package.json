@@ -1,11 +1,18 @@
 {
-  "private": true,
   "type": "module",
   "name": "@metreeca/mark",
-  "version": "0.10.0",
+  "version": "0.10.3",
   "description": "A minimalist markdown document reader.",
+  "keywords": [
+    "markdown",
+    "docs",
+    "gh-pages"
+  ],
   "homepage": "https://github.com/metreeca/mark",
-  "repository": "github:metreeca/mark",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metreeca/mark.git"
+  },
   "bugs": {
     "url": "https://github.com/metreeca/mark/issues"
   },
@@ -19,8 +26,8 @@
     "clean": "rm -rf node_modules dist",
     "setup": "npm install",
     "start": "vite --open",
-    "build": "vite build",
-    "issue": "npm run build && npm --prefix dist --access public publish"
+    "build": "vite build && node package.js",
+    "issue": "npm run build && npm publish ./dist"
   },
   "dependencies": {
     "react": "^18.3.1",
