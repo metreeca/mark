@@ -20,16 +20,11 @@ mark-page {
 
     display: flex;
     align-items: stretch;
-    justify-content: center;
 
     width: 100%;
     height: 100%;
 
     & > * {
-
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
 
         & > * {
             padding-left: 1.25rem;
@@ -37,8 +32,6 @@ mark-page {
         }
 
         & > header {
-
-            z-index: 1;
 
             display: flex;
             flex-direction: row;
@@ -80,6 +73,8 @@ mark-page {
     & > nav {
 
         & > header {
+
+            z-index: 2;
 
             position: sticky;
             top: 0;
@@ -178,6 +173,8 @@ mark-page {
 
         & > header {
 
+            z-index: 1;
+
             text-transform: lowercase;
 
             & > * {
@@ -226,7 +223,6 @@ mark-page {
             display: none;
         }
 
-
         & > * {
             display: contents;
         }
@@ -254,6 +250,11 @@ mark-page {
         flex-direction: row;
 
         & > * {
+
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
             overflow-y: auto;
         }
 
