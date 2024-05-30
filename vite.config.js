@@ -48,6 +48,7 @@ export default defineConfig(({mode}) => ({ // https://vitejs.dev/config/
         assetsDir: ".",
         emptyOutDir: true,
         minify: mode !== "development",
+        chunkSizeWarningLimit: 1024,
 
         rollupOptions: {
             output: {

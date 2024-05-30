@@ -26,8 +26,7 @@
     "clean": "rm -rf node_modules dist",
     "setup": "npm install",
     "start": "vite --open",
-    "build": "vite build && node package.js",
-    "issue": "npm run build && npm publish ./dist"
+    "build": "vite build"
   },
   "dependencies": {
     "react": "^18.3.1",
