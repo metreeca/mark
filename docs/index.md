@@ -65,7 +65,7 @@ The loader will dynamically load Markdown content as inferred from the current U
 | https://example.com/folder/  | https://example.com/folder/index.md |
 | https://example.com/document | https://example.com/document.md	    |
 
-Internal Markdown links in the *Content*format are automatically rewritten to the corresponding *URL*format.
+Internal Markdown links in the *Content* format are automatically rewritten to the corresponding *URL* format.
 
 # Support
 
