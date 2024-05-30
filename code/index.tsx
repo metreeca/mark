@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
+import MarkFile from "@metreeca/mark/nests/file";
+import MarkPage from "@metreeca/mark/tiles/page";
 import * as React from "react";
-import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
-
-const MarkFile=lazy(() => import("@metreeca/mark/nests/file"));
-const MarkPage=lazy(() => import("@metreeca/mark/tiles/page"));
 
 createRoot(document.body.appendChild(document.createElement("mark-root"))).render((
 
 	<React.StrictMode>
 
-		<Suspense>
+		<MarkFile>{file =>
 
-			<MarkFile>{file =>
+			<MarkPage>{file}</MarkPage>
 
-				<Suspense>
-
-					<MarkPage>{file}</MarkPage>
-
-				</Suspense>
-
-			}</MarkFile>
-
-		</Suspense>
+		}</MarkFile>
 
 	</React.StrictMode>
 
