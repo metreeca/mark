@@ -14,6 +14,8 @@ and related content.
 Define a HTML file to be served by your deployment environment as fallback content for unknown routes. For GitHub Pages
 that would be a `404.html` file in the root of your source branch/folder.
 
+> **⚠️** When deploying to GitHub Pages, make sure to include a `.nojekyll` file.
+
 Include a `head`element according to the following (all `meta`/`link`elements are optional).
 
 ```html
