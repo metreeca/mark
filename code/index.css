@@ -141,7 +141,7 @@ p {
 
 blockquote {
 
-    margin-top: 1.5em;
+    margin-top: 1em;
     padding-left: 1em;
     padding-right: 0.5em;
     border-left: solid 0.5em #EEE;
@@ -167,7 +167,6 @@ pre {
         border-radius: 0.5em;
         overflow: auto;
 
-        white-space: pre-wrap;
         text-align: left;
         tab-size: 2;
 
@@ -250,11 +249,13 @@ dd {
 /**** Tables **********************************************************************************************************/
 
 table {
+    display: block; /* enable horizontal scrolling */
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
     margin-bottom: 1em;
     font-size: 95%;
+    overflow-x: auto;
 }
 
 table tr > th:last-child {

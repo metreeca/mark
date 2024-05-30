@@ -31,8 +31,6 @@ mark-page {
         flex-direction: column;
         align-items: stretch;
 
-        overflow-y: auto;
-
         & > * {
             padding-left: 1.25rem;
             padding-right: 1.25rem;
@@ -56,12 +54,9 @@ mark-page {
 
             box-shadow: 0 0 0.75rem 0.75rem var(--background-color);
 
-
         }
 
         & > section {
-
-            flex-grow: 1;
 
             padding-top: 2rem;
             padding-bottom: 1rem;
@@ -69,6 +64,8 @@ mark-page {
         }
 
         & > footer {
+
+            margin-top: auto;
 
             padding-top: 0.75rem;
             padding-bottom: 0.75rem;
@@ -81,8 +78,6 @@ mark-page {
     }
 
     & > nav {
-
-        overflow: visible; /* project scrolling shadow */
 
         & > header {
 
@@ -181,9 +176,6 @@ mark-page {
 
     & > main {
 
-        flex-shrink: 1;
-        flex-grow: 1;
-
         & > header {
 
             text-transform: lowercase;
@@ -227,6 +219,7 @@ mark-page {
     @media screen and (width < 960px) {
 
         flex-direction: column;
+        overflow-y: auto;
 
         &:not(.tray) > nav > :not(header),
         &.tray > main {
@@ -235,7 +228,7 @@ mark-page {
 
 
         & > * {
-            flex-grow: 1;
+            display: contents;
         }
 
         & > main {
@@ -260,6 +253,10 @@ mark-page {
 
         flex-direction: row;
 
+        & > * {
+            overflow-y: auto;
+        }
+
         & > nav {
 
             & > * {
@@ -277,6 +274,9 @@ mark-page {
         }
 
         & > main {
+
+            flex-shrink: 1;
+            flex-grow: 1;
 
             & > * {
                 max-width: 50rem;
