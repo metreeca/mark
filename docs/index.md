@@ -44,10 +44,15 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
         <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
-        <link rel="icon" href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.svg" type="image/svg+xml"/>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.css" type="text/css">
 
-        <script src="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.js" type="module"></script>
+        <link rel="icon" type="image/svg+xml"
+                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.svg"/>
+
+        <link rel="stylesheet" type="text/css"
+                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.css">
+
+        <script type="module"
+                src="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.js"></script>
 
     </head>
 
