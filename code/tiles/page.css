@@ -252,6 +252,7 @@ mark-page {
 
             & > header {
                 padding-top: 0.5rem;
+                line-height: 1.25;
             }
 
             & > section {

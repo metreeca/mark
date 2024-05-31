@@ -159,6 +159,10 @@ pre {
     margin-bottom: 1.5em;
     white-space: pre;
 
+    & + & {
+        margin-top: -0.75em;
+    }
+
     & > code:only-child {
 
         display: block;
