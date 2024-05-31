@@ -1,14 +1,13 @@
 {
   "type": "module",
   "name": "@metreeca/mark",
-  "version": "0.10.6",
+  "version": "0.10.7",
   "description": "A minimalist markdown document reader.",
   "keywords": [
     "markdown",
     "docs",
     "gh-pages"
   ],
-  "homepage": "https://metreeca.github.io/mark/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/metreeca/mark.git"

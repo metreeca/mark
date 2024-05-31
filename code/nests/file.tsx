@@ -27,8 +27,6 @@ const Meta: Meta={
 	version: meta("version"),
 
 	creator: meta("creator"),
-	publisher: meta("publisher"),
-
 	copyright: meta("copyright"),
 	license: meta("license"),
 	licenseURI: meta("license:uri"),
@@ -54,11 +52,9 @@ function meta(name: string) {
 function sections() {
 
 	const home=link("home")?.replace(/\/?$/, "/") ?? "/";
-	const text=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
+	const json=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
 
-	const json=text ? JSON.parse(text) : undefined;
-
-	const sections=Object.entries(json).reduce((sections, [label, link]) => {
+	const sections=Object.entries(json ? JSON.parse(json) : {}).reduce((sections, [label, link]) => {
 
 		return typeof link === "string"
 			? { ...sections, [label]: link.replace(/^\//, home) }
@@ -82,8 +78,6 @@ export interface Meta {
 	readonly description?: string;
 
 	readonly creator?: string;
-	readonly publisher?: string;
-
 	readonly copyright?: string;
 	readonly license?: string;
 	readonly licenseURI?: string;

@@ -159,6 +159,10 @@ pre {
     margin-bottom: 1.5em;
     white-space: pre;
 
+    & + & {
+        margin-top: -0.75em;
+    }
+
     & > code:only-child {
 
         display: block;
@@ -179,6 +183,8 @@ pre {
 }
 
 hr {
+
+    width: 100%;
 
     margin-top: 1em;
     margin-bottom: 1em;
