@@ -180,6 +180,8 @@ pre {
 
 hr {
 
+    width: 100%;
+
     margin-top: 1em;
     margin-bottom: 1em;
     border-top-style: solid;

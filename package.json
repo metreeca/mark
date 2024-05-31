@@ -8,7 +8,6 @@
     "docs",
     "gh-pages"
   ],
-  "homepage": "https://metreeca.github.io/mark/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/metreeca/mark.git"

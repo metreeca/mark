@@ -16,7 +16,7 @@
 
 import { File } from "@metreeca/mark/nests/file";
 import MarkDown from "@metreeca/mark/tiles/down";
-import { Ban, Github, HeartCrack, Home, Lock, Menu, RefreshCw, Stethoscope, X } from "lucide-react";
+import { Ban, Github, HeartCrack, Lock, Menu, RefreshCw, Stethoscope, X } from "lucide-react";
 import React, { createElement, useState } from "react";
 import "./page.css";
 
@@ -35,8 +35,6 @@ export default function MarkPage({
 		description,
 
 		creator,
-		publisher,
-
 		copyright,
 		license,
 		licenseURI,
@@ -87,18 +85,12 @@ export default function MarkPage({
 
 			<section>
 
-				<div>
-
-					{version && <span>v{version}</span>}
-
-					{publisher?.match(/^\w+:/) && <a href={publisher}>{
-						publisher.startsWith("https://github.com/") ? <Github/> : <Home/>
-					}</a>}
-
-				</div>
+				{version && <span>v{version.replace(/^v/, "")}</span>}
 
 				{Object.entries(sections ?? {}).map(([label, link]) =>
-					<h1 key={link}><a href={link}>{label}</a></h1>
+					link.startsWith("https://github.com/")
+						? <a key={link} href={link} title={label}>{<Github/>}</a>
+						: <a key={link} href={link}>{label}</a>
 				)}
 
 				<hr/>

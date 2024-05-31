@@ -27,8 +27,6 @@ const Meta: Meta={
 	version: meta("version"),
 
 	creator: meta("creator"),
-	publisher: meta("publisher"),
-
 	copyright: meta("copyright"),
 	license: meta("license"),
 	licenseURI: meta("license:uri"),
@@ -80,8 +78,6 @@ export interface Meta {
 	readonly description?: string;
 
 	readonly creator?: string;
-	readonly publisher?: string;
-
 	readonly copyright?: string;
 	readonly license?: string;
 	readonly licenseURI?: string;

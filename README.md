@@ -4,12 +4,14 @@ care of the details…
 
 [![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
 
+
 # Usage
 
 ## Create Content
 
-Create Markdown content using your favourite editor. Make sure to use relative links to refer to images
-and related content.
+Create Markdown content using your favourite editor.
+
+Make sure to use relative links to refer to images and related content.
 
 ## Define a Loader
 
@@ -33,8 +35,6 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <meta name="description" content="A minimalist Markdown document reader">
 
         <meta name="creator" content="https://www.metreeca.com/">
-        <meta name="publisher" content="https://github.com/metreeca/mark">
-
         <meta name="copyright" content="&copy; 2020-2024 Metreeca">
         <meta name="license" content="Creative Commons BY-NC-SA 4.0 License">
         <meta name="license:uri" content="https://creativecommons.org/licenses/by-nc-sa/4.0/">
@@ -45,7 +45,13 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-        <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
+
+        <!-- define if deployed to a subfolder -->
+
+        <link rel="home" href="/mark/"/>
+
+
+        <!-- `@{major}` and `@{major.minor}`) version ranges also supported -->
 
         <link rel="icon" type="image/svg+xml"
                 href="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.svg"/>
@@ -55,15 +61,27 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
 
         <script type="module"
                 src="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.js"></script>
-        
-        <!-- `@{major}` and `@{major.minor}`) version ranges also supported -->
+
+
+        <!-- include to define top-level navigation links in the sidebar -->
+
+        <script type="application/json">
+
+            {
+                 "Tutorials": "/tutorials/",
+                 "How-To": "/how-to/",
+                 "Github": "https://github.com/metreeca/mark"
+            }
+
+        </script>
 
     </head>
 
 </html>
 ```
 
-The loader will dynamically load Markdown content as inferred from the current URL according to the following patterns:
+The loader will dynamically retrieve and render Markdown content as inferred from the current URL according to the
+following patterns:
 
 | URL						                    | Content							                      |
 |------------------------------|-------------------------------------|
