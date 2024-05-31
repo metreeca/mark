@@ -26,7 +26,7 @@ const out = resolve(process.env.out || "dist");
 export default defineConfig(({mode}) => ({ // https://vitejs.dev/config/
 
     root: resolve(src),
-    publicDir: mode === "development" && resolve(etc),
+    publicDir: resolve(etc),
 
     plugins: [react()],
 
@@ -47,7 +47,9 @@ export default defineConfig(({mode}) => ({ // https://vitejs.dev/config/
         outDir: out,
         assetsDir: ".",
         emptyOutDir: true,
+        copyPublicDir: false,
         minify: mode !== "development",
+
         chunkSizeWarningLimit: 1024,
 
         rollupOptions: {

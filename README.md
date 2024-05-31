@@ -8,13 +8,15 @@ care of the details…
 
 ## Create Content
 
-Create [Markdown](./sampler/) content using your favourite editor. Make sure to use relative links to refer to images
+Create Markdown content using your favourite editor. Make sure to use relative links to refer to images
 and related content.
 
 ## Define a Loader
 
 Define a HTML file to be served by your deployment environment as fallback content for unknown routes. For GitHub Pages
 that would be a `404.html` file in the root of your source branch/folder.
+
+> **⚠️** When deploying to GitHub Pages, make sure to include a `.nojekyll` file.
 
 Include a `head`element according to the following (all `meta`/`link`elements are optional).
 
@@ -27,7 +29,7 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
 
         <title>Metreeca/Mark</title>
 
-        <meta name="version" content="0.10.0">
+        <meta name="version" content="${version}">
         <meta name="description" content="A minimalist Markdown document reader">
 
         <meta name="creator" content="https://www.metreeca.com/">
@@ -44,9 +46,17 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
         <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
-        <link rel="icon" href="/mark/index.svg" type="image/svg+xml"/>
 
-        <script src="https://cdn.jsdelivr.net/npm/@metreeca/mark@0/+esm"></script>
+        <link rel="icon" type="image/svg+xml"
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.svg"/>
+
+        <link rel="stylesheet" type="text/css"
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.css">
+
+        <script type="module"
+                src="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.js"></script>
+        
+        <!-- `@{major}` and `@{major.minor}`) version ranges also supported -->
 
     </head>
 
@@ -61,7 +71,7 @@ The loader will dynamically load Markdown content as inferred from the current U
 | https://example.com/folder/  | https://example.com/folder/index.md |
 | https://example.com/document | https://example.com/document.md	    |
 
-Internal Markdown links in the *Content*format are automatically rewritten to the corresponding *URL*format.
+Internal Markdown links in the *Content* format are automatically rewritten to the corresponding *URL* format.
 
 # Support
 
@@ -70,6 +80,5 @@ Internal Markdown links in the *Content*format are automatically rewritten to th
 
 # License
 
-This project is licensed under the Apache 2.0 License –
-see [LICENSE](https://github.com/metreeca/mark/blob/main/LICENSE)
-file for details.
+This project is licensed under the Apache 2.0 License – see
+[LICENSE](https://github.com/metreeca/mark/blob/main/LICENSE) file for details.

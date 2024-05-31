@@ -1,5 +1,5 @@
 ---
-title: "Markdown Format"
+title: "Quisque semper erat non dignissima porta"
 ---
 
 # Text
@@ -10,7 +10,7 @@ Text can be **bold**, _italic_ or `code` and can contain :warning: :information_
 
 - [external](https://example.com/)
     - https://example.com/
-- [internal](../index.md)
+- [internal](.)
     - [anchor](#tables)
 - [broken](broken.md)
 
@@ -45,6 +45,12 @@ final class Samples {
     }
 
 }
+```
+
+```
+* generic
+* source
+* code
 ```
 
 ## Rules
@@ -102,21 +108,18 @@ Quisque semper erat non dignissim porta. Donec non tincidunt.
 
 # Tables
 
-| Variable           | Value                 |
-|--------------------|-----------------------|
-| project.artifactId | ${project.artifactId} |
-| project.version    | ${project.version}    |
-| page.root          | ${page.root}          |
-| page.base          | ${page.base}          |
-| page.path          | ${page.path}          |
+| Variable                            | Value                                                                      |
+|-------------------------------------|----------------------------------------------------------------------------|
+| page.root                           | ${page.root}                                                               |
+| page.base                           | ${page.base}                                                               |
+| [links are not wrapped in tables]() | Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet |
 
 # Images
 
 ![Large Image](images/large.svg#75)
 
 ![Small Image](images/small.svg#right) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis
-ac
-ex. Nunc non sem vitae est blandit feugiat.
+ac ex. Nunc non sem vitae est blandit feugiat.
 
 # Panels
 
@@ -125,5 +128,4 @@ ex. Nunc non sem vitae est blandit feugiat.
 
 > **⚠️**
 > Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum, tortor felis
-> tincidunt
-> felis, at convallis lorem orci a lacus.
+> tincidunt felis, at convallis lorem orci a lacus.
