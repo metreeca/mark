@@ -54,11 +54,9 @@ function meta(name: string) {
 function sections() {
 
 	const home=link("home")?.replace(/\/?$/, "/") ?? "/";
-	const text=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
+	const json=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
 
-	const json=text ? JSON.parse(text) : undefined;
-
-	const sections=Object.entries(json).reduce((sections, [label, link]) => {
+	const sections=Object.entries(json ? JSON.parse(json) : {}).reduce((sections, [label, link]) => {
 
 		return typeof link === "string"
 			? { ...sections, [label]: link.replace(/^\//, home) }
