@@ -228,8 +228,22 @@ li {
 
     margin-top: 0.1em;
 
-    & > p:first-child {
-        display: inline;
+    & > p {
+
+        &:first-child {
+            display: inline;
+        }
+
+        &:not(:first-child) {
+
+            margin-top: 0.25em;
+
+            &:last-child {
+                margin-bottom: 0.75em;
+            }
+
+        }
+
     }
 
 }
