@@ -21,7 +21,7 @@ const Meta: Meta={
 
 	name: title(),
 	logo: link("icon"),
-	home: link("home"),
+	home: link("home")?.replace(/\/?$/, "/"),
 
 	description: meta("description"),
 	version: meta("version"),
@@ -53,6 +53,7 @@ function meta(name: string) {
 
 function sections() {
 
+	const home=link("home")?.replace(/\/?$/, "/") ?? "/";
 	const text=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
 
 	const json=text ? JSON.parse(text) : undefined;
@@ -60,12 +61,10 @@ function sections() {
 	const sections=Object.entries(json).reduce((sections, [label, link]) => {
 
 		return typeof link === "string"
-			? { ...sections, [label]: link }  // !!! absolute links
+			? { ...sections, [label]: link.replace(/^\//, home) }
 			: sections;
 
 	}, {});
-
-	console.log(sections);
 
 	return Object.keys(sections).length ? sections : undefined;
 }
