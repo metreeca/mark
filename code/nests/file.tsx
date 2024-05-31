@@ -31,7 +31,9 @@ const Meta: Meta={
 
 	copyright: meta("copyright"),
 	license: meta("license"),
-	licenseURI: meta("license:uri")
+	licenseURI: meta("license:uri"),
+
+	sections: sections()
 
 };
 
@@ -47,6 +49,27 @@ function link(rel: string) {
 function meta(name: string) {
 	return document.querySelector<HTMLMetaElement>(`meta[name='${name}']`)?.content || undefined;
 }
+
+
+function sections() {
+
+	const text=document.querySelector<HTMLScriptElement>(`script[type='application/json']`)?.text;
+
+	const json=text ? JSON.parse(text) : undefined;
+
+	const sections=Object.entries(json).reduce((sections, [label, link]) => {
+
+		return typeof link === "string"
+			? { ...sections, [label]: link }  // !!! absolute links
+			: sections;
+
+	}, {});
+
+	console.log(sections);
+
+	return Object.keys(sections).length ? sections : undefined;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +88,8 @@ export interface Meta {
 	readonly copyright?: string;
 	readonly license?: string;
 	readonly licenseURI?: string;
+
+	readonly sections?: { [label: string]: string };
 
 }
 

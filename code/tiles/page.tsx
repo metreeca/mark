@@ -41,6 +41,8 @@ export default function MarkPage({
 		license,
 		licenseURI,
 
+		sections,
+
 		path,
 		code,
 		text
@@ -54,7 +56,6 @@ export default function MarkPage({
 }) {
 
 	const [tray, setTray]=useState(false);
-
 
 	return createElement("mark-page", {
 
@@ -74,7 +75,13 @@ export default function MarkPage({
 
 				<a href={home || "/"}>{name}</a>
 
-				<button onClick={() => setTray(!tray)}>{tray ? <X/> : <Menu/>}</button>
+				<button onClick={e => {
+
+					e.currentTarget.closest("mark-page")?.scrollTo({ top: 0 });
+
+					setTray(!tray);
+
+				}}>{tray ? <X/> : <Menu/>}</button>
 
 			</header>
 
@@ -82,9 +89,7 @@ export default function MarkPage({
 
 				<div>
 
-					<span>v{version}</span>
-
-					{/* <button><Search/></button> */}
+					{version && <span>v{version}</span>}
 
 					{publisher?.match(/^\w+:/) && <a href={publisher}>{
 						publisher.startsWith("https://github.com/") ? <Github/> : <Home/>
@@ -92,6 +97,11 @@ export default function MarkPage({
 
 				</div>
 
+				{Object.entries(sections ?? {}).map(([label, link]) =>
+					<h1 key={link}><a href={link}>{label}</a></h1>
+				)}
+
+				<hr/>
 
 				<MarkDown meta={"toc"}>{text}</MarkDown>
 
@@ -100,8 +110,7 @@ export default function MarkPage({
 			<footer>
 
 				{logo && creator?.match(/^\w+:/)
-					?
-					<a className={"logo"} href={creator} title={creator} style={{ backgroundImage: `url("${logo}")` }}/>
+					? <a className={"logo"} href={creator} style={{ backgroundImage: `url("${logo}")` }}/>
 					: <span className={"logo"} style={{ backgroundImage: `url("${logo}")` }}/>
 				}
 

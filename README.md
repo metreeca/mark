@@ -48,13 +48,15 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
         <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
 
         <link rel="icon" type="image/svg+xml"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@${version}/dist/index.svg"/>
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.svg"/>
 
         <link rel="stylesheet" type="text/css"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@${version}/dist/index.css">
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.css">
 
         <script type="module"
-                src="https://cdn.jsdelivr.net/gh/metreeca/mark@${version}/dist/index.js"></script>
+                src="https://cdn.jsdelivr.net/npm/@metreeca/mark@${version}/dist/index.js"></script>
+        
+        <!-- `@{major}` and `@{major.minor}`) version ranges also supported -->
 
     </head>
 

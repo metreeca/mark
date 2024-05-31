@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@import url(https://fonts.googleapis.com/css?family=Roboto:300,500|Roboto+Mono:400);
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,500|Roboto+Mono:300);
 
 :root {
 
@@ -50,7 +50,7 @@ html {
 code, pre[class*=language-] {
     font-family: "Roboto Mono", monospace;
     font-size: 0.9em;
-    font-weight: 400;
+    font-weight: 300;
     line-height: 1.25;
     letter-spacing: -0.01em;
 }
@@ -119,17 +119,17 @@ h3 {
 h1 {
     padding-bottom: 0.2em;
     border-bottom-style: solid;
-    font-size: 150%;
+    font-size: 1.5em;
 }
 
 h2 {
     padding-bottom: 0.2em;
     border-bottom-style: dotted;
-    font-size: 110%;
+    font-size: 1.1em;
 }
 
 h3 {
-    font-size: 100%;
+    font-size: 1em
 }
 
 
@@ -159,7 +159,7 @@ pre {
     margin-bottom: 1.5em;
     white-space: pre;
 
-    & > code.hljs {
+    & > code:only-child {
 
         display: block;
         padding: 0.75em 1em;
@@ -167,6 +167,7 @@ pre {
         border-radius: 0.5em;
         overflow: auto;
 
+        white-space: pre;
         text-align: left;
         tab-size: 2;
 
@@ -178,9 +179,16 @@ pre {
 }
 
 hr {
+
     margin-top: 1em;
     margin-bottom: 1em;
     border-top-style: solid;
+
+    &:first-child,
+    &:last-child {
+        display: none;
+    }
+
 }
 
 
@@ -204,7 +212,7 @@ ul, ol {
 }
 
 ul {
-    list-style-type: square;
+    list-style-type: disc;
 }
 
 ul.contains-task-list {
@@ -258,7 +266,7 @@ table {
     overflow-x: auto;
 }
 
-table tr > th:last-child {
+tr > th:last-child {
     width: 100%;
 }
 
@@ -268,10 +276,16 @@ tr:nth-child(odd) > td {
 
 th,
 td {
+
     padding: 0.5em 0.5em;
     border-bottom-style: solid;
     vertical-align: baseline;
     text-align: start;
+
+    a {
+        white-space: nowrap;
+    }
+
 }
 
 th {
@@ -467,7 +481,7 @@ button {
 /**** Icons ***********************************************************************************************************/
 
 .lucide {
-    display: block;
+    display: inline-block;
     width: 1em;
     height: 1em;
 }
