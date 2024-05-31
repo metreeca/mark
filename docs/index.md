@@ -1,83 +1,127 @@
-Metreeca/Mark is a minimalist reader for static Markdown document sites. It doesn't require complex setups, specific
-site layouts or release-time static site generation: just throw in a couple of Markdown pages and let the reader take
-care of the details…
+---
+title: "A minimalist Markdown document reader"
+---
 
-[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
+# Text
 
-# Usage
+Text can be **bold**, _italic_ or `code` and can contain :warning: :information_source: .
 
-## Create Content
+## Links
 
-Create [Markdown](./sampler/) content using your favourite editor. Make sure to use relative links to refer to images
-and related content.
+- [external](https://example.com/)
+    - https://example.com/
+- [internal](.)
+    - [anchor](#tables)
+- [broken](broken.md)
 
-## Define a Loader
+# Blocks
 
-Define a HTML file to be served by your deployment environment as fallback content for unknown routes. For GitHub Pages
-that would be a `404.html` file in the root of your source branch/folder.
+## Paragraphs
 
-> **⚠️** When deploying to GitHub Pages, make sure to include a `.nojekyll` file.
+Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit
+feugiat.
 
-Include a `head`element according to the following (all `meta`/`link`elements are optional).
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt
+nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
 
-```html
-<!DOCTYPE html>
+## Quotes
 
-<html lang="en">
+> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper erat non dignissim porta. Donec non tincidunt
+> nulla. Donec tempus velit eu ipsum facilisis imperdiet quis ac ex. Nunc non sem vitae est blandit feugiat.
 
-    <head>
+## Sources
 
-        <title>Metreeca/Mark</title>
+```java
+final class Samples {
 
-        <meta name="version" content="1.2.3">
-        <meta name="description" content="A minimalist Markdown document reader">
+    public static void main(final String... args) {
+        new Mark()
 
-        <meta name="creator" content="https://www.metreeca.com/">
-        <meta name="publisher" content="https://github.com/metreeca/mark">
+                .source(Paths.get("src/docs"))
+                .target(Paths.get("target/docs"))
 
-        <meta name="copyright" content="&copy; 2020-2024 Metreeca">
-        <meta name="license" content="Creative Commons BY-NC-SA 4.0 License">
-        <meta name="license:uri" content="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                .build();
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#786">
+    }
 
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-        <link rel="home" href="/mark/"/> <!-- define if deployed to a subfolder -->
-
-        <link rel="icon" type="image/svg+xml"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.svg"/>
-
-        <link rel="stylesheet" type="text/css"
-                href="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.css">
-
-        <script type="module"
-                src="https://cdn.jsdelivr.net/gh/metreeca/mark@0.10.4/dist/index.js"></script>
-
-    </head>
-
-</html>
+}
 ```
 
-The loader will dynamically load Markdown content as inferred from the current URL according to the following patterns:
+## Rules
 
-| URL						                    | Content							                      |
-|------------------------------|-------------------------------------|
-| https://example.com/		       | https://example.com/index.md		      |
-| https://example.com/folder/  | https://example.com/folder/index.md |
-| https://example.com/document | https://example.com/document.md	    |
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 
-Internal Markdown links in the *Content* format are automatically rewritten to the corresponding *URL* format.
+---
+Quisque semper erat non dignissim porta. Donec non tincidunt.
 
-# Support
+# Lists
 
-- open an [issue](https://github.com/metreeca/mark/issues) to report a problem or to suggest a new feature
-- start a [discussion](https://github.com/metreeca/mark/discussions) to ask a how-to question or to share an idea
+## Unordered
 
-# License
+- Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+- Aliquam condimentum neque id quam cursus mollis.
+- Sed viverra risus non dui scelerisque pulvinar.
 
-This project is licensed under the Apache 2.0 License –
-see [LICENSE](https://github.com/metreeca/mark/blob/main/LICENSE)
-file for details.
+## Ordered
+
+1. Integer id turpis mattis, aliquam neque tincidunt, porttitor orci.
+2. Vestibulum at ante in tortor tincidunt tincidunt.
+3. Pellentesque tincidunt nunc et urna efficitur egestas.
+
+## Tasks
+
+- [ ] One
+- [ ] two
+- [x] three
+
+## Nested
+
+- level 1 item (ul)
+
+    1. level 2 item (ol)
+    1. level 2 item (ol)
+
+        - level 3 item (ul)
+        - level 3 item (ul)
+
+- level 1 item (ul)
+
+    1. level 2 item (ol)
+    1. level 2 item (ol)
+
+        - level 3 item (ul)
+        - level 3 item (ul)
+
+            1. level 4 item (ol)
+            1. level 4 item (ol)
+
+        - level 3 item (ul)
+        - level 3 item (ul)
+
+- level 1 item (ul)
+
+# Tables
+
+| Variable           | Value                 |
+|--------------------|-----------------------|
+| project.artifactId | ${project.artifactId} |
+| project.version    | ${project.version}    |
+| page.root          | ${page.root}          |
+| page.base          | ${page.base}          |
+| page.path          | ${page.path}          |
+
+# Images
+
+![Large Image](images/large.svg#75)
+
+![Small Image](images/small.svg#right) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis
+ac ex. Nunc non sem vitae est blandit feugiat.
+
+# Panels
+
+> _ℹ️_
+> Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
+
+> **⚠️**
+> Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum, tortor felis
+> tincidunt felis, at convallis lorem orci a lacus.

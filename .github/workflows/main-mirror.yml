@@ -1,0 +1,27 @@
+name: main-mirror
+
+on:
+
+  push:
+    tags:
+      - '*'
+
+jobs:
+
+  mirror:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Update README
+        run: sed "s/\${version}/${{ github.ref_name }}/g" README.md | tee README.md
+
+      - name: Publish docs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Publish docs
+          branch: main
