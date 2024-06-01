@@ -70,7 +70,7 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
             {
                  "Tutorials": "/tutorials/",
                  "How-To": "/how-to/",
-                 "Github": "https://github.com/metreeca/mark"
+                 "GitHub": "https://github.com/metreeca/mark"
             }
 
         </script>
