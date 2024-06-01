@@ -37,7 +37,7 @@ jobs:
       - name: Update docs
         run: |
           sed "s/{{meta.version}}/${{ github.ref_name }}/g" docs/index.md > README.md
-          sed "s/{{meta.version}}/${{ github.ref_name }}/g" docs/404.html | tee docs/404.html
+          sed "s/{{meta.version}}/${{ github.ref_name }}/g" docs/404.html  > $$ && mv $$ docs/404.html
           touch docs/.nojekyll
 
       - name: Publish docs
