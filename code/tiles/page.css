@@ -45,7 +45,7 @@ mark-page {
             font-size: 1.75em;
             letter-spacing: -0.02em;
 
-            box-shadow: 0 0 0.75rem 0.75rem var(--background-color);
+            box-shadow: 0 0 0.5rem 0.75rem var(--background-color);
 
         }
 

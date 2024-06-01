@@ -102,10 +102,10 @@ export default function MarkPage({
 
 			<footer>
 
-				{logo && creator?.match(/^\w+:/)
+				{logo && (creator?.match(/^\w+:/)
 					? <a className={"logo"} href={creator} style={{ backgroundImage: `url("${logo}")` }}/>
 					: <span className={"logo"} style={{ backgroundImage: `url("${logo}")` }}/>
-				}
+				)}
 
 			</footer>
 
