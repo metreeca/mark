@@ -499,15 +499,9 @@ button {
 /**** Icons ***********************************************************************************************************/
 
 .lucide {
-
     display: inline-block;
     width: 1em;
     height: 1em;
-
-    *:has(> &:only-child) {
-        display: inline-grid;
-    }
-
 }
 
 

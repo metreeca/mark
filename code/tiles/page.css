@@ -82,6 +82,10 @@ mark-page {
             text-transform: lowercase;
             white-space: nowrap;
 
+            & > button {
+                display: flex;
+            }
+
         }
 
         & > section {
