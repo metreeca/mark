@@ -29,7 +29,7 @@ import { remark } from "remark";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGemoji from "remark-gemoji";
 import remarkGfm from "remark-gfm";
-import { find } from "unist-util-find";
+import { selectAll } from "unist-util-select";
 
 
 export interface Meta {
@@ -105,24 +105,7 @@ function MarkMeta(text: string, meta: string | ((meta: Meta) => ReactNode)) {
 	const file=remark()
 
 		.use(remarkFrontmatter)
-
-		.use(() => (tree: Nodes, file: VFile) => {
-
-			const node=find(tree, { type: "yaml" });
-
-			if ( node && "value" in node && typeof node.value === "string" ) {
-
-				const matches=[...node.value.matchAll(/(?:^|\n)\s*(\w+)\s*:\s*(.*?)\s*(?:\n|$)/g)];
-
-				file.data.meta=matches.reduce((entries, [, $1, $2]) => ({
-
-					...entries, [$1]: JSON.parse($2)
-
-				}), {});
-
-			}
-
-		})
+		.use(remarkMetadata)
 
 		.processSync(text);
 
@@ -133,11 +116,10 @@ function MarkMeta(text: string, meta: string | ((meta: Meta) => ReactNode)) {
 			: null;
 }
 
-
 function MarkText(text: string, meta: undefined | Meta) {
 	return <ReactMarkdown
 
-		remarkPlugins={[remarkFrontmatter, remarkGfm, remarkGemoji]}
+		remarkPlugins={[remarkFrontmatter, remarkGfm, remarkGemoji, remarkCodeFormatter]}
 		rehypePlugins={[rehypeSlug, rehypeHighlight]}
 
 		urlTransform={href => [defaultUrlTransform(href)]
@@ -153,4 +135,38 @@ function MarkText(text: string, meta: undefined | Meta) {
 		)
 
 	}</ReactMarkdown>;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function remarkMetadata() {
+	return (tree: Nodes, file: VFile) => selectAll("yaml", tree).forEach(node => {
+
+		if ( "value" in node && typeof node.value === "string" ) {
+
+			const matches=[...node.value.matchAll(/(?:^|\n)\s*(\w+)\s*:\s*(.*?)\s*(?:\n|$)/g)];
+
+			file.data.meta=matches.reduce((entries, [, $1, $2]) => ({
+
+				...entries, [$1]: JSON.parse($2)
+
+			}), {});
+
+		}
+	});
+}
+
+function remarkCodeFormatter() {
+	return (tree: Nodes) => selectAll("code", tree).forEach(node => {
+
+		if ( node && "value" in node && typeof node.value === "string" ) {
+
+			node.value=node.value
+				.replace(/^\s*|\s*$/g, "") // remove leading and traing space
+				.replace(/^[ \t]+/mg, $0 => $0.replace(/ {4}|\t/g, "  ")); // compact indentation
+
+		}
+
+	});
 }
