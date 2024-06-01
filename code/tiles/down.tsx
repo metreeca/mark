@@ -34,7 +34,7 @@ import { find } from "unist-util-find";
 
 export interface Meta {
 
-	readonly [label: string]: string;
+	readonly [label: string]: undefined | string;
 
 }
 
@@ -49,7 +49,7 @@ export default function MarkDown({
 
 }: {
 
-	meta?: "toc" | string | ((meta: Meta) => ReactNode)
+	meta?: "toc" | ((meta: Meta) => ReactNode) | Meta
 
 	children: undefined | string
 
@@ -57,8 +57,8 @@ export default function MarkDown({
 
 	return !text ? null
 		: meta === "toc" ? MarkTOC(text)
-			: meta ? MarkMeta(text, meta)
-				: MarkText(text);
+			: typeof meta === "function" ? MarkMeta(text, meta)
+				: MarkText(text, meta);
 
 }
 
@@ -114,7 +114,7 @@ function MarkMeta(text: string, meta: string | ((meta: Meta) => ReactNode)) {
 
 				const matches=[...node.value.matchAll(/(?:^|\n)\s*(\w+)\s*:\s*(.*?)\s*(?:\n|$)/g)];
 
-				file.data.meta=matches.reduce((entries, [$0, $1, $2]) => ({
+				file.data.meta=matches.reduce((entries, [, $1, $2]) => ({
 
 					...entries, [$1]: JSON.parse($2)
 
@@ -134,8 +134,7 @@ function MarkMeta(text: string, meta: string | ((meta: Meta) => ReactNode)) {
 }
 
 
-function MarkText(text: string) {
-
+function MarkText(text: string, meta: undefined | Meta) {
 	return <ReactMarkdown
 
 		remarkPlugins={[remarkFrontmatter, remarkGfm, remarkGemoji]}
@@ -149,7 +148,9 @@ function MarkText(text: string) {
 
 	>{
 
-		text
+		text.replace(/(\\)?\{\{meta\.([.:\w]+)}}/g, ($0, $1, $2) =>
+			$1 ? $0.substring(1) : meta?.[$2] || ""
+		)
 
 	}</ReactMarkdown>;
 }

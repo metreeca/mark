@@ -24,13 +24,14 @@ const Meta: Meta={
 	home: link("home")?.replace(/\/?$/, "/"),
 
 	description: meta("description"),
-	version: meta("version"),
+	version: meta("version")?.replace(/^v/, ""),
 
 	creator: meta("creator"),
 	copyright: meta("copyright"),
 	license: meta("license"),
 	licenseURI: meta("license:uri"),
 
+	snippets: { ...snippets() },
 	sections: sections()
 
 };
@@ -48,6 +49,19 @@ function meta(name: string) {
 	return document.querySelector<HTMLMetaElement>(`meta[name='${name}']`)?.content || undefined;
 }
 
+
+function snippets() {
+	return Array.from(document.querySelectorAll<HTMLMetaElement>("meta[name][content]")).reduce((snippets, {
+
+		name,
+		content
+
+	}) => ({
+
+		...snippets, [name]: (name === "version" ? content.replace(/^v/, "") : content) || undefined
+
+	}), {});
+}
 
 function sections() {
 
@@ -82,6 +96,7 @@ export interface Meta {
 	readonly license?: string;
 	readonly licenseURI?: string;
 
+	readonly snippets?: { [label: string]: string };
 	readonly sections?: { [label: string]: string };
 
 }
