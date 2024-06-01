@@ -39,6 +39,7 @@ export default function MarkPage({
 		license,
 		licenseURI,
 
+		snippets,
 		sections,
 
 		path,
@@ -146,7 +147,7 @@ export default function MarkPage({
 					403: <Ban/>,
 					404: <HeartCrack/>,
 
-					200: <MarkDown>{text}</MarkDown>
+					200: <MarkDown meta={snippets}>{text}</MarkDown>
 
 				}[code ?? 0] ?? <Stethoscope/>
 
