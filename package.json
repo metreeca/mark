@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@metreeca/mark",
-  "version": "0.10.10",
+  "version": "0.10.11",
   "description": "A minimalist markdown document reader.",
   "keywords": [
     "markdown",
