@@ -229,6 +229,8 @@ mark-page {
     @media screen and (width < 960px) {
 
         flex-direction: column;
+
+        overflow-x: hidden;
         overflow-y: auto;
 
         &:not(.tray) > nav > :not(header),
