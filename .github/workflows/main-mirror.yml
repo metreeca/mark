@@ -17,7 +17,7 @@ jobs:
       - name: Check out tagged version
         uses: actions/checkout@v4
 
-      - name: Update README
+      - name: Update docs
         run: |
           sed "s/{{meta.version}}/${{ github.ref_name }}/g" docs/index.md > README.md
           touch docs/.nojekyll
