@@ -19,7 +19,7 @@ jobs:
 
       - name: Update README
         run: |
-          sed "s/\${version}/${{ github.ref_name }}/g" docs/index.md > README.md
+          sed "s/{{meta.version}}/${{ github.ref_name }}/g" docs/index.md > README.md
           touch docs/.nojekyll
 
       - name: Publish docs
