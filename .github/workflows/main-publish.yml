@@ -3,10 +3,8 @@ name: main-mirror
 on:
 
   push:
-    #    tags:
-    #      - 'v0.10.*'
-    branches:
-      - 'release/*'
+    tags:
+      - 'v0.10.*'
 
 jobs:
 
