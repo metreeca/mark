@@ -4,11 +4,12 @@ care of the details…
 
 [![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
 
+
 # Usage
 
 ## Create Content
 
-Create [Markdown](sample.md) content using your favourite editor.
+Create Markdown content using your favourite editor.
 
 Make sure to use relative links to refer to images and related content.
 
