@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Mirror to main
-        uses: metreeca/gh-mirror-action
+        uses: metreeca/gh-mirror-action@v1
         with:
           commit_message: Mirror ${{ github.ref_name }} to main
           branch: main
