@@ -3,8 +3,8 @@ name: main-mirror
 on:
 
   push:
-    tags:
-      - 'v0.10.*'
+    branches:
+      - release/*
 
 jobs:
 
@@ -17,10 +17,10 @@ jobs:
       - name: Check out tagged version
         uses: actions/checkout@v4
 
-      - name: Merge into main
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Mirror to main
+        uses: metreeca/gh-mirror-action
         with:
-          commit_message: Merge ${{ github.ref_name }} into main
+          commit_message: Mirror ${{ github.ref_name }} to main
           branch: main
 
   publish:
@@ -37,8 +37,8 @@ jobs:
 
       - name: Update docs
         run: |
-          sed "s#{{meta.version}}#${{ github.ref_name }}#g" docs/index.md > README.md
-          sed "s#{{meta.version}}#${{ github.ref_name }}#g" docs/.html > docs/404.html
+          sed "s:{{meta.version}}:${{ github.ref_name }}:g" docs/index.md > README.md
+          sed "s:{{meta.version}}:${{ github.ref_name }}:g" docs/template.html > docs/404.html
           touch docs/.nojekyll
 
       - name: Publish docs

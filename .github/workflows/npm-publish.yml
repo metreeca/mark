@@ -4,7 +4,7 @@ on:
 
   push:
     tags:
-      - '*'
+      - *
 
 jobs:
 
@@ -24,7 +24,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Create README
-        run: sed "s#{{meta.version}}#${{ github.ref_name }}#g" docs/index.md > README.md
+        run: sed 's:{{meta.version}}:${{ github.ref_name }}:g' docs/index.md > README.md
 
       - name: Setup environment
         run: npm run setup
