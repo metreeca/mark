@@ -31,7 +31,7 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
 
         <title>Metreeca/Mark</title>
 
-        <meta name="version" content="${version}">
+        <meta name="version" content="{{meta.version}}">
         <meta name="description" content="A minimalist Markdown document reader">
 
         <meta name="creator" content="https://www.metreeca.com/">
