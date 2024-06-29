@@ -84,7 +84,19 @@ export default function MarkPage({
 
 			</header>
 
-			<section>
+			<section onClick={e => { // force scroll to header
+
+				if ( e.target instanceof HTMLAnchorElement ) {
+
+					const href=e.target.getAttribute("href"); // ;( not resolved against location
+
+					if ( href?.startsWith("#") ) {
+						document.getElementById(href?.substring(1))?.scrollIntoView();
+					}
+
+				}
+
+			}}>
 
 				{version && <span>v{version.replace(/^v/, "")}</span>}
 
@@ -101,8 +113,8 @@ export default function MarkPage({
 			<footer>
 
 				{logo && (creator?.match(/^\w+:/)
-					? <a className={"logo"} href={creator} style={{ backgroundImage: `url("${logo}")` }}/>
-					: <span className={"logo"} style={{ backgroundImage: `url("${logo}")` }}/>
+						? <a className={"logo"} href={creator} style={{ backgroundImage: `url("${logo}")` }}/>
+						: <span className={"logo"} style={{ backgroundImage: `url("${logo}")` }}/>
 				)}
 
 			</footer>
