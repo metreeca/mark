@@ -129,11 +129,13 @@ ac ex. Nunc non sem vitae est blandit feugiat.
 
 # Panels
 
+
 > _ℹ️_
-> Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
+> (`> _icon_ text`) Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
 
 > **⚠️**
-> Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum, tortor felis
+> (`> **icon** text`) Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum,
+> tortor felis
 > tincidunt felis, at convallis lorem orci a lacus.
 
 # Headings
