@@ -16,7 +16,7 @@ Text can be **bold**, _italic_ or `code` and can contain :warning: :information_
 
 ## Placeholders
 
-Placeholder expression formatted like `{{meta.<name>`} are replaced with the content defined by the
+Placeholder expression formatted like `{{meta.<name>}}` are replaced with the content defined by the
 matching `<meta name="<name>" content="<content>">` tag in the HTML loader document, for instance
 `\{{meta.version}}` with `{{meta.version}}`.
 
