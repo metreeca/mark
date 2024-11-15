@@ -9,18 +9,27 @@ care of the details…
 
 ## Create Content
 
-Create Markdown content using your favourite editor.
+Create Markdown content using your favourite editor; the following markdown extensions are supported:
 
-Make sure to use relative links to refer to images and related content.
+- [YAML Frontmatter](https://github.com/remarkjs/remark-frontmatter?tab=readme-ov-file#remark-frontmatter)
+- [GitHub Flavored Markdown](https://github.com/remarkjs/remark-gfm?tab=readme-ov-file#remark-gfm)
+- [GitHub Alerts](https://github.com/jaywcjlove/remark-github-blockquote-alert?tab=readme-ov-file#remark-github-blockquote-alert)
+- [GitHub Emojis](https://github.com/remarkjs/remark-gemoji?tab=readme-ov-file#remark-gemoji)
+
+> [!WARNING]
+>
+> Make sure to use relative links to refer to images and related content.
 
 ## Define a Loader
 
 Define a HTML file to be served by your deployment environment as fallback content for unknown routes. For GitHub Pages
 that would be a `404.html` file in the root of your source branch/folder.
 
-> **⚠️** When deploying to GitHub Pages, make sure to include a `.nojekyll` file.
+> [!WARNING]
+>
+> When deploying to GitHub Pages, make sure to include a `.nojekyll` file.
 
-Include a `head`element according to the following (all `meta`/`link`elements are optional).
+Include a `head` element according to the following (all `meta`/`link`elements are optional).
 
 ```html
 <!DOCTYPE html>
@@ -80,6 +89,8 @@ Include a `head`element according to the following (all `meta`/`link`elements ar
 </html>
 ```
 
+### URL Rewriting
+
 The loader will dynamically retrieve and render Markdown content as inferred from the current URL according to the
 following patterns:
 
@@ -90,6 +101,12 @@ following patterns:
 | https://example.com/document | https://example.com/document.md	    |
 
 Internal Markdown links in the *Content* format are automatically rewritten to the corresponding *URL* format.
+
+### Meta Placeholders
+
+The loader will dynamically replace placeholder expression formatted like `{{meta.<name>}}`  with the content defined by
+the matching `<meta name="<name>" content="<content>">` tag in the HTML loader document, for instance `{{meta.version}}`
+with `1.2.3`.
 
 # Support
 

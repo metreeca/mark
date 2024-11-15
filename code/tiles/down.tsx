@@ -29,7 +29,10 @@ import { remark } from "remark";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGemoji from "remark-gemoji";
 import remarkGfm from "remark-gfm";
+import { remarkAlert } from "remark-github-blockquote-alert";
 import { selectAll } from "unist-util-select";
+
+import "remark-github-blockquote-alert/alert.css";
 
 
 export interface Meta {
@@ -119,8 +122,18 @@ function MarkMeta(text: string, meta: string | ((meta: Meta) => ReactNode)) {
 function MarkText(text: string, meta: undefined | Meta) {
 	return <ReactMarkdown
 
-		remarkPlugins={[remarkFrontmatter, remarkGfm, remarkGemoji, remarkCodeFormatter]}
-		rehypePlugins={[rehypeSlug, rehypeHighlight]}
+		remarkPlugins={[
+			remarkFrontmatter,
+			remarkGfm,
+			remarkAlert,
+			remarkGemoji,
+			remarkCodeFormatter
+		]}
+
+		rehypePlugins={[
+			rehypeSlug,
+			rehypeHighlight
+		]}
 
 		urlTransform={href => [defaultUrlTransform(href)]
 			.map(value => value.endsWith("/index.md") ? value.substring(0, value.length - "/index.md".length) : value)

@@ -127,16 +127,42 @@ Quisque semper erat non dignissim porta. Donec non tincidunt.
 ![Small Image](images/small.svg#right) Donec non tincidunt nulla. Donec tempus velit eu ipsum facilisis imperdiet quis
 ac ex. Nunc non sem vitae est blandit feugiat.
 
-# Panels
+# Alerts
 
+Alert panels are supported with
+the [GitHub syntax.](https://github.com/orgs/community/discussions/16925#discussion-4085374)
 
-> _ℹ️_
-> (`> _icon_ text`) Curabitur ornare lacinia nulla, nec rhoncus elit efficitur quis. Quisque non volutpat dolor.
+```mardown
+> [!NOTE]  
+> Highlights information that users should take into account, even when skimming.
 
-> **⚠️**
-> (`> **icon** text`) Duis lacinia risus eget tincidunt viverra. Pellentesque fringilla, justo ut facilisis condimentum,
-> tortor felis
-> tincidunt felis, at convallis lorem orci a lacus.
+> [!TIP]
+> Optional information to help a user be more successful.
+
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
+
+> [!CAUTION]
+> Negative potential consequences of an action.
+```
+
+> [!NOTE]  
+> Highlights information that users should take into account, even when skimming.
+
+> [!TIP]
+> Optional information to help a user be more successful.
+
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
+
+> [!CAUTION]
+> Negative potential consequences of an action.
 
 # Headings
 
