@@ -138,8 +138,12 @@ mark-page {
                 margin-top: 0.1em;
             }
 
-            & > h1 + h2 {
-                margin-top: 0.25em;
+            & > h2 + h1 {
+                margin-top: 0.75em;
+            }
+
+            & > h3 + h1 {
+                margin-top: 0.75em;
             }
 
             & > h2 {
@@ -147,12 +151,33 @@ mark-page {
                 font-size: 0.9em;
             }
 
-            & > h2 + h1 {
+            & > h1 + h2 {
+                margin-top: 0.25em;
+            }
+
+            & > h2 + h2 {
+                margin-top: 0.1em;
+            }
+
+            & > h3 + h2 {
                 margin-top: 0.75em;
             }
 
             & > h3 {
-                display: none;
+                margin-left: 1em;
+                font-size: 0.85em;
+            }
+
+            & > h1 + h3 {
+                margin-top: 0.5em;
+            }
+
+            & > h2 + h3 {
+                margin-top: 0.5em;
+            }
+
+            & > h3 + h3 {
+                margin-top: 0.1em;
             }
 
         }
@@ -241,6 +266,7 @@ mark-page {
 
             & > section {
                 padding-top: 0.5rem;
+                font-size: 125%;
             }
 
         }
