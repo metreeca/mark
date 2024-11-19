@@ -1,10 +1,10 @@
 # Metreeca/Mark 
 
+[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
+
 Metreeca/Mark is a minimalist reader for static Markdown document sites. It doesn't require complex setups, specific
 site layouts or release-time static site generation: just throw in a couple of Markdown pages and let the reader take
 care of the details…
-
-[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
 
 # Usage
 
@@ -41,7 +41,7 @@ Include a `head` element according to the following (all `meta`/`link`elements a
 
         <title>Metreeca/Mark</title>
 
-        <meta name="version" content="v1.0.0">
+        <meta name="version" content="v1.0.1">
         <meta name="description" content="A minimalist Markdown document reader">
 
         <meta name="creator" content="https://www.metreeca.com/">
@@ -64,13 +64,13 @@ Include a `head` element according to the following (all `meta`/`link`elements a
         <!-- `@{major}` and `@{major.minor}`) version ranges also supported -->
 
         <link rel="icon" type="image/svg+xml"
-                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.0/dist/index.svg"/>
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.1/dist/index.svg"/>
 
         <link rel="stylesheet" type="text/css"
-                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.0/dist/index.css">
+                href="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.1/dist/index.css">
 
         <script type="module"
-                src="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.0/dist/index.js"></script>
+                src="https://cdn.jsdelivr.net/npm/@metreeca/mark@v1.0.1/dist/index.js"></script>
 
 
         <!-- include to define top-level navigation links in the sidebar -->
@@ -106,7 +106,7 @@ Internal Markdown links in the *Content* format are automatically rewritten to t
 ### Meta Placeholders
 
 The loader will dynamically replace placeholder expression formatted like `{{meta.<name>}}`  with the content defined by
-the matching `<meta name="<name>" content="<content>">` tag in the HTML loader document, for instance `v1.0.0`
+the matching `<meta name="<name>" content="<content>">` tag in the HTML loader document, for instance `v1.0.1`
 with `1.2.3`.
 
 # Support
