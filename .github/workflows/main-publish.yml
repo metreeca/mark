@@ -1,0 +1,44 @@
+name: main-publish
+
+on:
+
+  push:
+    tags:
+      - v1.*
+
+jobs:
+
+  mirror:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Check out tagged version
+        uses: actions/checkout@v4
+
+      - name: Mirror to main
+        uses: metreeca/gh-mirror-action@v2
+
+  publish:
+
+    runs-on: ubuntu-latest
+    needs: mirror
+
+    steps:
+
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Update docs
+        run: |
+          sed -E 's:<!---\s*|\s*--->::g' docs/index.md | sed 's:{{meta.version}}:${{ github.ref_name }}:g' > README.md
+          sed 's:{{meta.version}}:${{ github.ref_name }}:g' docs/template.html > docs/404.html
+          touch docs/.nojekyll
+
+      - name: Publish docs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update docs
