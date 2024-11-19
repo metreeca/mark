@@ -15,7 +15,7 @@
  */
 
 import { File } from "@metreeca/mark/nests/file";
-import MarkDown from "@metreeca/mark/tiles/down";
+import MarkDown from "@metreeca/mark/tiles/mark";
 import { Ban, HeartCrack, Lock, Menu, RefreshCw, Stethoscope, X } from "lucide-react";
 import React, { createElement, useState } from "react";
 import "./page.css";

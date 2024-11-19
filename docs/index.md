@@ -1,10 +1,10 @@
 <!--- # Metreeca/Mark ---> 
 
+[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
+
 Metreeca/Mark is a minimalist reader for static Markdown document sites. It doesn't require complex setups, specific
 site layouts or release-time static site generation: just throw in a couple of Markdown pages and let the reader take
 care of the details…
-
-[![npm](https://img.shields.io/npm/v/@metreeca/mark)](https://www.npmjs.com/package/@metreeca/mark)
 
 # Usage
 
