@@ -1,5 +1,5 @@
 ---
-title: "Quisque semper erat non dignissima porta"
+title: "Markdown Kitchen Sink"
 ---
 
 # Text

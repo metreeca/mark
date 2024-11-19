@@ -30,6 +30,7 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkGemoji from "remark-gemoji";
 import remarkGfm from "remark-gfm";
 import { remarkAlert } from "remark-github-blockquote-alert";
+import removeComments from "remark-remove-comments";
 import { selectAll } from "unist-util-select";
 
 import "remark-github-blockquote-alert/alert.css";
@@ -123,6 +124,7 @@ function MarkText(text: string, meta: undefined | Meta) {
 	return <ReactMarkdown
 
 		remarkPlugins={[
+			removeComments,
 			remarkFrontmatter,
 			remarkGfm,
 			remarkAlert,
@@ -176,7 +178,7 @@ function remarkCodeFormatter() {
 		if ( node && "value" in node && typeof node.value === "string" ) {
 
 			node.value=node.value
-				.replace(/^\s*|\s*$/g, "") // remove leading and traing space
+				.replace(/^\s*|\s*$/g, "") // remove leading and trailing space
 				.replace(/^[ \t]+/mg, $0 => $0.replace(/ {4}|\t/g, "  ")); // compact indentation
 
 		}
