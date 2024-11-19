@@ -1,0 +1,368 @@
+/*
+ * Copyright © 2020-2024 Metreeca srl
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**** Layout **********************************************************************************************************/
+
+mark-page {
+
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+    height: 100%;
+
+    & > * {
+
+        & > * {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        & > header {
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            grid-column-gap: 0.5em;
+
+            padding-top: 0.75rem;
+            padding-bottom: 0.5rem;
+
+            font-size: 1.75em;
+            letter-spacing: -0.02em;
+
+            box-shadow: 0 0 0.5rem 0.75rem var(--background-color);
+
+        }
+
+        & > section {
+
+            flex-grow: 1;
+
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+
+        }
+
+        & > footer {
+
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+
+            font-size: 0.8em;
+            color: #999;
+
+        }
+
+    }
+
+    & > nav {
+
+        & > header {
+
+            z-index: 2;
+
+            position: sticky;
+            top: 0;
+
+            text-transform: lowercase;
+            white-space: nowrap;
+
+            & > button {
+                display: grid;
+            }
+
+        }
+
+        & > section {
+
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+
+            & > span:first-child {
+
+                margin-bottom: 0.5em;
+
+                font-weight: bold;
+
+                & ~ a {
+                    margin-left: 0.5em;
+                    font-weight: inherit;
+                    font-size: 0.9em;
+                }
+
+            }
+
+            & > a {
+                font-weight: bold;
+            }
+
+            & > h1,
+            & > h2,
+            & > h3 {
+
+                --hanging: 0.75em;
+
+                padding: 0;
+                margin: 0;
+                border: none;
+
+                padding-left: var(--hanging);
+                text-indent: calc(-1 * var(--hanging));
+
+                font-size: inherit;
+                font-weight: inherit;
+
+            }
+
+            & > h1 {
+                font-weight: bolder;
+            }
+
+            & > h1 + h1 {
+                margin-top: 0.1em;
+            }
+
+            & > h2 + h1 {
+                margin-top: 0.75em;
+            }
+
+            & > h3 + h1 {
+                margin-top: 0.75em;
+            }
+
+            & > h2 {
+                margin-left: 0.5em;
+                font-size: 0.9em;
+            }
+
+            & > h1 + h2 {
+                margin-top: 0.25em;
+            }
+
+            & > h2 + h2 {
+                margin-top: 0.1em;
+            }
+
+            & > h3 + h2 {
+                margin-top: 0.75em;
+            }
+
+            & > h3 {
+                margin-left: 1em;
+                font-size: 0.85em;
+            }
+
+            & > h1 + h3 {
+                margin-top: 0.5em;
+            }
+
+            & > h2 + h3 {
+                margin-top: 0.5em;
+            }
+
+            & > h3 + h3 {
+                margin-top: 0.1em;
+            }
+
+        }
+
+        & > footer {
+
+            & > .logo {
+                display: inline-block;
+                width: 1em;
+                height: 1em;
+                background-size: cover;
+                background-position: center;
+                transform: scale(2);
+            }
+
+        }
+
+        & a, & a:visited {
+            font: inherit;
+            color: inherit;
+        }
+
+    }
+
+    & > main {
+
+        & > header {
+
+            z-index: 1;
+
+            text-transform: lowercase;
+
+            & > * {
+                flex-shrink: 1;
+            }
+
+            & a, & a:visited {
+                font: inherit;
+                color: inherit;
+            }
+
+        }
+
+        & > section {
+
+            &:has(> .lucide:only-child) {
+
+                display: grid;
+
+                & > * {
+
+                    margin: auto;
+                    font-size: 20vmin;
+                    color: #CCC;
+                    stroke-width: 0.1vmax;
+
+                    &.spin {
+                        animation: mark-page-spin 1.5s infinite linear;
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    @media screen and (width < 960px) {
+
+        flex-direction: column;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        &:not(.tray) > nav > :not(header),
+        &.tray > main {
+            display: none;
+        }
+
+        & > * {
+            display: contents;
+        }
+
+        & > nav {
+
+            & > section {
+                padding-top: 0.5rem;
+                font-size: 125%;
+            }
+
+        }
+
+        & > main {
+
+            & > header {
+                padding-top: 0.5rem;
+                line-height: 1.25;
+            }
+
+            & > section {
+
+                & > h1,
+                & > h2 {
+                    scroll-margin-top: 4.5rem;
+                }
+
+            }
+
+        }
+
+    }
+
+    @media screen and (min-width: 960px) {
+
+        flex-direction: row;
+
+        & > * {
+
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
+            overflow-y: auto;
+        }
+
+        & > nav {
+
+            width: 15rem;
+
+            & > header {
+
+                & > button {
+                    display: none;
+                }
+
+            }
+
+        }
+
+        & > main {
+
+            flex-shrink: 1;
+            flex-grow: 1;
+
+            & > * {
+                max-width: 50rem;
+            }
+
+            & > header {
+                position: sticky;
+                top: 0;
+            }
+
+            & > section {
+
+                & > h1 {
+                    scroll-margin-top: 4.5rem;
+                }
+
+                & > h2 {
+                    scroll-margin-top: 4.75rem;
+                }
+
+            }
+        }
+
+    }
+
+
+    @media print {
+
+        & > nav {
+            display: none !important;
+        }
+
+    }
+
+}
+
+@keyframes mark-page-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

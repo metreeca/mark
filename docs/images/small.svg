@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  - Copyright © 2020-2024 Metreeca srl
+  -
+  - Licensed under the Apache License, Version 2.0 (the "License");
+  - you may not use this file except in compliance with the License.
+  - You may obtain a copy of the License at
+  -
+  -     http://www.apache.org/licenses/LICENSE-2.0
+  -
+  - Unless required by applicable law or agreed to in writing, software
+  - distributed under the License is distributed on an "AS IS" BASIS,
+  - WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  - See the License for the specific language governing permissions and
+  - limitations under the License.
+  -->
+
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+        xmlns="http://www.w3.org/2000/svg" viewBox="874 258 61 84" width="61" height="84">
+    <defs/>
+    <g id="small" stroke-dasharray="none" fill-opacity="1" fill="none" stroke-opacity="1" stroke="none">
+        <title>small</title>
+        <rect fill="white" x="874" y="258" width="61" height="84"/>
+        <g id="small_Layer_1">
+            <title>Layer 1</title>
+            <g id="Group_2">
+                <g id="Graphic_5">
+                    <circle cx="904.544" cy="278.50394" r="6.3779627411192" fill="white"/>
+                    <circle cx="904.544" cy="278.50394" r="6.3779627411192" stroke="black" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width=".25"/>
+                </g>
+                <g id="Graphic_4">
+                    <path d="M 895.9688 305.29872 L 901.6616 289.03358 C 902.2089 287.46974 903.9204 286.6457 905.4842 287.19306 C 906.3458 287.4946 907.0232 288.172 907.3248 289.03358 L 913.0176 305.29872 C 913.5649 306.86256 912.7409 308.574 911.177 309.12135 C 910.8585 309.23283 910.5235 309.28977 910.186 309.28977 L 898.8004 309.28977 C 897.1435 309.28977 895.8004 307.94663 895.8004 306.28977 C 895.8004 305.9523 895.8573 305.61725 895.9688 305.29872 Z"
+                            fill="white"/>
+                    <path d="M 895.9688 305.29872 L 901.6616 289.03358 C 902.2089 287.46974 903.9204 286.6457 905.4842 287.19306 C 906.3458 287.4946 907.0232 288.172 907.3248 289.03358 L 913.0176 305.29872 C 913.5649 306.86256 912.7409 308.574 911.177 309.12135 C 910.8585 309.23283 910.5235 309.28977 910.186 309.28977 L 898.8004 309.28977 C 897.1435 309.28977 895.8004 307.94663 895.8004 306.28977 C 895.8004 305.9523 895.8573 305.61725 895.9688 305.29872 Z"
+                            stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width=".25"/>
+                </g>
+                <g id="Graphic_3">
+                    <text transform="translate(893.6614 312.87277)" fill="black">
+                        <tspan font-family="Helvetica Neue" font-size="9" fill="black" x="2344791e-19" y="9">Actor
+                        </tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
